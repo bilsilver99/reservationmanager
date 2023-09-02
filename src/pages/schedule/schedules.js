@@ -114,6 +114,7 @@ const SchedulerComponent = () => {
 
       <div className="scheduler">
         <Scheduler
+          showAllDayPanel={false}
           dataSource={appointments}
           defaultCurrentDate={currentDate}
           height={schedulerHeight}
