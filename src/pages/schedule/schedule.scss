@@ -1,8 +1,3 @@
-.scheduler {
-  //height: 800px;
-  width: 1000px;
-}
-
 .app {
   display: flex;
   flex-direction: column;
@@ -22,35 +17,66 @@
   border-radius: 10px; /* rounded corners */
   padding: 20px; /* Added */
 }
+#scheduler .dx-scheduler-cell-sizes-vertical {
+  height: 50px !important;
+}
+// .options {
+//   padding: 20px;
+//   background-color: rgba(191, 191, 191, 0.15);
+//   margin-top: 20px;
+// }
 
-.scheduler {
-  width: 90%;
-  max-width: 800px;
-  background-color: #ffffff; /* white scheduler */
-  border: 1px solid #d3d3d3; /* light gray border */
-  border-radius: 0px; /* rounded corners */
-}
+// .caption {
+//   font-size: 18px;
+//   font-weight: 500;
+// }
 
-.dx-dropdowneditor-input-wrapper {
-  padding: 10px;
-}
+// .option {
+//   margin-top: 10px;
+//   display: inline-block;
+// }
 
-.dx-scrollview-content .dx-list-item {
-  display: flex;
-  justify-content: center;
-  padding: 10px 0;
-  cursor: pointer;
-  color: #000000; /* black text */
-}
+// .dx-scheduler-work-space-group-by-date .dx-scheduler-group-header-content {
+//   font-size: 20px;
+// }
 
-.dx-scrollview-content .dx-list-item:hover {
-  background-color: #87cefa; /* light blue hover */
-  color: #ffffff; /* white text */
-}
-.service-select-container {
-  width: 300px;
-}
+//////////////////////////////////////////////////
+// .scheduler {
+//   //height: 800px;
+//   width: 1000px;
+// }
 
-.service-select {
-  width: 100%;
-}
+// .scheduler {
+//   width: 90%;
+//   //max-width: 800px;
+//   background-color: #ffffff; /* white scheduler */
+//   border: 1px solid #d3d3d3; /* light gray border */
+//   border-radius: 0px; /* rounded corners */
+// }
+
+// .dx-dropdowneditor-input-wrapper {
+//   padding: 10px;
+// }
+
+// .dx-scrollview-content .dx-list-item {
+//   display: flex;
+//   justify-content: center;
+//   padding: 10px 0;
+//   cursor: pointer;
+//   color: #000000; /* black text */
+// }
+
+// .dx-scrollview-content .dx-list-item:hover {
+//   background-color: #87cefa; /* light blue hover */
+//   color: #ffffff; /* white text */
+// }
+// .service-select-container {
+//   width: 300px;
+// }
+
+// .service-select {
+//   width: 100%;
+// }
+// #scheduler .dx-scheduler-appointment {
+//   max-height: 200px;
+// }

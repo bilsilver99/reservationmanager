@@ -2,9 +2,17 @@ import React, { useEffect } from "react";
 import Scheduler, { View } from "devextreme-react/scheduler";
 import SelectBox from "devextreme-react/select-box";
 import "./schedule.scss";
-import { appointments } from "./data";
+//import { appointments } from "./data";
 import { useAuth } from "../../contexts/auth";
-import { mystore, myshift } from "./ScheduleServices";
+import {
+  mystore,
+  myshift,
+  myEmployees,
+  myAppointments,
+  addAppointment,
+  deleteAppointment,
+  updateAppointment,
+} from "./ScheduleServices";
 const employees = ["sam", "lou"];
 const views = ["Day", "Week", "Month"];
 const durations = [];
@@ -27,6 +35,7 @@ const SchedulerComponent = () => {
   const [durationsdata, setDurationsData] = React.useState(durations);
   const [currentViewName, setCurrentViewName] = React.useState("Day");
   const [currentCellDuration, setCurrentCellDuration] = React.useState(15);
+  const [currentCellkey, setCurrentCellkey] = React.useState();
   //const [thisTypeDuration, setThisTypeDuration] = React.useState(15);
   const [currentEmployeeName, setCurrentEmployeeName] = React.useState("");
   const [allowAdding, setAllowAdding] = React.useState(true);
@@ -35,8 +44,22 @@ const SchedulerComponent = () => {
   const [startDayHour, setStartDayHour] = React.useState(7);
   const [endDayHour, setEndDayHour] = React.useState(17);
   const [key, setKey] = React.useState(Math.random());
+  const [employeesData, setEmployeesData] = React.useState(employees);
 
-  const [schedulerHeight, setSchedulerHeight] = React.useState(580);
+  const [dataVariable, setDataVariable] = React.useState(null);
+
+  const [appointments, setAppointmentsData] = React.useState("");
+  // const [startdate, setStartDate] = React.useState("");
+  // const [enddate, setEndDate] = React.useState("");
+  // const [DESCRIPTION, setDESCRIPTION] = React.useState("");
+  // const [text, setText] = React.useState("");
+
+  const [schedulerHeight, setSchedulerHeight] = React.useState(800);
+
+  const setCurrentValues = (e) => {
+    setCurrentCellkey(e.key);
+    setCurrentCellDuration(e.value);
+  };
 
   //const [currentDuration, setCurrentDuration] = React.useState(60);
 
@@ -47,6 +70,58 @@ const SchedulerComponent = () => {
 
   //const startDayHour = 8; // Start at 8:00 AM
   // const endDayHour = 19; // End at 6:00 PM
+
+  //////////////////////////////////////////////////////////
+  const handleAppointmentAdded = async (e) => {
+    try {
+      // e.appointmentData contains the data of the newly added appointment
+      //console.log("appointment added", e.appointmentData);
+      //console.log("startdate:", e.appointmentData.startDate);
+      //setDataVariable(e.appointmentData);
+      //console.log(dataVariable);
+
+      const response = await addAppointment(
+        user.companynumber,
+        currentEmployeeName,
+        e.appointmentData.startDate,
+        e.appointmentData.endDate,
+        e.appointmentData.description,
+        e.appointmentData.text,
+        currentCellkey
+      );
+      // handle success (maybe refresh appointments or show a success message)
+    } catch (error) {
+      console.error("Error adding appointment:", error);
+      // handle error (maybe show an error message to the user)
+    }
+  };
+
+  const handleAppointmentDeleted = async (e) => {
+    try {
+      // e.appointmentData contains the data of the deleted appointment
+      //const response = await deleteAppointment(e.appointmentData);
+      console.log("appointment Deleted", e.appointmentData);
+      // handle success
+    } catch (error) {
+      console.error("Error deleting appointment:", error);
+      // handle error
+    }
+  };
+
+  const handleAppointmentUpdated = async (e) => {
+    try {
+      // e.newData contains the updated data
+      // e.oldData contains the data before the update
+      //const response = await updateAppointment(e.newData);
+      console.log("appointment Updated", e.appointmentData);
+      // handle success
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      // handle error
+    }
+  };
+
+  //////////////////////////////////////////////////////////
 
   useEffect(() => {
     (async () => {
@@ -61,12 +136,25 @@ const SchedulerComponent = () => {
       setStartDayHour(resultShift.startshift);
       setEndDayHour(resultShift.endshift);
       console.log("start", resultShift.startshift, "end", resultShift.endshift);
+
+      const resultEmployee = await myEmployees(user.companynumber);
+      console.log("employee", resultEmployee);
+      setEmployeesData(resultEmployee.data);
+      setKey(Math.random());
+
+      const resultAppointments = await myAppointments(
+        user.companynumber,
+        currentEmployeeName
+      );
+      console.log("Appointments", resultAppointments);
+      setAppointmentsData(resultAppointments.data);
+      setKey(Math.random());
     })();
 
     return () => {
       // This now gets called when the component unmounts
     };
-  }, [user]);
+  }, [user, currentEmployeeName]);
 
   return (
     <div className="app">
@@ -78,8 +166,11 @@ const SchedulerComponent = () => {
           <p style={{ marginRight: "10px" }}>Employee:</p>
           <SelectBox
             style={{ width: "200px" }}
-            items={employees}
+            items={employeesData}
+            valueExpr="value"
+            displayExpr="label"
             value={currentEmployeeName}
+            //value={currentEmployeeName}
             onValueChanged={(e) => setCurrentEmployeeName(e.value)}
           />
         </div>
@@ -107,19 +198,21 @@ const SchedulerComponent = () => {
             valueExpr="value"
             displayExpr="label"
             value={currentCellDuration}
-            onValueChanged={(e) => setCurrentCellDuration(e.value)}
+            //            onValueChanged={(e) => setCurrentCellDuration(e.value) setCurrentCellkey(e.key)}
+            onValueChanged={setCurrentValues}
           />
         </div>
       </div>
 
-      <div className="scheduler">
+      <div className="scheduler" id="scheduler">
         <Scheduler
+          crossScrollingEnabled={true}
           showAllDayPanel={false}
           dataSource={appointments}
           defaultCurrentDate={currentDate}
           height={schedulerHeight}
           //height={800}
-          //width={200}
+          width={"80%"}
           backgroundColor="red"
           useDropDownViewSwitcher={false}
           currentView={currentViewName}
@@ -127,6 +220,9 @@ const SchedulerComponent = () => {
           startDayHour={startDayHour}
           endDayHour={endDayHour}
           editing={{ allowDeleting, allowAdding, allowUpdating }}
+          onAppointmentAdded={handleAppointmentAdded}
+          onAppointmentDeleted={handleAppointmentDeleted}
+          onAppointmentUpdated={handleAppointmentUpdated}
           // editing={{
           //   allowAdding: true,
           //   allowDeleting: true,
