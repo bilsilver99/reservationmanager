@@ -106,6 +106,7 @@ export const fetchcompany = async (companynumber) => {
         EmailAddress: json.user_response.ReturnEmailAddress,
         UserName: json.user_response.ReturnUserName,
         UserPassword: json.user_response.ReturnUserPassword,
+        TimeZoneOffset: json.user_response.ReturnTimeZoneOffset,
       };
     });
 };
@@ -132,6 +133,7 @@ export const updateCompany = async (companynumber, companyValues) => {
       EmailAddress: companyValues.EmailAddress,
       UserName: companyValues.UserName,
       UserPassword: companyValues.UserPassword,
+      TimeZoneOffset: companyValues.TimeZoneOffset,
     }),
   };
   const url = `${process.env.REACT_APP_BASE_URL}/updateCompany`;

@@ -46,7 +46,7 @@ const SchedulerComponent = () => {
   const [key, setKey] = React.useState(Math.random());
   const [employeesData, setEmployeesData] = React.useState(employees);
 
-  const [dataVariable, setDataVariable] = React.useState(null);
+  //const [dataVariable, setDataVariable] = React.useState(null);
 
   const [appointments, setAppointmentsData] = React.useState("");
   // const [startdate, setStartDate] = React.useState("");
@@ -57,7 +57,6 @@ const SchedulerComponent = () => {
   const [schedulerHeight, setSchedulerHeight] = React.useState(800);
 
   const setCurrentValues = (e) => {
-    setCurrentCellkey(e.key);
     setCurrentCellDuration(e.value);
   };
 
@@ -127,15 +126,14 @@ const SchedulerComponent = () => {
     (async () => {
       // Fetching service levels data
       const resultServiceLevels = await mystore(user.companynumber);
-      console.log("service levels", resultServiceLevels);
       setDurationsData(resultServiceLevels.data);
-      setKey(Math.random());
+      setKey(resultServiceLevels.data.key);
 
       // Fetching shift data
       const resultShift = await myshift(user.companynumber);
       setStartDayHour(resultShift.startshift);
       setEndDayHour(resultShift.endshift);
-      console.log("start", resultShift.startshift, "end", resultShift.endshift);
+      //console.log("start", resultShift.startshift, "end", resultShift.endshift);
 
       const resultEmployee = await myEmployees(user.companynumber);
       console.log("employee", resultEmployee);
@@ -199,7 +197,10 @@ const SchedulerComponent = () => {
             displayExpr="label"
             value={currentCellDuration}
             //            onValueChanged={(e) => setCurrentCellDuration(e.value) setCurrentCellkey(e.key)}
-            onValueChanged={setCurrentValues}
+            onValueChanged={(e) => {
+              setCurrentCellDuration(e.value);
+              //setCurrentCellkey(e.itemData.key);
+            }}
           />
         </div>
       </div>

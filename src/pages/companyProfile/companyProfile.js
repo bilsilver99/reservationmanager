@@ -28,19 +28,41 @@ function CompanyProfilex(props) {
     EmailAddress: "",
     UserName: "",
     UserPassword: "",
+    TimeZoneOffset: 0,
   });
 
   const timeZonesArray = getTimeZones();
-  //console.log(timeZones);
+  console.log(timeZonesArray);
   const TimeZone = timeZonesArray.map((item) => item.name);
   const offset = timeZonesArray.map((item) => item.OffsetInMinutes);
 
   console.log("countries:", TimeZone);
   const onValueChanged = (e) => {
     companyValues.Country = e.value;
+
+    if (companyValues.Country) {
+      let timezoneDetails = timeZonesArray.find(
+        (tz) => tz.name === companyValues.Country
+      );
+
+      if (timezoneDetails) {
+        companyValues.TimeZoneOffset =
+          timezoneDetails.currentTimeOffsetInMinutes;
+        console.log(
+          `Timezone for ${companyValues.Country} is ${timezoneDetails.currentTimeOffsetInMinutes}`
+        );
+        // Execute any other code you need here
+      } else {
+        console.log(`No timezone found for ${companyValues.Country}`);
+      }
+    }
+    console.log("Offset ", companyValues.TimeZoneOffset);
     console.log(e.previousValue);
     console.log(e.value);
   };
+
+  //  const found = timeZonesArray.find(tz => tz.abbreviation === abbreviation);
+
   //const [employee, getemployee] = useState();
 
   //this.employee = service.getEmployee();
@@ -66,6 +88,7 @@ function CompanyProfilex(props) {
         EmailAddress: result.EmailAddress,
         UserName: result.UserName,
         UserPassword: result.UserPassword,
+        TimeZoneOffset: result.TimeZoneOffset,
       });
     })();
     //getemployee(service.getEmployee());

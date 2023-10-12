@@ -168,6 +168,7 @@ export const addAppointment = async (
   console.log("company in:", companynumber);
   console.log("Employee:", currentEmployeeName);
   console.log("Appointment:", text);
+  console.log("service:", currentCellkey);
 
   var requestoptions = {
     method: "POST",
@@ -185,11 +186,10 @@ export const addAppointment = async (
 
       SentCompany: companynumber,
       SentOperatorName: currentEmployeeName,
-      sentServiceID: "1",
+      //sentServiceID: "1",
       StartDate: startDate,
       endDate: endDate,
       Text: text,
-
       //SentAppointmentData: appointmentData,
       sentServiceID: currentCellkey,
     }),
