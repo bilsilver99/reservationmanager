@@ -12,6 +12,7 @@ import {
   addAppointment,
   deleteAppointment,
   updateAppointment,
+  getCurrentOption,
 } from "./ScheduleServices";
 const employees = ["sam", "lou"];
 const views = ["Day", "Week", "Month"];
@@ -57,7 +58,10 @@ const SchedulerComponent = () => {
   const [schedulerHeight, setSchedulerHeight] = React.useState(800);
 
   const setCurrentValues = (e) => {
-    setCurrentCellDuration(e.value);
+    if (!e || !e.value) return;
+    getCurrentOption(e.value);
+    setCurrentCellDuration(setCurrentValues.duration);
+    console.log("duration ", currentCellDuration);
   };
 
   //const [currentDuration, setCurrentDuration] = React.useState(60);
@@ -127,6 +131,7 @@ const SchedulerComponent = () => {
       // Fetching service levels data
       const resultServiceLevels = await mystore(user.companynumber);
       setDurationsData(resultServiceLevels.data);
+      console.log("service levels", resultServiceLevels.data);
       setKey(resultServiceLevels.data.key);
 
       // Fetching shift data
@@ -196,10 +201,9 @@ const SchedulerComponent = () => {
             valueExpr="value"
             displayExpr="label"
             value={currentCellDuration}
-            //            onValueChanged={(e) => setCurrentCellDuration(e.value) setCurrentCellkey(e.key)}
+            //onValueChanged={setCurrentValues}
             onValueChanged={(e) => {
               setCurrentCellDuration(e.value);
-              //setCurrentCellkey(e.itemData.key);
             }}
           />
         </div>
