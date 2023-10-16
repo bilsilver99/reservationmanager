@@ -1,5 +1,5 @@
 export const mystore = async (companynumber) => {
-  console.log("company in:", companynumber);
+  //console.log("company in:", companynumber);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -13,7 +13,7 @@ export const mystore = async (companynumber) => {
   const url = `${process.env.REACT_APP_BASE_URL}/GetAllServiceLevels`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      console.log("company:", companynumber);
+      //console.log("company:", companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -27,8 +27,8 @@ export const mystore = async (companynumber) => {
       return {
         data: json.user_response.mdata.map((item) => ({
           label: item.DESCRIPTION,
-          value: item.MINUTESREQUIRED,
-          key: item.UNIQUEID,
+          minutes: item.MINUTESREQUIRED,
+          keyvalue: item.UNIQUEID,
         })),
         totalCount: json.user_response.totalCount,
         key: json.user_response.keyname,
@@ -53,7 +53,7 @@ export const myshift = async (companynumber) => {
   const url = `${process.env.REACT_APP_BASE_URL}/Getshifts`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      console.log(companynumber);
+      //console.log(companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -72,7 +72,7 @@ export const myshift = async (companynumber) => {
 };
 
 export const myEmployees = async (companynumber) => {
-  console.log("company in:", companynumber);
+  //console.log("company in:", companynumber);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -86,7 +86,7 @@ export const myEmployees = async (companynumber) => {
   const url = `${process.env.REACT_APP_BASE_URL}/getEmployees`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      console.log("company:", companynumber);
+      //console.log("company:", companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -113,7 +113,7 @@ export const myEmployees = async (companynumber) => {
 
 export const myAppointments = async (companynumber, currentEmployeeName) => {
   //const ThisEmployee = 2;
-  console.log("company in:", companynumber);
+  //console.log("company in:", companynumber);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -128,7 +128,7 @@ export const myAppointments = async (companynumber, currentEmployeeName) => {
   const url = `${process.env.REACT_APP_BASE_URL}/getAppointments`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      console.log("company:", companynumber);
+      //console.log("company:", companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -156,19 +156,20 @@ export const myAppointments = async (companynumber, currentEmployeeName) => {
 
 export const addAppointment = async (
   companynumber,
-  currentEmployeeName,
+  currentEmployeeNameLong,
   startDate,
   endDate,
   description,
   text,
-  //appointmentData,
-  currentCellkey
+  activitykey
 ) => {
   //const ThisEmployee = 2;
   console.log("company in:", companynumber);
-  console.log("Employee:", currentEmployeeName);
+  console.log("Employee Name:", currentEmployeeNameLong);
   console.log("Appointment:", text);
-  console.log("service:", currentCellkey);
+  //console.log("service:", currentCellkey);
+  console.log("KEY: ", activitykey);
+  var currentEmployeeName = currentEmployeeNameLong.toString();
 
   var requestoptions = {
     method: "POST",
@@ -185,19 +186,22 @@ export const addAppointment = async (
       // "Text" : "text"
 
       SentCompany: companynumber,
+
       SentOperatorName: currentEmployeeName,
+      //SentOperatorName: "8",
+
       //sentServiceID: "1",
       StartDate: startDate,
       endDate: endDate,
       Text: text,
       //SentAppointmentData: appointmentData,
-      sentServiceID: currentCellkey,
+      sentServiceID: activitykey,
     }),
   };
   const url = `${process.env.REACT_APP_BASE_URL}/AddAppointment`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      console.log("company:", companynumber);
+      //console.log("company:", companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -225,7 +229,7 @@ export const addAppointment = async (
 
 export const deleteAppointment = async (companynumber, currentEmployeeName) => {
   //const ThisEmployee = 2;
-  console.log("company in:", companynumber);
+  //console.log("company in:", companynumber);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -240,7 +244,7 @@ export const deleteAppointment = async (companynumber, currentEmployeeName) => {
   const url = `${process.env.REACT_APP_BASE_URL}/getAppointments`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      console.log("company:", companynumber);
+      //console.log("company:", companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -268,7 +272,7 @@ export const deleteAppointment = async (companynumber, currentEmployeeName) => {
 
 export const updateAppointment = async (companynumber, currentEmployeeName) => {
   //const ThisEmployee = 2;
-  console.log("company in:", companynumber);
+  //console.log("company in:", companynumber);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -283,7 +287,7 @@ export const updateAppointment = async (companynumber, currentEmployeeName) => {
   const url = `${process.env.REACT_APP_BASE_URL}/getAppointments`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      console.log("company:", companynumber);
+      //console.log("company:", companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -337,7 +341,7 @@ export const getCurrentOption = async (keyvalue) => {
       //throw new Error("invalid username/password");
       return {
         duration: json.user_response.duration,
-        keyvalue: json.user_response.keyvalue,
+        keyvalue: json.user_response.sentkey,
       };
     });
 };

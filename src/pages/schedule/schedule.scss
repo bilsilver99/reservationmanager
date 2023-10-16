@@ -5,6 +5,13 @@
   background-color: red #f0f0f0; /* light gray background */
 }
 
+.scheduler {
+  margin: 0 auto;
+  width: 60%;
+  background-color: #ffffff; /* white scheduler */
+  border: 1px solid #9e0e0e; /* light gray border */
+  border-radius: 0px; /* rounded corners */
+}
 .dropdown {
   margin-bottom: 20px;
   margin: 20px auto;
@@ -13,7 +20,7 @@
   display: flex; /* Added */
   justify-content: space-between; /* Added */
   background-color: #ffffff; /* white dropdown */
-  border: 1px solid #d3d3d3; /* light gray border */
+  border: 1px solid #9e0e0e; /* light gray border */
   border-radius: 10px; /* rounded corners */
   padding: 20px; /* Added */
 }
