@@ -46,10 +46,8 @@ export default function LoginForm() {
         <Item
           dataField={"email"}
           editorType={"dxTextBox"}
-          editorOptions={emailEditorOptions}
+          //editorOptions={emailEditorOptions}
         >
-          <RequiredRule message="Email is required" />
-          <EmailRule message="Email is invalid" />
           <Label visible={false} />
         </Item>
         <Item
@@ -58,13 +56,6 @@ export default function LoginForm() {
           editorOptions={passwordEditorOptions}
         >
           <RequiredRule message="Password is required" />
-          <Label visible={false} />
-        </Item>
-        <Item
-          dataField={"rememberMe"}
-          editorType={"dxCheckBox"}
-          editorOptions={rememberMeEditorOptions}
-        >
           <Label visible={false} />
         </Item>
         <ButtonItem>
@@ -81,18 +72,6 @@ export default function LoginForm() {
               )}
             </span>
           </ButtonOptions>
-        </ButtonItem>
-        <Item>
-          <div className={"link"}>
-            <Link to={"/reset-password"}>Forgot password?</Link>
-          </div>
-        </Item>
-        <ButtonItem>
-          <ButtonOptions
-            text={"Create an account"}
-            width={"100%"}
-            onClick={onCreateAccountClick}
-          />
         </ButtonItem>
       </Form>
     </form>

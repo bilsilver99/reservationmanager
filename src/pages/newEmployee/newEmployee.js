@@ -1,96 +1,90 @@
 import React from "react";
-import TextBox from "devextreme-react/text-box";
+import "devextreme-react/text-area";
+
+import Form, { Item } from "devextreme-react/form";
+import service from "./newEmployeeData";
 
 class NewEmployee extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      emailValue: "smith@corp.com",
-    };
+    this.employee = service.getEmployee();
+    this.positions = service.getPositions();
     this.rules = { X: /[02-9]/ };
-    this.valueChanged = this.valueChanged.bind(this);
-  }
 
-  valueChanged(data) {
-    this.setState({
-      emailValue: `${data.value.replace(/\s/g, "").toLowerCase()}@corp.com`,
-    });
+    this.validationRules = {
+      position: [{ type: "required", message: "Position is required." }],
+      hireDate: [{ type: "required", message: "Hire Date is required." }],
+    };
+
+    this.nameEditorOptions = { disabled: true };
+    this.positionEditorOptions = {
+      items: this.positions,
+      searchEnabled: true,
+      value: "",
+    };
+    this.hireDateEditorOptions = { width: "100%", value: null };
+    this.birthDateEditorOptions = { width: "100%", disabled: true };
+    this.notesEditorOptions = { height: 90 };
+    this.phonesEditorOptions = {
+      mask: "+1 (X00) 000-0000",
+      maskRules: this.rules,
+    };
+
+    this.validateForm = (e) => {
+      e.component.validate();
+    };
   }
 
   render() {
     return (
-      <div>
-        <div className="dx-fieldset">
-          <div className="dx-field">
-            <div className="dx-field-label">Default mode</div>
-            <div className="dx-field-value">
-              <TextBox defaultValue="John Smith" />
-            </div>
-          </div>
-          <div className="dx-field">
-            <div className="dx-field-label">With placeholder</div>
-            <div className="dx-field-value">
-              <TextBox placeholder="Enter full name here..." />
-            </div>
-          </div>
-          <div className="dx-field">
-            <div className="dx-field-label">With clear button</div>
-            <div className="dx-field-value">
-              <TextBox defaultValue="John Smith" showClearButton={true} />
-            </div>
-          </div>
-          <div className="dx-field">
-            <div className="dx-field-label">Password mode</div>
-            <div className="dx-field-value">
-              <TextBox
-                mode="password"
-                placeholder="Enter password"
-                showClearButton={true}
-                defaultValue="f5lzKs0T"
-              />
-            </div>
-          </div>
-          <div className="dx-field">
-            <div className="dx-field-label">Text mask</div>
-            <div className="dx-field-value">
-              <TextBox mask="+1 (X00) 000-0000" maskRules={this.rules} />
-            </div>
-          </div>
-          <div className="dx-field">
-            <div className="dx-field-label">Disabled</div>
-            <div className="dx-field-value">
-              <TextBox defaultValue="John Smith" disabled={true} />
-            </div>
-          </div>
+      <React.Fragment>
+        <div className="long-title">
+          <h3>Employee Details</h3>
         </div>
-        <div className="dx-fieldset">
-          <div className="dx-fieldset-header">Events and API</div>
-          <div className="dx-field">
-            <div className="dx-field-label">Full Name</div>
-            <div className="dx-field-value">
-              <TextBox
-                defaultValue="Smith"
-                showClearButton={true}
-                placeholder="Enter full name"
-                valueChangeEvent="keyup"
-                onValueChanged={this.valueChanged}
-              />
-            </div>
-          </div>
-          <div className="dx-field">
-            <div className="dx-field-label">Email (read only)</div>
-            <div className="dx-field-value">
-              <TextBox
-                readOnly={true}
-                hoverStateEnabled={false}
-                value={this.state.emailValue}
-              />
-            </div>
-          </div>
+        <div className="form-container">
+          <Form
+            onContentReady={this.validateForm}
+            colCount={2}
+            id="form"
+            formData={this.employee}
+          >
+            <Item
+              dataField="FirstName"
+              editorOptions={this.nameEditorOptions}
+            />
+            <Item
+              dataField="Position"
+              editorType="dxSelectBox"
+              editorOptions={this.positionEditorOptions}
+              validationRules={this.validationRules.position}
+            />
+            <Item dataField="LastName" editorOptions={this.nameEditorOptions} />
+            <Item
+              dataField="HireDate"
+              editorType="dxDateBox"
+              editorOptions={this.hireDateEditorOptions}
+              validationRules={this.validationRules.hireDate}
+            />
+            <Item
+              dataField="BirthDate"
+              editorType="dxDateBox"
+              editorOptions={this.birthDateEditorOptions}
+            />
+            <Item dataField="Address" />
+            <Item
+              dataField="Notes"
+              colSpan={2}
+              editorType="dxTextArea"
+              editorOptions={this.notesEditorOptions}
+            />
+            <Item dataField="Phone" editorOptions={this.phonesEditorOptions} />
+          </Form>
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }
 
 export default NewEmployee;
+
+//<Item dataField="Email" />

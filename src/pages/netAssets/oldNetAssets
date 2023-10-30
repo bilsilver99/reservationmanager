@@ -1,0 +1,67 @@
+import React, { useEffect } from "react";
+
+import ReactDataSheet from "react-datasheet";
+// Be sure to include styles at some point, probably during your bootstrapping
+import "react-datasheet/lib/react-datasheet.css";
+import { getNetAssets } from "../../api/MyOwnServices";
+
+class NetAssets extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      clientsent: "PETRUNGARO",
+      grid: [
+        [
+          { value: "1", width: 50 },
+          { value: "h", width: 100 },
+          { value: "NET WORTH", width: 150 },
+          { value: " 7-JUN-22", width: 75 },
+        ],
+        [{ value: 2 }, { value: 4 }],
+      ],
+    };
+  }
+  componentWillMount = () => {
+    const result = getNetAssets();
+    console.log(result);
+  };
+
+  render() {
+    return (
+      <ReactDataSheet
+        data={this.state.grid}
+        valueRenderer={(cell) => cell.value}
+        onCellsChanged={(changes) => {
+          const grid = this.state.grid.map((row) => [...row]);
+          changes.forEach(({ cell, row, col, value }) => {
+            grid[row][col] = { ...grid[row][col], value };
+          });
+          this.setState({ grid });
+        }}
+      />
+    );
+  }
+}
+
+export default NetAssets;
+
+//   [{ value: 1 }, { value: 3 }],
+//   [{ value: 2 }, { value: 4 }],
+
+// [{value: "1"},
+// {value:  "h"},
+// {value: "NET WORTH"},
+// {value " 7-JUN-22"}],
+//
+// {
+//   ROWNUMBER: "3",
+//   ROWTYPE: "h",
+//   DESCRIPTIONONE: "Assets",
+//   DESCRIPTIONTWO: "97455.00",
+//   DESCRIPTIONTHREE: "",
+//   DESCRIPTIONFOUR: ".00",
+//   VALUEONE: "0.00",
+//   VALUETWO: "2.00",
+//   VALUETHREE: "0.00",
+//   UNIQUEID: "0",
+// },

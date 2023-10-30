@@ -3,53 +3,108 @@ export const navigation = [
     text: "Home",
     path: "/home",
     icon: "home",
-    tooltip: "home",
+    auth: "N",
+  },
+  {
+    text: "Home",
+    path: "/home",
+    icon: "home",
+    auth: "Y",
+  },
+  {
+    text: "User Information",
+    path: "/profile",
+    icon: "card",
+    auth: "N",
   },
 
   {
-    text: " Company Information",
-    path: "/companyProfile",
-    icon: "globe",
+    text: "Bank Accounts",
+    path: "/bankAccountSummary",
+    icon: "money",
+    auth: "N",
   },
+  {
+    text: "Unallocated Bank Transactions",
+    path: "/unallocatedBankTransactions",
+    icon: "money",
+    auth: "N",
+  },
+  {
+    text: "Investments",
+    path: "/investmentSummary",
+    icon: "money",
+    auth: "N",
+  },
+  {
+    text: "Authorizations/Setup",
+    icon: "folder",
+    auth: "N",
+    items: [
+      {
+        text: "Authorize Banks",
+        path: "/authorizeUser",
+        icon: "key",
+      },
 
-  {
-    text: " Employee Management",
-    path: "/employeeManagement",
-    icon: "group",
+      {
+        text: "Authorize Investments",
+        path: "/authorizeInvestmentUser",
+        icon: "imgarunlock",
+      },
+      {
+        text: "Change Password",
+        path: "/changePassword",
+        icon: "check",
+      },
+
+      {
+        text: "Validate Accounts",
+        path: "/validateExistingAccounts",
+        icon: "revert",
+      },
+    ],
   },
   {
-    text: "Holiday Management",
-    path: "/holiday",
-    icon: "event",
+    text: "Analysis Tools",
+    icon: "folder",
+    auth: "N",
+    items: [
+      {
+        text: "Net Assets",
+        path: "/netAssets",
+        icon: "image",
+      },
+      {
+        text: "Net Worth",
+        path: "/netWorth",
+        icon: "image",
+      },
+    ],
   },
   {
-    text: "Shifts",
-    path: "/shifts",
-    icon: "event",
-  },
-  {
-    text: "Products",
-    path: "/products",
-    icon: "product",
-  },
-  {
-    text: "Services",
-    path: "/services",
-    icon: "product",
-  },
-  {
-    text: "Schedule",
-    path: "/schedule",
-    icon: "product",
+    text: "Administration",
+    icon: "folder",
+    auth: "Y",
+    items: [
+      {
+        text: "Company Profile",
+        icon: "folder",
+        auth: "Y",
+        path: "/company",
+      },
+      {
+        text: "Transaction Groups",
+        icon: "folder",
+        auth: "Y",
+        path: "/transactionGroups",
+      },
+      {
+        text: "Transaction Types",
+        icon: "folder",
+        auth: "Y",
+        path: "/transactionTypes",
+      },
+    ],
   },
 ];
-
-// {
-//   text: " Employee Setup",
-//   path: "/employee",
-// },
-
-// {
-//   text: " New Employee",
-//   path: "/newEmployee",
-// },

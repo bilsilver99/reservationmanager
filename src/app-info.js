@@ -1,4 +1,6 @@
+import beach from "./images/beach.png";
 const appInfo = {
-  title: "Reservation Management System",
+  title: "Beach Street Wealth Inc.",
+  image: beach,
 };
 export default appInfo;

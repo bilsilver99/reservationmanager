@@ -9,11 +9,28 @@ export async function signIn(email, password) {
     //console.log(email, password);
     await login(email, password).then((response) => {
       thisOK = response.returnOK;
-      //console.log(thisOK);
-      currentUser.email = response.clientname;
-      currentUser.companynumber = response.clientcompany;
+      console.log("response", response);
+      currentUser.name = response.clientname;
+      currentUser.clientCode = response.clientcode;
+      currentUser.administrator = response.administrator;
       currentUser.avatarUrl =
         "https://js.devexpress.com/Demos/WidgetsGallery/JSDemos/images/employees/07.png";
+      currentUser.guid = response.guid;
+      currentUser.widget = response.widget;
+      currentUser.UserCode = response.UserCode;
+      currentUser.UserPassword = response.UserPassword;
+      //currentUser.FlinksEnvironmentRetail=response.FlinksEnvironmentRetail
+      currentUser.FlinkCustomerRetail = response.FlinkCustomerRetail;
+      currentUser.FlinksAPIDomainRetail = response.FlinksAPIDomainRetail;
+      currentUser.FlinksConnectDomainRetail =
+        response.FlinksConnectDomainRetail;
+      currentUser.FlinksProjectIDRetail = response.FlinksProjectIDRetail;
+      currentUser.FlinkCustomerWealth = response.FlinkCustomerWealth;
+      currentUser.FlinksAPIDomainWealth = response.FlinksAPIDomainWealth;
+      currentUser.FlinksConnectDomainWealth =
+        response.FlinksConnectDomainWealth;
+      currentUser.FlinksProjectIDWealth = response.FlinksProjectIDWealth;
+
       //console.log(currentUser);
     });
     if (thisOK === "1") {

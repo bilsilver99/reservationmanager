@@ -1,0 +1,119 @@
+#wrapper {
+  width: 800px;
+  height: 20px;
+  background-color: white;
+  overflow-x: auto;
+  font-size: 12px;
+}
+#parent {
+  width: calc(200px * 4);
+  height: 100%;
+  overflow: hidden; /* or any clear-fix snippet */
+}
+#scroll-container {
+  height: 200px; /* Set the height of the container */
+  width: 800px; /* Set the width of the container */
+  overflow: scroll; /* Make the container scrollable */
+}
+.header1 {
+  float: left;
+  width: 200px;
+  height: 100%;
+  color: white;
+  background-color: rgb(12, 12, 12);
+  border-style: solid;
+  border-width: 1;
+  border-color: black;
+}
+.header2 {
+  padding-left: 10%;
+  float: left;
+  width: 200px;
+  height: 100%;
+  background-color: rgb(230, 209, 128);
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+.header3 {
+  float: left;
+  width: 200px;
+  height: 100%;
+  background-color: rgb(230, 209, 128);
+}
+.child {
+  float: left;
+  width: 200px;
+  height: 100%;
+  background-color: rgb(114, 130, 199);
+}
+.detailh {
+  float: left;
+  width: 200px;
+  height: 100%;
+  background-color: white;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+.detail {
+  float: left;
+  padding-left: 10%;
+  width: 200px;
+  height: 100%;
+  background-color: white;
+}
+.detail1 {
+  float: left;
+  text-align: right;
+  width: 200px;
+  height: 100%;
+  background-color: white;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+.totalh {
+  float: left;
+  width: 200px;
+  height: 100%;
+  background-color: rgb(217, 217, 217);
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+  font-weight: bold;
+}
+.total {
+  float: left;
+  text-align: right;
+  width: 200px;
+  height: 100%;
+  background-color: rgb(217, 217, 217);
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+  font-weight: bold;
+}
+
+.card {
+  height: 600px;
+  margin-top: 10px;
+  width: 450px;
+  float: left;
+  margin-left: 32px;
+  border-radius: 10px;
+}
+.card-top {
+  padding-top: 5px;
+  color: blue;
+  padding-left: 15px;
+}
+.systempic {
+  padding-left: 30px;
+}
+.blank {
+  float: left;
+  width: 200px;
+  height: 100%;
+  background-color: white;
+}

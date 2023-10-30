@@ -1,55 +1,92 @@
 import {
   HomePage,
-  EmployeeManagementPage,
-  CompanyProfilePage,
-  //EmployeePage,
-  HolidayPage,
-  newEmployeePage,
-  ShiftsPage,
-  ServicesPage,
-  ProductsPage,
-  SchedulesPage,
+  ProfilePage,
+  AuthorizeUserPage,
+  AuthorizeSpecificBankPage,
+  AuthorizeInvestmentUserPage,
+  AuthorizeAccountsPage,
+  ValidateExistingAccountsPage,
+  ChangePasswordPage,
+  GraphsPage,
+  NetAssetsPage,
+  NetWorthPage,
+  BankAccountSummaryPage,
+  InvestmentSummaryPage,
+  UnallocatedBankTransactions,
+  CompanyPage,
+  TransactionGroupsPage,
+  TransactionTypesPage,
 } from "./pages";
 import { withNavigationWatcher } from "./contexts/navigation";
 
 const routes = [
   {
-    path: "/employeeManagement",
-    element: EmployeeManagementPage,
+    path: "/authorizeUser",
+    element: AuthorizeUserPage,
   },
   {
-    path: "/companyProfile",
-    element: CompanyProfilePage,
+    path: "/unallocatedBankTransactions",
+    element: UnallocatedBankTransactions,
   },
-
+  {
+    path: "/authorizeSpecificBank",
+    element: AuthorizeSpecificBankPage,
+  },
+  {
+    path: "/authorizeInvestmentUser",
+    element: AuthorizeInvestmentUserPage,
+  },
+  {
+    path: "/profile",
+    element: ProfilePage,
+  },
+  {
+    path: "/validateExistingAccounts",
+    element: ValidateExistingAccountsPage,
+  },
+  {
+    path: "/authorizeAccounts",
+    element: AuthorizeAccountsPage,
+  },
+  {
+    path: "/netAssets",
+    element: NetAssetsPage,
+  },
+  {
+    path: "/netWorth",
+    element: NetWorthPage,
+  },
+  {
+    path: "/graphs",
+    element: GraphsPage,
+  },
   {
     path: "/home",
     element: HomePage,
   },
-
   {
-    path: "/holiday",
-    element: HolidayPage,
+    path: "/changePassword",
+    element: ChangePasswordPage,
   },
   {
-    path: "/newemployee",
-    element: newEmployeePage,
+    path: "/bankAccountSummary",
+    element: BankAccountSummaryPage,
   },
   {
-    path: "/shifts",
-    element: ShiftsPage,
+    path: "/investmentSummary",
+    element: InvestmentSummaryPage,
   },
   {
-    path: "/products",
-    element: ProductsPage,
+    path: "/company",
+    element: CompanyPage,
   },
   {
-    path: "/services",
-    element: ServicesPage,
+    path: "/transactionGroups",
+    element: TransactionGroupsPage,
   },
   {
-    path: "/schedule",
-    element: SchedulesPage,
+    path: "/transactionTypes",
+    element: TransactionTypesPage,
   },
 ];
 
@@ -59,12 +96,3 @@ export default routes.map((route) => {
     element: withNavigationWatcher(route.element, route.path),
   };
 });
-
-// {
-//   path: "/employee",
-//   element: EmployeePage,
-// },
-// {
-//   path: "/newEmployee",
-//   element: newEmployeePage,
-// },
