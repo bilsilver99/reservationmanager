@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+
+//import React, { useEffect, useState } from "react";
 //import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 //import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //import { faCheckSquare, faSquare } from "@fortawesome/free-solid-svg-icons";
 //import { getTransactionGroups } from "../../api/MyOwnServices";
+//
 import DataGrid, {
   Column,
   Editing,
@@ -11,34 +14,49 @@ import DataGrid, {
   Lookup,
   Form,
   Pager,
+  FilterRow,
+  HeaderFilter,
+  Search,
+  SearchPanel,
 } from "devextreme-react/data-grid";
-import { Item, SimpleItem } from "devextreme-react/form";
+import { Item } from "devextreme-react/form";
 import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import { useAuth } from "../../contexts/auth";
 import "./app.scss";
-import { mystore } from "./transactionTypesData";
+//import { mystore } from "./transactionTypesData";
 import { mystore2 } from "./transactionGroupData";
+import "whatwg-fetch";
+import CustomStore from "devextreme/data/custom_store";
+import SelectBox from "devextreme-react/select-box";
 
-//import SelectBox from "devextreme-react/select-box";
-//import { Button } from "devextreme-react";
-//import { SelectBox } from "devextreme-react";
-//import { Template } from "devextreme-react/core/template";
-
-const allowedPageSizes = [8, 12, 20];
+const allowedPageSizes = [8, 12, 24];
 
 //let pageoption = 90;
 
 class TransactionTypesx extends React.Component {
   constructor(props) {
     super(props);
+    this.applyFilterTypes = [
+      {
+        key: "auto",
+        name: "Immediately",
+      },
+      {
+        key: "onClick",
+        name: "On Button Click",
+      },
+    ];
     this.state = {
       //myClient: this.props.clientCode,
       currentRow: 0,
       filterValue: "90",
       selectedRowKeys: [],
-      transactionGroupData: [],
-
+      transactionGroupData: [], // add new state variable
+      companyCode: 1,
+      showFilterRow: true,
+      showHeaderFilter: true,
+      currentFilter: this.applyFilterTypes[0].key,
       //bankNameToAuthorize: "", // add new state variable
     };
   }
@@ -46,6 +64,7 @@ class TransactionTypesx extends React.Component {
   componentDidMount() {
     mystore2() // call the function to fetch data
       .then((data) => {
+        //console.log("data", data);
         this.setState({ transactionGroupData: data.data }); // store the data in state
       })
       .catch((error) => {
@@ -54,39 +73,59 @@ class TransactionTypesx extends React.Component {
           error
         );
       });
-    console.log("maybe?", this.state.transactionGroupData);
+    //console.log("maybe?", this.state.transactionGroupData);
+
+    // mystore(this.state.companyCode) // call the function to fetch data
+    //   .then((data) => {
+    //     console.log("mystore", data); // log the data to inspect its structure
+    //   })
+    //   .catch((error) => {
+    //     console.error(
+    //       "There was an error fetching the transaction types data:",
+    //       error
+    //     );
+    //   });
   }
-
-  simpleLookupLabel = { "aria-label": "Simple lookup" };
-
-  handleFilterChange = (e) => {
-    this.setState({ filterValue: e.value }, () => {
-      //console.log("New filter value:", this.state.filterValue);
-      //pageoption = this.state.filterValue;
-    });
-  };
 
   handleSelectionChanged(e) {
     this.setState({ selectedRowKeys: e.selectedRowKeys });
+    if (e.selectedRowKeys.length > 0) {
+      this.setState({ currentRow: e.selectedRowKeys[0] }); // update the current row
+    }
   }
 
-  applyFilter = () => {
-    //const { filterValue } = this.state;
-    // Perform filter action with the selected filter value
-    // You can pass the filterValue to your data source or perform any other filtering logic
-    //console.log("Filter value:", filterValue);
-  };
+  handleEditingStart(e) {
+    console.log("Editing is starting for row", e.data);
+
+    // You can access the data of the row that is being edited
+    const rowToBeEdited = e.data;
+
+    // Perform any checks or logic you want here.
+    // For example, you might want to prevent editing if a certain condition is met:
+    if (rowToBeEdited.someField === "someValue") {
+      e.cancel = true; // Prevents the editing from starting
+    }
+  }
 
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Transaction Groups</h3>
+        <h3>Transaction Types</h3>
         <DataGrid
-          dataSource={mystore(this.state.companyCode)}
+          dataSource={mystore(this.props.companyCode)}
+          keyExpr="UNIQUEID"
           showBorders={true}
-          remoteOperations={true}
-          //keyExpr={"UNIQUEID"}
+          remoteOperations={false}
+          onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
+          onEditingStart={this.handleEditingStart}
         >
+          <FilterRow
+            visible={this.state.showFilterRow}
+            applyFilter={this.state.currentFilter}
+          />
+          <HeaderFilter visible={this.state.showHeaderFilter} />
+          <SearchPanel visible={true} width={240} placeholder="Search..." />
+          <Paging enabled={true} />
           <Editing
             mode="popup"
             allowUpdating={true}
@@ -109,18 +148,12 @@ class TransactionTypesx extends React.Component {
                 <Item dataField="FPTRANSACTIONCODE" />
                 <Item dataField="DESCRIPTION" />
 
-                <SimpleItem
-                  dataField="TRANSACTIONGROUP"
-                  editorType="dxLookup"
-                  editorOptions={{
-                    dataSource: this.state.transactionGroupData,
-                    displayExpr: "TRANSACTIONGROUP",
-                    valueexpression: "UNIQUEID",
-                  }}
-                />
-
-                <Item dataField="REPORTINGROW" />
+                <Item dataField="TRANSACTIONGROUP" />
                 <Item dataField="CHANGEINNETWORTHCODE" />
+                <Item
+                  dataField="REPORTINGROW"
+                  label={{ text: "Reporting Row" }}
+                />
               </Item>
 
               <Item
@@ -130,89 +163,51 @@ class TransactionTypesx extends React.Component {
                 colSpan={2}
                 showBorders={true}
               >
-                <Item dataField="INTERESTCHARGE" editorType="dxCheckBox" />
+                <Item dataField="INTERESTCHARGE" />
                 <Item dataField={"INTERESTPAYMENT"} editorType="dxCheckBox" />
-                <Item
-                  dataField={"DIRECTINTERESTPAYMENT"}
-                  //label={{ text: "Direct Interest Payment", location: "left" }}
-                />
+                <Item dataField={"DIRECTINTERESTPAYMENT"} />
                 <Item
                   dataField={"COMPOUNDINTERESTTYPE"}
                   editorType="dxCheckBox"
-                  //label={{ text: "Compound Interest", location: "right" }}
                 />
-                <Item
-                  dataField={"CLIENTTRANSACTION"}
-                  editorType="dxCheckBox"
-                  //label={{ text: "Client Transaction", location: "right" }}
-                />
+                <Item dataField={"CLIENTTRANSACTION"} editorType="dxCheckBox" />
                 <Item
                   dataField={"TRANSFERTRANSACTIONS"}
                   editorType="dxCheckBox"
-                  //label={{ text: "Transfer", location: "right" }}
                 />
                 <Item
                   dataField={"PERSONALINTERESTPAYMENT"}
                   editorType="dxCheckBox"
-                  //label={{
-                  //  text: "Personal Interest Payment",
-                  //  location: "right",
-                  //}}
                 />
 
                 <Item
                   dataField={"DEDUCTIBLEINTERESTPAYMENT"}
                   editorType="dxCheckBox"
-                  //label={{
-                  //  text: "Deductible Interest Payment",
-                  //  location: "right",
-                  //}}
                 />
 
                 <Item
                   dataField={"INCLUDEINCOMPOUNDVALUE"}
                   editorType="dxCheckBox"
-                  //label={{
-                  //  text: "Include in Compound Interest",
-                  //  location: "right",
-                  //}}
                 />
 
                 <Item
                   dataField={"INTERESTALLOCATION"}
                   editorType="dxCheckBox"
-                  //label={{ text: "Interest Allocation", location: "right" }}
                 />
                 <Item
                   dataField={"CARRYINGCHARGEINTERESTPAID"}
                   editorType="dxCheckBox"
-                  //label={{
-                  //  text: "Carrying Charge Interest Paid",
-                  //  location: "right",
-                  //}}
                 />
                 <Item
                   dataField={"CARRYINGCHARGEDEDUCTIBLEPAYMENT"}
                   editorType="dxCheckBox"
-                  //label={{
-                  //  text: "Carrying Charges Deductible Payment",
-                  //  location: "right",
-                  //}}
                 />
 
-                <Item
-                  dataField={"TAXSHELTERPAYMENT"}
-                  editorType="dxCheckBox"
-                  //label={{ text: "Tax Shelter Payment", location: "right" }}
-                />
+                <Item dataField={"TAXSHELTERPAYMENT"} editorType="dxCheckBox" />
 
                 <Item
                   dataField={"CARRYINGCHARGEDEDUCTIBLEINTEREST"}
                   editorType="dxCheckBox"
-                  //label={{
-                  //  text: "Carrying Charge Deductible Payment",
-                  //  location: "right",
-                  //}}
                 />
               </Item>
             </Form>
@@ -231,26 +226,20 @@ class TransactionTypesx extends React.Component {
             hidingPriority={8}
             visible={true}
           />
-          <Column
-            dataField={"TRANSACTIONGROUP"}
-            width={190}
-            caption={"Transaction Group"}
-            hidingPriority={8}
-            visible={true}
-          />
-          <Column
-            dataField={"REPORTINGROW  "}
-            width={190}
-            caption={"Reporting Row"}
-            hidingPriority={8}
-            visible={true}
-          />
+
+          <Column dataField="TRANSACTIONGROUP" caption="Group" width={125}>
+            <Lookup
+              dataSource={this.state.transactionGroupData}
+              valueExpr="CODE"
+              displayExpr="DESCRIPTION"
+            />
+          </Column>
+
           <Column
             dataField={"CHANGEINNETWORTHCODE"}
             caption={"Change in Net Worth Code"}
             hidingPriority={8}
-            width={150}
-            visible={false}
+            visible={true}
             //onCellClick={this.handleActionRequiredClick}
           />
 
@@ -260,13 +249,13 @@ class TransactionTypesx extends React.Component {
             caption={"Interest Charge"}
             hidingPriority={8}
             visible={true}
+            editorType="dxCheckBox"
           />
           <Column
             dataType="boolean"
             dataField={"INTERESTPAYMENT"}
             caption={"Interest Payment"}
             hidingPriority={8}
-            width={150}
             visible={true}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -275,7 +264,6 @@ class TransactionTypesx extends React.Component {
             dataField={"DIRECTINTERESTPAYMENT"}
             caption={"Direct Interest Payment"}
             hidingPriority={8}
-            width={150}
             visible={true}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -284,7 +272,6 @@ class TransactionTypesx extends React.Component {
             dataField={"COMPOUNDINTERESTTYPE"}
             caption={"Compound Interest Type"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -293,7 +280,6 @@ class TransactionTypesx extends React.Component {
             dataField={"CLIENTTRANSACTION"}
             caption={"Compound Interest Rest Type"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -302,7 +288,6 @@ class TransactionTypesx extends React.Component {
             dataField={"TRANSFERTRANSACTIONS"}
             caption={"Transfer Transactions"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -311,7 +296,6 @@ class TransactionTypesx extends React.Component {
             dataField={"PERSONALINTERESTPAYMENT"}
             caption={"Personal Interest Payment"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -320,7 +304,6 @@ class TransactionTypesx extends React.Component {
             dataField={"DEDUCTIBLEINTERESTPAYMENT"}
             caption={"Deductible Interest Payment"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -329,7 +312,6 @@ class TransactionTypesx extends React.Component {
             dataField={"INCLUDEINCOMPOUNDVALUE"}
             caption={"Deductible Interest Payment"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -338,7 +320,6 @@ class TransactionTypesx extends React.Component {
             dataField={"INTERESTALLOCATION"}
             caption={"Interest Allocation"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -347,7 +328,6 @@ class TransactionTypesx extends React.Component {
             dataField={"CARRYINGCHARGEINTERESTPAID"}
             caption={"Carrying Charge Interest Paid"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -356,7 +336,6 @@ class TransactionTypesx extends React.Component {
             dataField={"CARRYINGCHARGEDEDUCTIBLEPAYMENT"}
             caption={"Carrying Charge Deductible Payment"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -365,7 +344,6 @@ class TransactionTypesx extends React.Component {
             dataField={"TAXSHELTERPAYMENT"}
             caption={"Tax Shelter Payment"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
           />
@@ -374,9 +352,15 @@ class TransactionTypesx extends React.Component {
             dataField={"CARRYINGCHARGEDEDUCTIBLEINTEREST"}
             caption={"Carrying Charge Deductible Interest"}
             hidingPriority={8}
-            width={150}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}
+          />
+          <Column
+            dataField={"REPORTINGROW"}
+            width={190}
+            caption={"Reporting Row"}
+            hidingPriority={8}
+            visible={false}
           />
 
           <Column
@@ -396,11 +380,6 @@ class TransactionTypesx extends React.Component {
       </div>
     );
   }
-  handleRowClick = (e) => {
-    this.setState({ currentRow: e.row });
-    console.log(this.state.currentRow);
-    console.log("here");
-  };
 }
 // function cellRender(data) {
 //   //console.log("wtf", data.row.data.IMAGE);
@@ -425,3 +404,170 @@ export default function TransactionTypes() {
   //console.log({ user });
   return <TransactionTypesx companyCode={user.companyCode} />;
 }
+
+//{
+/* <SimpleItem
+dataField="TRANSACTIONGROUP"
+editorType="dxLookup"
+editorOptions={{
+  dataSource: this.state.transactionGroupData,
+  displayExpr: "CODE",
+  //valueExpr: "CODE",
+  
+}}
+/> */
+//}
+
+// dataField={"TRANSACTIONGROUP"}
+//             width={190}
+//             caption={"Transaction Group"}
+//             hidingPriority={8}
+//             visible={true}
+//           />
+
+function isNotEmpty(value) {
+  return value !== undefined && value !== null && value !== "";
+}
+
+const mystore = (myClient) =>
+  new CustomStore({
+    key: "UNIQUEID",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: myClient,
+          Parameters: params,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/getTransactionTypes`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          //console.log("client " + myClient);
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          console.log("types: ", json);
+          return {
+            data: json.user_response.loginq,
+            totalCount: json.user_response.totalCount,
+            key: json.user_response.keyname,
+          };
+        });
+    },
+    insert: (values) => {
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          ThisFunction: "insert",
+          keyvaluepair: values,
+          SentCompany: myClient,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/updateTransactionTypes`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+    remove: (key) => {
+      console.log(key);
+      //console.log(values);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          SentCompany: key,
+          ThisFunction: "delete",
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/updateTransactionTypes`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+    update: (key, values) => {
+      console.log("key: ", key);
+      console.log("values: ", values);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          ThisFunction: "change",
+          SentCompany: key,
+          keyvaluepair: values,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/updateTransactionTypes`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+  });

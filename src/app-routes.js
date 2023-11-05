@@ -16,6 +16,7 @@ import {
   CompanyPage,
   TransactionGroupsPage,
   TransactionTypesPage,
+  CodeMappingPage,
 } from "./pages";
 import { withNavigationWatcher } from "./contexts/navigation";
 
@@ -87,6 +88,10 @@ const routes = [
   {
     path: "/transactionTypes",
     element: TransactionTypesPage,
+  },
+  {
+    path: "/codeMapping",
+    element: CodeMappingPage,
   },
 ];
 

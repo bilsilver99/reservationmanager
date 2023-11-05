@@ -105,6 +105,12 @@ export const navigation = [
         auth: "Y",
         path: "/transactionTypes",
       },
+      {
+        text: "Code Mapping",
+        icon: "folder",
+        auth: "Y",
+        path: "/codeMapping",
+      },
     ],
   },
 ];

@@ -15,3 +15,4 @@ export { default as UnallocatedBankTransactions } from "./unallocatedTransaction
 export { default as CompanyPage } from "./company/company";
 export { default as TransactionGroupsPage } from "./transactionGroups/transactionGroups";
 export { default as TransactionTypesPage } from "./transactionTypes/transactionTypes";
+export { default as CodeMappingPage } from "./codeMapping/codeMapping";

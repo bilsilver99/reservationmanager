@@ -2,6 +2,7 @@ import CustomStore from "devextreme/data/custom_store";
 function isNotEmpty(value) {
   return value !== undefined && value !== null && value !== "";
 }
+
 export const mystore = (myClient) =>
   new CustomStore({
     key: "UNIQUEID",
@@ -22,8 +23,6 @@ export const mystore = (myClient) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-
-      //mycompany = 1;
 
       params = params.slice(0, -1);
       var requestoptions = {
@@ -50,7 +49,7 @@ export const mystore = (myClient) =>
           return response.json();
         })
         .then((json) => {
-          //console.log(json);
+          console.log("types: ", json);
           return {
             data: json.user_response.loginq,
             totalCount: json.user_response.totalCount,

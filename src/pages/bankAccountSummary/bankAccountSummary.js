@@ -72,11 +72,7 @@ function booleanCellRender(cellData) {
           size="xl"
         />
       ) : (
-        <FontAwesomeIcon
-          icon={"icon-check-empty"}
-          style={{ color: "green" }}
-          size="xl"
-        />
+        <></>
       )}
     </div>
   );

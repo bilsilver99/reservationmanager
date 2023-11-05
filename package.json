@@ -56,6 +56,7 @@
     ]
   },
   "devDependencies": {
+    "@types/whatwg-fetch": "^0.0.33",
     "devextreme-cli": "1.4.2",
     "devextreme-themebuilder": "23.1.3"
   }
