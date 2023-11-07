@@ -111,6 +111,30 @@ export const navigation = [
         auth: "Y",
         path: "/codeMapping",
       },
+      {
+        text: "Asset Groups",
+        icon: "folder",
+        auth: "Y",
+        path: "/assetTypeGroups",
+      },
+      {
+        text: "Asset Types",
+        icon: "folder",
+        auth: "Y",
+        path: "/assetTypes",
+      },
+      {
+        text: "Investment Banks",
+        icon: "folder",
+        auth: "Y",
+        path: "/investmentBanks",
+      },
+      {
+        text: "Clients",
+        icon: "folder",
+        auth: "Y",
+        path: "/clientProfiles",
+      },
     ],
   },
 ];

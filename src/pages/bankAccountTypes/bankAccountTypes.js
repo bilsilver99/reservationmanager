@@ -24,17 +24,17 @@ import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import { useAuth } from "../../contexts/auth";
 import "./app.scss";
-//import { mystore } from "./transactionTypesData";
-import { mystore2 } from "./transactionGroupData";
+import { mystore } from "./bankaccountTypesDataTypesData";
+import { mystore2 } from "./bankaccountTypesData";
 import "whatwg-fetch";
-import CustomStore from "devextreme/data/custom_store";
-import SelectBox from "devextreme-react/select-box";
+//import CustomStore from "devextreme/data/custom_store";
+//import SelectBox from "devextreme-react/select-box";
 
 const allowedPageSizes = [8, 12, 24];
 
 //let pageoption = 90;
 
-class TransactionTypesx extends React.Component {
+class BankaccountTypesx extends React.Component {
   constructor(props) {
     super(props);
     this.applyFilterTypes = [
@@ -98,7 +98,7 @@ class TransactionTypesx extends React.Component {
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Transaction Types</h3>
+        <h3>Bank Account Types</h3>
         <DataGrid
           dataSource={mystore(this.props.companyCode)}
           keyExpr="UNIQUEID"
@@ -133,14 +133,12 @@ class TransactionTypesx extends React.Component {
                 colSpan={2}
                 showBorders={true}
               >
-                <Item dataField="FPTRANSACTIONCODE" />
+                <Item dataField="BANKACCOUNTTYPE" />
                 <Item dataField="DESCRIPTION" />
 
-                <Item dataField="TRANSACTIONGROUP" />
-                <Item dataField="CHANGEINNETWORTHCODE" />
                 <Item
-                  dataField="REPORTINGROW"
-                  label={{ text: "Reporting Row" }}
+                  dataField="REPORTINGSEQUENCE"
+                  label={{ text: "Reporting Sequence" }}
                 />
               </Item>
 
@@ -151,52 +149,20 @@ class TransactionTypesx extends React.Component {
                 colSpan={2}
                 showBorders={true}
               >
-                <Item dataField="INTERESTCHARGE" />
-                <Item dataField={"INTERESTPAYMENT"} editorType="dxCheckBox" />
-                <Item dataField={"DIRECTINTERESTPAYMENT"} />
-                <Item
-                  dataField={"COMPOUNDINTERESTTYPE"}
-                  editorType="dxCheckBox"
-                />
-                <Item dataField={"CLIENTTRANSACTION"} editorType="dxCheckBox" />
-                <Item
-                  dataField={"TRANSFERTRANSACTIONS"}
-                  editorType="dxCheckBox"
-                />
-                <Item
-                  dataField={"PERSONALINTERESTPAYMENT"}
-                  editorType="dxCheckBox"
-                />
-
-                <Item
-                  dataField={"DEDUCTIBLEINTERESTPAYMENT"}
-                  editorType="dxCheckBox"
-                />
-
-                <Item
-                  dataField={"INCLUDEINCOMPOUNDVALUE"}
-                  editorType="dxCheckBox"
-                />
-
-                <Item
-                  dataField={"INTERESTALLOCATION"}
-                  editorType="dxCheckBox"
-                />
-                <Item
-                  dataField={"CARRYINGCHARGEINTERESTPAID"}
-                  editorType="dxCheckBox"
-                />
-                <Item
-                  dataField={"CARRYINGCHARGEDEDUCTIBLEPAYMENT"}
-                  editorType="dxCheckBox"
-                />
-
-                <Item dataField={"TAXSHELTERPAYMENT"} editorType="dxCheckBox" />
-
-                <Item
-                  dataField={"CARRYINGCHARGEDEDUCTIBLEINTEREST"}
-                  editorType="dxCheckBox"
-                />
+                <Item dataField={"ASSET"} />
+                <Item dataField={"LIABILITY"} />
+                <Item dataField={"PERSONALACCOUNT"} />
+                <Item dataField={"LOC"} />
+                <Item dataField={"INVESTMENT"} />
+                <Item dataField={"SAVINGS"} />
+                <Item dataField={"INVESTMENTLOANS"} />
+                <Item dataField={"PERSONALLOANS"} />
+                <Item dataField={"HOUSE"} />
+                <Item dataField={"REALESTATEINVESTMENT"} />
+                <Item dataField={"CFM"} />
+                <Item dataField={"REALESTATERENTALMORTGAGE"} />
+                <Item dataField={"SINGLELINESUMMARY"} />
+                <Item dataField={"BUSINESSLOAN"} />
               </Item>
             </Form>
           </Editing>
@@ -387,175 +353,8 @@ class TransactionTypesx extends React.Component {
 //   return <img src={`${data}`} alt="BANK" height={40} />;
 // }
 
-export default function TransactionTypes() {
+export default function BankaccountTypes() {
   const { user } = useAuth();
   //console.log({ user });
-  return <TransactionTypesx companyCode={user.companyCode} />;
+  return <BankaccountTypesx companyCode={user.companyCode} />;
 }
-
-//{
-/* <SimpleItem
-dataField="TRANSACTIONGROUP"
-editorType="dxLookup"
-editorOptions={{
-  dataSource: this.state.transactionGroupData,
-  displayExpr: "CODE",
-  //valueExpr: "CODE",
-  
-}}
-/> */
-//}
-
-// dataField={"TRANSACTIONGROUP"}
-//             width={190}
-//             caption={"Transaction Group"}
-//             hidingPriority={8}
-//             visible={true}
-//           />
-
-function isNotEmpty(value) {
-  return value !== undefined && value !== null && value !== "";
-}
-
-const mystore = (myClient) =>
-  new CustomStore({
-    key: "UNIQUEID",
-    load: (loadOptions) => {
-      let params = "?";
-      [
-        "skip",
-        "take",
-        "requireTotalCount",
-        "requireGroupCount",
-        "sort",
-        "filter",
-        "totalSummary",
-        "group",
-        "groupSummary",
-      ].forEach((i) => {
-        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
-          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
-        }
-      });
-
-      params = params.slice(0, -1);
-      var requestoptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json;",
-        },
-        body: JSON.stringify({
-          sentclientcode: myClient,
-          Parameters: params,
-        }),
-      };
-      const url = `${process.env.REACT_APP_BASE_URL}/getTransactionTypes`;
-      return fetch(url, requestoptions) // Request fish
-        .then((response) => {
-          //console.log("client " + myClient);
-          if (!response.ok) {
-            return {
-              companyname: "System did not respond",
-              returnaddress: " ",
-            };
-          }
-          return response.json();
-        })
-        .then((json) => {
-          console.log("types: ", json);
-          return {
-            data: json.user_response.loginq,
-            totalCount: json.user_response.totalCount,
-            key: json.user_response.keyname,
-          };
-        });
-    },
-    insert: (values) => {
-      var requestoptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json;",
-        },
-        body: JSON.stringify({
-          ThisFunction: "insert",
-          keyvaluepair: values,
-          SentCompany: myClient,
-        }),
-      };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateTransactionTypes`;
-      return fetch(url, requestoptions) // Request fish
-        .then((response) => {
-          if (!response.ok) {
-            return {
-              companyname: "System did not respond",
-              returnaddress: " ",
-            };
-          }
-          return response.json();
-        })
-        .then((json) => {
-          return {};
-        });
-    },
-    remove: (key) => {
-      console.log(key);
-      //console.log(values);
-      var requestoptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json;",
-        },
-        body: JSON.stringify({
-          SentCompany: key,
-          ThisFunction: "delete",
-        }),
-      };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateTransactionTypes`;
-      return fetch(url, requestoptions) // Request fish
-        .then((response) => {
-          if (!response.ok) {
-            return {
-              companyname: "System did not respond",
-              returnaddress: " ",
-            };
-          }
-          return response.json();
-        })
-        .then((json) => {
-          return {};
-        });
-    },
-    update: (key, values) => {
-      console.log("key: ", key);
-      console.log("values: ", values);
-      var requestoptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json;",
-        },
-        body: JSON.stringify({
-          ThisFunction: "change",
-          SentCompany: key,
-          keyvaluepair: values,
-        }),
-      };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateTransactionTypes`;
-      return fetch(url, requestoptions) // Request fish
-        .then((response) => {
-          if (!response.ok) {
-            return {
-              companyname: "System did not respond",
-              returnaddress: " ",
-            };
-          }
-          return response.json();
-        })
-        .then((json) => {
-          return {};
-        });
-    },
-  });

@@ -16,3 +16,7 @@ export { default as CompanyPage } from "./company/company";
 export { default as TransactionGroupsPage } from "./transactionGroups/transactionGroups";
 export { default as TransactionTypesPage } from "./transactionTypes/transactionTypes";
 export { default as CodeMappingPage } from "./codeMapping/codeMapping";
+export { default as AssetTypeGroupsPage } from "./assetTypeGroups/assetTypeGroups";
+export { default as AssetTypesPage } from "./assetTypes/assetTypes";
+export { default as InvestmentBanksPage } from "./investmentBanks/investmentBanks";
+export { default as ClientProfilesPage } from "./clientProfiles/clientProfiles";

@@ -17,6 +17,10 @@ import {
   TransactionGroupsPage,
   TransactionTypesPage,
   CodeMappingPage,
+  AssetTypeGroupsPage,
+  AssetTypesPage,
+  InvestmentBanksPage,
+  ClientProfilesPage,
 } from "./pages";
 import { withNavigationWatcher } from "./contexts/navigation";
 
@@ -92,6 +96,22 @@ const routes = [
   {
     path: "/codeMapping",
     element: CodeMappingPage,
+  },
+  {
+    path: "/assetTypeGroups",
+    element: AssetTypeGroupsPage,
+  },
+  {
+    path: "/assetTypes",
+    element: AssetTypesPage,
+  },
+  {
+    path: "/investmentBanks",
+    element: InvestmentBanksPage,
+  },
+  {
+    path: "/clientProfiles",
+    element: ClientProfilesPage,
   },
 ];
 
