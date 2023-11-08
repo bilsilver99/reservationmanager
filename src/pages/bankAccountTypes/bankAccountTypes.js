@@ -24,7 +24,7 @@ import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import { useAuth } from "../../contexts/auth";
 import "./app.scss";
-import { mystore } from "./bankaccountTypesDataTypesData";
+import { mystore } from "./bankaccountTypesData";
 import { mystore2 } from "./bankaccountTypesData";
 import "whatwg-fetch";
 //import CustomStore from "devextreme/data/custom_store";

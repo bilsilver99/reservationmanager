@@ -33,6 +33,7 @@ export const login = async (username, password) => {
         return {
           clientname: json.user_response.ReturnClientName,
           clientcode: json.user_response.ReturnClientCode,
+          thisClientcode: "",
           authorized: "Y",
           administrator: json.user_response.Returnadministrator,
           clientcompany: json.user_response.Returnedcompanynumber,

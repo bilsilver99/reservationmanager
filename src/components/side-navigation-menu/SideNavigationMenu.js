@@ -20,7 +20,10 @@ export default function SideNavigationMenu(props) {
       .filter(
         (item) =>
           (user.administrator === "Y" && item.auth === "Y") ||
-          (user.administrator === "N" && item.auth === "N")
+          (user.administrator === "N" && item.auth === "N") ||
+          (user.administrator === "Y" &&
+            item.auth === "X" &&
+            user.thisClientcode !== "")
       )
       .map((item) => ({
         ...item,

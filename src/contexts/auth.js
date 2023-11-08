@@ -11,6 +11,10 @@ function AuthProvider(props) {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
 
+  const updateUser = useCallback((updates) => {
+    setUser((currentUser) => ({ ...currentUser, ...updates }));
+  }, []);
+
   useEffect(() => {
     (async function () {
       const result = await getUser();
@@ -25,6 +29,7 @@ function AuthProvider(props) {
     const result = await sendSignInRequest(email, password);
     if (result.isOk) {
       setUser(result.data);
+      console.log("user values ", result.data);
     }
 
     return result;
@@ -36,7 +41,7 @@ function AuthProvider(props) {
 
   return (
     <AuthContext.Provider
-      value={{ user, signIn, signOut, loading }}
+      value={{ user, signIn, signOut, loading, updateUser }}
       {...props}
     />
   );

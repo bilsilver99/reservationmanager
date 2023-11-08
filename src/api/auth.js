@@ -30,8 +30,14 @@ export async function signIn(email, password) {
       currentUser.FlinksConnectDomainWealth =
         response.FlinksConnectDomainWealth;
       currentUser.FlinksProjectIDWealth = response.FlinksProjectIDWealth;
+      currentUser.thisClientcode = response.thisClientcode;
 
-      //console.log(currentUser);
+      console.log(
+        "this:",
+        currentUser.thisClientcode,
+        "sent",
+        currentUser.clientCode
+      );
     });
     if (thisOK === "1") {
       return {

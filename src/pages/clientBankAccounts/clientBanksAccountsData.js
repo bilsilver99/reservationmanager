@@ -36,7 +36,7 @@ export const mystore = (myClient) =>
           Parameters: params,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/getBankAccountypes`;
+      const url = `${process.env.REACT_APP_BASE_URL}/getClientbankAccounts`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           //console.log("client " + myClient);
@@ -49,9 +49,9 @@ export const mystore = (myClient) =>
           return response.json();
         })
         .then((json) => {
-          console.log("types: ", json);
+          console.log("from client: ", myClient, "types: ", json);
           return {
-            data: json.user_response.loginq,
+            data: json.user_response.bankq,
             totalCount: json.user_response.totalCount,
             key: json.user_response.keyname,
           };

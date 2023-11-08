@@ -130,10 +130,24 @@ export const navigation = [
         path: "/investmentBanks",
       },
       {
-        text: "Clients",
+        text: "List Clients",
         icon: "folder",
         auth: "Y",
         path: "/clientProfiles",
+      },
+    ],
+  },
+
+  {
+    text: "Client Management",
+    icon: "folder",
+    auth: "Y",
+    items: [
+      {
+        text: "Client",
+        icon: "folder",
+        path: "/clientManagement",
+        auth: "Y",
       },
     ],
   },

@@ -1,4 +1,11 @@
 import React from "react";
+
+//import React, { useEffect, useState } from "react";
+//import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
+//import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+//import { faCheckSquare, faSquare } from "@fortawesome/free-solid-svg-icons";
+//import { getTransactionGroups } from "../../api/MyOwnServices";
+//
 import DataGrid, {
   Column,
   Editing,
@@ -12,24 +19,22 @@ import DataGrid, {
   Search,
   SearchPanel,
 } from "devextreme-react/data-grid";
-import { EmptyItem, Item, GroupItem } from "devextreme-react/form";
+import { Item } from "devextreme-react/form";
 import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import { useAuth } from "../../contexts/auth";
 import "./app.scss";
-
-//import "devextreme/dist/css/dx.light.css";
-
-import { mystore } from "./clientprofilesData";
-//import { mystore2 } from "./transactionGroupData";
+import { mystore } from "./clientBanksAccountsData";
+import { mystore2 } from "./clientBanksAccountsData";
 import "whatwg-fetch";
-import SelectBox from "devextreme-react/select-box";
+//import CustomStore from "devextreme/data/custom_store";
+//import SelectBox from "devextreme-react/select-box";
 
 const allowedPageSizes = [8, 12, 24];
 
 //let pageoption = 90;
 
-class ClientProfilesx extends React.Component {
+class ClientBankAccountsx extends React.Component {
   constructor(props) {
     super(props);
     this.applyFilterTypes = [
@@ -78,7 +83,7 @@ class ClientProfilesx extends React.Component {
   }
 
   handleEditingStart(e) {
-    console.log("Editing is starting for row", e.data);
+    //console.log("Editing is starting for row", e.data);
 
     // You can access the data of the row that is being edited
     const rowToBeEdited = e.data;
@@ -89,19 +94,18 @@ class ClientProfilesx extends React.Component {
       e.cancel = true; // Prevents the editing from starting
     }
   }
-  //  <div className="content-block-font dx-card responsive-paddings">
 
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
+        <h3>Bank Accounts</h3>
         <DataGrid
-          dataSource={mystore(this.props.companyCode)}
-          keyExpr="UNIQUEID"
+          dataSource={mystore(this.props.clientCode)}
+          //keyExpr="UNIQUEID"
           showBorders={true}
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
-          id="form"
         >
           <FilterRow
             visible={this.state.showFilterRow}
@@ -110,106 +114,56 @@ class ClientProfilesx extends React.Component {
           <HeaderFilter visible={this.state.showHeaderFilter} />
           <SearchPanel visible={true} width={240} placeholder="Search..." />
           <Paging enabled={true} />
-          <Editing
-            mode="popup"
-            allowUpdating={true}
-            allowAdding={true}
-            allowDeleting={true}
-          >
-            <Popup
-              title="Client Information"
-              showTitle={true}
-              width={"80%"}
-              height={800}
-            />
-            <Form colCount={2}>
-              <Item itemType="group" colCount={8} colSpan={8} caption="Main">
-                <Item dataField="CLIENTCODE" colSpan={2} />
-                <Item dataField="NAME" colSpan={6} />
-              </Item>
-              <Item itemType="group" colCount={8} colSpan={8} caption="Main">
-                <Item dataField="ADDRESSLINEONE" />
-                <Item dataField="ADDRESSLINETWO" />
-                <Item dataField="ADDRESSLINETHREE" />
-                <Item dataField="ADDRESSLINEFOUR" />
-                <Item dataField="COUNTRY" />
-                <Item dataField="POSTALZIP" />
-                <Item dataField="ASSIGNEDTO" />
-                <Item dataField="INACTIVE" />
-              </Item>
-            </Form>
-          </Editing>
           <Column
             dataField={"CLIENTCODE"}
-            caption={"Client Code"}
+            width={190}
+            caption={"Client"}
             hidingPriority={8}
             visible={true}
           />
           <Column
-            dataField={"NAME"}
-            caption={"Name"}
+            dataField={"BANKCODE"}
+            width={190}
+            caption={"Bank Code"}
             hidingPriority={8}
             visible={true}
           />
           <Column
-            dataField={"ADDRESSLINEONE"}
-            caption={"Address"}
+            dataField={"BANKNAME"}
+            width={190}
+            caption={"Bank"}
             hidingPriority={8}
             visible={true}
           />
           <Column
-            dataField={"ADDRESSLINETWO"}
-            caption={"Address Two"}
+            dataField={"BANKACCOUNTNUMBER"}
+            width={190}
+            caption={"Account"}
             hidingPriority={8}
             visible={true}
           />
           <Column
-            dataField={"ADDRESSLINETHREE"}
-            caption={"Address Three"}
+            dataField={"ACCOUNTDESCRIPTION"}
+            width={190}
+            caption={"Description"}
             hidingPriority={8}
             visible={true}
           />
           <Column
-            dataField={"ADDRESSLINEFOUR"}
-            caption={"Address Four"}
+            dataField={"BANKBALANCE"}
+            width={190}
+            caption={"Balance"}
             hidingPriority={8}
             visible={true}
-          />
-          <Column
-            dataField={"COUNTRY"}
-            caption={"Country"}
-            hidingPriority={8}
-            visible={true}
-          />
-          <Column
-            dataField={"POSTALZIP"}
-            caption={"Postal/Zip"}
-            hidingPriority={8}
-            visible={true}
-          />
-          <Column
-            dataField={"ASSIGNEDTO"}
-            caption={"Assigned To"}
-            hidingPriority={8}
-            visible={true}
-          />
-
-          <Column
-            dataType="boolean"
-            dataField={"INACTIVE"}
-            caption={"Inactive"}
-            hidingPriority={8}
-            visible={true}
-            editorType="dxCheckBox"
           />
           <Column
             dataField={"UNIQUEID"}
-            width={90}
+            width={190}
+            caption={"ID"}
             hidingPriority={8}
-            dataType="Number"
             visible={false}
-            allowEditing={false}
           />
+
           <Paging defaultPageSize={8} />
           <Pager
             showPageSizeSelector={true}
@@ -220,9 +174,79 @@ class ClientProfilesx extends React.Component {
     );
   }
 }
+// function cellRender(data) {
+//   //console.log("wtf", data.row.data.IMAGE);
+//   if (data.row.data.IMAGE || 0)
+//     return (
+//       <img
+//         src={imagetoshow[data.row.data.IMAGE - 1]}
+//         alt={data.row.data.BANKNAME}
+//         height={40}
+//       />
+//       // <img src={cibc} alt={`${data.row.data.IMAGE}`} height={40} />
+//     );
+// }
 
-export default function ClientProfiles() {
+// function cellRender(data) {
+//   console.log("sent", data);
+//   return <img src={`${data}`} alt="BANK" height={40} />;
+// }
+
+export default function ClientBankAccounts() {
   const { user } = useAuth();
-  //console.log({ user });
-  return <ClientProfilesx companyCode={user.companyCode} />;
+  console.log("my user stuff", { user });
+  return <ClientBankAccountsx clientCode={user.thisClientcode} />;
 }
+
+// {/* <Editing
+// mode="popup"
+// allowUpdating={true}
+// allowAdding={true}
+// allowDeleting={true}
+// >
+// <Popup
+//   title="Type Info"
+//   showTitle={true}
+//   width={900}
+//   height={800}
+// />
+// <Form>
+//   <Item
+//     itemType="group"
+//     colCount={2}
+//     colSpan={2}
+//     showBorders={true}
+//   >
+//     <Item dataField="BANKACCOUNTTYPE" />
+//     <Item dataField="DESCRIPTION" />
+
+//     <Item
+//       dataField="REPORTINGSEQUENCE"
+//       label={{ text: "Reporting Sequence" }}
+//     />
+//   </Item>
+
+//   <Item
+//     itemType="group"
+//     caption="Options"
+//     colCount={2}
+//     colSpan={2}
+//     showBorders={true}
+//   >
+//     <Item dataField={"ASSET"} />
+//     <Item dataField={"LIABILITY"} />
+//     <Item dataField={"PERSONALACCOUNT"} />
+//     <Item dataField={"LOC"} />
+//     <Item dataField={"INVESTMENT"} />
+//     <Item dataField={"SAVINGS"} />
+//     <Item dataField={"INVESTMENTLOANS"} />
+//     <Item dataField={"PERSONALLOANS"} />
+//     <Item dataField={"HOUSE"} />
+//     <Item dataField={"REALESTATEINVESTMENT"} />
+//     <Item dataField={"CFM"} />
+//     <Item dataField={"REALESTATERENTALMORTGAGE"} />
+//     <Item dataField={"SINGLELINESUMMARY"} />
+//     <Item dataField={"BUSINESSLOAN"} />
+//   </Item>
+// </Form>
+// </Editing> */}

@@ -21,6 +21,8 @@ import {
   AssetTypesPage,
   InvestmentBanksPage,
   ClientProfilesPage,
+  ClientManagementPage,
+  ClientBankAccountsPage,
 } from "./pages";
 import { withNavigationWatcher } from "./contexts/navigation";
 
@@ -112,6 +114,14 @@ const routes = [
   {
     path: "/clientProfiles",
     element: ClientProfilesPage,
+  },
+  {
+    path: "/clientManagement",
+    element: ClientManagementPage,
+  },
+  {
+    path: "/clientBankAccounts",
+    element: ClientBankAccountsPage,
   },
 ];
 

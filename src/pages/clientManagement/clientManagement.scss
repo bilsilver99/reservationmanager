@@ -1,0 +1,94 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  background-color: red #f0f0f0; /* light gray background */
+  justify-content: space-between; /* Added */
+  background-color: #ffffff; /* white dropdown */
+  border: 1px solid #9e0e0e; /* light gray border */
+  border-radius: 10px; /* rounded corners */
+  padding: 20px; /* Added */
+}
+
+.scheduler {
+  margin: 0 auto;
+  width: 60%;
+  background-color: #ffffff; /* white scheduler */
+  border: 1px solid #9e0e0e; /* light gray border */
+  border-radius: 0px; /* rounded corners */
+}
+.dropdown {
+  margin-bottom: 20px;
+  margin: 20px auto;
+  align-items: center;
+  //width: 400px; /* Adjust width as needed */
+  display: flex; /* Added */
+  justify-content: space-between; /* Added */
+  background-color: #ffffff; /* white dropdown */
+  border: 1px solid #9e0e0e; /* light gray border */
+  border-radius: 10px; /* rounded corners */
+  padding: 20px; /* Added */
+}
+#scheduler .dx-scheduler-cell-sizes-vertical {
+  height: 50px !important;
+}
+// .options {
+//   padding: 20px;
+//   background-color: rgba(191, 191, 191, 0.15);
+//   margin-top: 20px;
+// }
+
+// .caption {
+//   font-size: 18px;
+//   font-weight: 500;
+// }
+
+// .option {
+//   margin-top: 10px;
+//   display: inline-block;
+// }
+
+// .dx-scheduler-work-space-group-by-date .dx-scheduler-group-header-content {
+//   font-size: 20px;
+// }
+
+//////////////////////////////////////////////////
+// .scheduler {
+//   //height: 800px;
+//   width: 1000px;
+// }
+
+// .scheduler {
+//   width: 90%;
+//   //max-width: 800px;
+//   background-color: #ffffff; /* white scheduler */
+//   border: 1px solid #d3d3d3; /* light gray border */
+//   border-radius: 0px; /* rounded corners */
+// }
+
+// .dx-dropdowneditor-input-wrapper {
+//   padding: 10px;
+// }
+
+// .dx-scrollview-content .dx-list-item {
+//   display: flex;
+//   justify-content: center;
+//   padding: 10px 0;
+//   cursor: pointer;
+//   color: #000000; /* black text */
+// }
+
+// .dx-scrollview-content .dx-list-item:hover {
+//   background-color: #87cefa; /* light blue hover */
+//   color: #ffffff; /* white text */
+// }
+// .service-select-container {
+//   width: 300px;
+// }
+
+// .service-select {
+//   width: 100%;
+// }
+// #scheduler .dx-scheduler-appointment {
+//   max-height: 200px;
+// }
