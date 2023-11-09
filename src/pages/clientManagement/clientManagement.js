@@ -6,7 +6,7 @@ import "./clientManagement.scss";
 import { useAuth } from "../../contexts/auth";
 import { fetchThisClientData, getClients } from "./clientManagementData";
 import { Button } from "devextreme-react/button";
-import ClientBankAccounts from "../clientBankAccounts/clientBankAccounts";
+import ClientBankAccounts from "./clientBankAccounts/clientBankAccounts";
 
 const clients = ["sam", "lou"];
 const ClientManagement = () => {
@@ -126,6 +126,7 @@ const ClientManagement = () => {
               valueExpr="label"
               displayExpr="label"
               value={currentClientCode}
+              searchEnabled={true}
               //value={currentEmployeeName}
               onValueChanged={setClientData}
               //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
@@ -143,8 +144,8 @@ const ClientManagement = () => {
             />
           </div>
         </div>
-        <div className="content-block dx-card responsive-paddings">
-          {showInfo && (
+        {showInfo && (
+          <div className="content-block dx-card responsive-paddings">
             <Form id="form" formData={customerData}>
               <GroupItem colCount={3}>
                 <Item labeltext={"Client Code"} dataField="ClientCode" />
@@ -188,9 +189,9 @@ const ClientManagement = () => {
                 />
               </GroupItem>
             </Form>
-          )}
-          {showBanks && <ClientBankAccounts clientCode={currentClientCode} />}
-        </div>
+          </div>
+        )}
+        {showBanks && <ClientBankAccounts clientCode={currentClientCode} />}
       </div>
     </>
   );

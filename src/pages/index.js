@@ -21,4 +21,4 @@ export { default as AssetTypesPage } from "./assetTypes/assetTypes";
 export { default as InvestmentBanksPage } from "./investmentBanks/investmentBanks";
 export { default as ClientProfilesPage } from "./clientProfiles/clientProfiles";
 export { default as ClientManagementPage } from "./clientManagement/clientManagement";
-export { default as ClientBankAccountsPage } from "./clientBankAccounts/clientBankAccounts";
+export { default as ClientBankAccountsPage } from "./clientManagement/clientBankAccounts/clientBankAccounts";

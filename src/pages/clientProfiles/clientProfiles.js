@@ -102,6 +102,12 @@ class ClientProfilesx extends React.Component {
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
           id="form"
+          editing={{
+            mode: "row", // or 'batch' or 'cell', depending on what you use
+            allowAdding: false, // Disable adding new rows
+            allowUpdating: false, // Disable updating rows
+            allowDeleting: false, // Disable deleting rows
+          }}
         >
           <FilterRow
             visible={this.state.showFilterRow}
@@ -110,35 +116,6 @@ class ClientProfilesx extends React.Component {
           <HeaderFilter visible={this.state.showHeaderFilter} />
           <SearchPanel visible={true} width={240} placeholder="Search..." />
           <Paging enabled={true} />
-          <Editing
-            mode="popup"
-            allowUpdating={true}
-            allowAdding={true}
-            allowDeleting={true}
-          >
-            <Popup
-              title="Client Information"
-              showTitle={true}
-              width={"80%"}
-              height={800}
-            />
-            <Form colCount={2}>
-              <Item itemType="group" colCount={8} colSpan={8} caption="Main">
-                <Item dataField="CLIENTCODE" colSpan={2} />
-                <Item dataField="NAME" colSpan={6} />
-              </Item>
-              <Item itemType="group" colCount={8} colSpan={8} caption="Main">
-                <Item dataField="ADDRESSLINEONE" />
-                <Item dataField="ADDRESSLINETWO" />
-                <Item dataField="ADDRESSLINETHREE" />
-                <Item dataField="ADDRESSLINEFOUR" />
-                <Item dataField="COUNTRY" />
-                <Item dataField="POSTALZIP" />
-                <Item dataField="ASSIGNEDTO" />
-                <Item dataField="INACTIVE" />
-              </Item>
-            </Form>
-          </Editing>
           <Column
             dataField={"CLIENTCODE"}
             caption={"Client Code"}
@@ -226,3 +203,33 @@ export default function ClientProfiles() {
   //console.log({ user });
   return <ClientProfilesx companyCode={user.companyCode} />;
 }
+
+// {/* <Editing
+// mode="popup"
+// allowUpdating={true}
+// allowAdding={true}
+// allowDeleting={true}
+// >
+// <Popup
+//   title="Client Information"
+//   showTitle={true}
+//   width={"80%"}
+//   height={800}
+// />
+// <Form colCount={2}>
+//   <Item itemType="group" colCount={8} colSpan={8} caption="Main">
+//     <Item dataField="CLIENTCODE" colSpan={2} />
+//     <Item dataField="NAME" colSpan={6} />
+//   </Item>
+//   <Item itemType="group" colCount={8} colSpan={8} caption="Main">
+//     <Item dataField="ADDRESSLINEONE" />
+//     <Item dataField="ADDRESSLINETWO" />
+//     <Item dataField="ADDRESSLINETHREE" />
+//     <Item dataField="ADDRESSLINEFOUR" />
+//     <Item dataField="COUNTRY" />
+//     <Item dataField="POSTALZIP" />
+//     <Item dataField="ASSIGNEDTO" />
+//     <Item dataField="INACTIVE" />
+//   </Item>
+// </Form>
+// </Editing> */}

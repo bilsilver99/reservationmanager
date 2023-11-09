@@ -119,10 +119,6 @@ const routes = [
     path: "/clientManagement",
     element: ClientManagementPage,
   },
-  {
-    path: "/clientBankAccounts",
-    element: ClientBankAccountsPage,
-  },
 ];
 
 export default routes.map((route) => {

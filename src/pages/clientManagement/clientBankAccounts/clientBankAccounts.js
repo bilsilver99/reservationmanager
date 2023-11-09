@@ -18,21 +18,23 @@ import DataGrid, {
   HeaderFilter,
   Search,
   SearchPanel,
+  MasterDetail,
 } from "devextreme-react/data-grid";
 import { Item } from "devextreme-react/form";
 import "devextreme-react/text-area";
 import "devextreme/data/data_source";
-import { useAuth } from "../../contexts/auth";
+import { useAuth } from "../../../contexts/auth";
 import "./app.scss";
 import { mystore } from "./clientBanksAccountsData";
 import { mystore2 } from "./clientBanksAccountsData";
 import "whatwg-fetch";
+import ClientBankSegments from "./clientBankSegments";
 //import CustomStore from "devextreme/data/custom_store";
 //import SelectBox from "devextreme-react/select-box";
 
 const allowedPageSizes = [8, 12, 24];
 
-//let pageoption = 90;
+let pageoption = 90;
 
 class ClientBankAccountsx extends React.Component {
   constructor(props) {
@@ -98,14 +100,14 @@ class ClientBankAccountsx extends React.Component {
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Bank Accounts</h3>
         <DataGrid
           dataSource={mystore(this.props.clientCode)}
           //keyExpr="UNIQUEID"
-          showBorders={true}
+          showBorders={false}
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
+          width={"100%"}
         >
           <FilterRow
             visible={this.state.showFilterRow}
@@ -115,36 +117,43 @@ class ClientBankAccountsx extends React.Component {
           <SearchPanel visible={true} width={240} placeholder="Search..." />
           <Paging enabled={true} />
           <Column
+            dataField={"UNIQUEID"}
+            width={190}
+            caption={"ID"}
+            hidingPriority={8}
+            visible={false}
+          />
+          <Column
             dataField={"CLIENTCODE"}
             width={190}
             caption={"Client"}
             hidingPriority={8}
-            visible={true}
+            visible={false}
           />
           <Column
             dataField={"BANKCODE"}
-            width={190}
+            width={40}
             caption={"Bank Code"}
             hidingPriority={8}
-            visible={true}
+            visible={false}
           />
           <Column
             dataField={"BANKNAME"}
-            width={190}
+            width={100}
             caption={"Bank"}
             hidingPriority={8}
             visible={true}
           />
           <Column
             dataField={"BANKACCOUNTNUMBER"}
-            width={190}
+            width={200}
             caption={"Account"}
             hidingPriority={8}
             visible={true}
           />
           <Column
             dataField={"ACCOUNTDESCRIPTION"}
-            width={190}
+            width={400}
             caption={"Description"}
             hidingPriority={8}
             visible={true}
@@ -155,15 +164,32 @@ class ClientBankAccountsx extends React.Component {
             caption={"Balance"}
             hidingPriority={8}
             visible={true}
+            format={"$###,###,###.00"}
+            alignment="right"
           />
           <Column
-            dataField={"UNIQUEID"}
+            dataField={"AVAILABLEBALANCE"}
             width={190}
-            caption={"ID"}
+            caption={"Available Balance"}
             hidingPriority={8}
-            visible={false}
+            visible={true}
+            format={"$###,###,###.00"}
+            alignment="right"
           />
-
+          <Column
+            dataField={"ACCOUNTLIMIT"}
+            width={190}
+            caption={"Account Limit"}
+            hidingPriority={8}
+            visible={true}
+            format={"$###,###,###.00"}
+            alignment="right"
+          />
+          <MasterDetail
+            enabled={true}
+            render={renderDetail}
+            sendor={this.state.filterValue}
+          />
           <Paging defaultPageSize={8} />
           <Pager
             showPageSizeSelector={true}
@@ -194,10 +220,15 @@ class ClientBankAccountsx extends React.Component {
 
 export default function ClientBankAccounts() {
   const { user } = useAuth();
-  console.log("my user stuff", { user });
+  //console.log("my user stuff", { user });
   return <ClientBankAccountsx clientCode={user.thisClientcode} />;
 }
 
+function renderDetail(props) {
+  //console.log("unique", props.data.UNIQUEID, "range: ", pageoption);
+  const uniqueid = props.data.UNIQUEID;
+  return <ClientBankSegments rowid={uniqueid} sendit={pageoption} />;
+}
 // {/* <Editing
 // mode="popup"
 // allowUpdating={true}
