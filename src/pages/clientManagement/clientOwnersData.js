@@ -23,7 +23,6 @@ export const mystore = (myClient) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -36,10 +35,10 @@ export const mystore = (myClient) =>
           Parameters: params,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/getClientbankAccounts`;
+      const url = `${process.env.REACT_APP_BASE_URL}/getClientOwners`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
-          ////console.log("client " + myClient);
+          //console.log("client " + myClient);
           if (!response.ok) {
             return {
               companyname: "System did not respond",
@@ -70,7 +69,8 @@ export const mystore = (myClient) =>
           SentCompany: myClient,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientbankAccounts`;
+      //console.log("Add", "KVP", values, "SC", myClient);
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientOwners`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -87,7 +87,7 @@ export const mystore = (myClient) =>
     },
     remove: (key) => {
       //console.log(key);
-      ////console.log(values);
+      //console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -99,7 +99,7 @@ export const mystore = (myClient) =>
           ThisFunction: "delete",
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientbankAccounts`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientOwners`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -129,8 +129,7 @@ export const mystore = (myClient) =>
           keyvaluepair: values,
         }),
       };
-      //console.log("key: ', key", "values", values);
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientbankAccounts`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientOwners`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -148,99 +147,3 @@ export const mystore = (myClient) =>
   });
 
 export const mystore2 = (myClient) => {};
-
-export const myStore3 = () => {
-  var myClient = 1;
-  var requestoptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json;",
-    },
-    body: JSON.stringify({
-      sentclientcode: myClient,
-    }),
-  };
-  const url = `${process.env.REACT_APP_BASE_URL}/getBanks`;
-  return fetch(url, requestoptions) // Request fish
-    .then((response) => {
-      ////console.log("client " + myClient);
-      if (!response.ok) {
-        return {
-          companyname: "System did not respond",
-          returnaddress: " ",
-        };
-      }
-      return response.json();
-    })
-    .then((json) => {
-      //console.log("banks list", json);
-      return {
-        data: json.user_response.loginq,
-      };
-    });
-};
-
-export const myStore4 = (myClient) => {
-  //var myClient = 1;
-  var requestoptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json;",
-    },
-    body: JSON.stringify({
-      sentclientcode: myClient,
-    }),
-  };
-  const url = `${process.env.REACT_APP_BASE_URL}/getClientOwners`;
-  return fetch(url, requestoptions) // Request fish
-    .then((response) => {
-      ////console.log("client " + myClient);
-      if (!response.ok) {
-        return {
-          companyname: "System did not respond",
-          returnaddress: " ",
-        };
-      }
-      return response.json();
-    })
-    .then((json) => {
-      //console.log("banks list", json);
-      return {
-        data: json.user_response.bankq,
-      };
-    });
-};
-
-export const myStore5 = (myClient) => {
-  //var myClient = 1;
-  var requestoptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json;",
-    },
-    body: JSON.stringify({
-      sentclientcode: myClient,
-    }),
-  };
-  const url = `${process.env.REACT_APP_BASE_URL}/getBankAccountTypes`;
-  return fetch(url, requestoptions) // Request fish
-    .then((response) => {
-      ////console.log("client " + myClient);
-      if (!response.ok) {
-        return {
-          companyname: "System did not respond",
-          returnaddress: " ",
-        };
-      }
-      return response.json();
-    })
-    .then((json) => {
-      //console.log("banks list", json);
-      return {
-        data: json.user_response.loginq,
-      };
-    });
-};

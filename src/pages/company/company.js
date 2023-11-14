@@ -136,7 +136,7 @@ function Companyx(props) {
 
   return (
     <React.Fragment>
-      <h2 className={"content-block"}>Client Information</h2>
+      <h2 className={"content-block"}>Company Information</h2>
       <div className="content-block dx-card responsive-paddings">
         <form onSubmit={companyUpdate}>
           <Form

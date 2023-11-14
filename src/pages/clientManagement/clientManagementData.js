@@ -23,7 +23,7 @@ export const getClients = async () => {
       return response.json();
     })
     .then((json) => {
-      console.log("data stuff", json);
+      //console.log("data stuff", json);
       return {
         data: json.user_response.loginq.map((item) => ({
           label: item.CLIENTCODE,
@@ -38,7 +38,7 @@ export const getClients = async () => {
     });
 };
 export const fetchThisClientData = async (clientCode) => {
-  console.log("client in:", clientCode);
+  //console.log("client in:", clientCode);
   var requestoptions = {
     method: "POST",
     headers: {

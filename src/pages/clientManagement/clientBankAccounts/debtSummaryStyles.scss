@@ -1,0 +1,30 @@
+.custom-container .dx-datagrid-rowsview .dx-row > td {
+  font-size: 11px !important;
+  overflow: auto; // Ensures the grid doesn't overflow the container
+  .dx-row {
+    height: 80px;
+  }
+  padding-left: 20px;
+}
+.data-grid-container {
+  border: 1px solid #ccc;
+  overflow: auto; // Ensures the grid doesn't overflow the container
+  padding: 10px;
+  // ... other styles ...
+}
+
+.custom-container .dx-datagrid-rowsview .dx-row > td {
+  font-size: mynummber !important;
+  overflow: auto; // Ensures the grid doesn't overflow the container
+  .dx-row {
+    height: 80px;
+  }
+  padding-left: 20px;
+}
+
+.description-highlight {
+  color: red;
+}
+.description-highlight2 {
+  color: blue;
+}

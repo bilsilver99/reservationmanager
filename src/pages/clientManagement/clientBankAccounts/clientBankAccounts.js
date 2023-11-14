@@ -26,7 +26,8 @@ import "devextreme/data/data_source";
 import { useAuth } from "../../../contexts/auth";
 import "./app.scss";
 import { mystore } from "./clientBanksAccountsData";
-import { mystore2 } from "./clientBanksAccountsData";
+//import { mystore2 } from "./clientBanksAccountsData";
+import { myStore3, myStore4, myStore5 } from "./clientBanksAccountsData";
 import "whatwg-fetch";
 import ClientBankSegments from "./clientBankSegments";
 //import CustomStore from "devextreme/data/custom_store";
@@ -54,26 +55,77 @@ class ClientBankAccountsx extends React.Component {
       currentRow: 0,
       filterValue: "90",
       selectedRowKeys: [],
-      transactionGroupData: [], // add new state variable
+      //transactionGroupData: [], // add new state variable
       companyCode: 1,
       showFilterRow: true,
       showHeaderFilter: true,
       currentFilter: this.applyFilterTypes[0].key,
+      bankData: [],
+      ownerData: [],
+      bankTypes: [],
       //bankNameToAuthorize: "", // add new state variable
     };
   }
 
+  componentDidMount() {
+    myStore3() // call the function to fetch data
+      .then((data) => {
+        //console.log("banks", data);
+        this.setState({ bankData: data.data }); // store the data in state
+        //console.log("bankdata", this.state.bankData);
+      })
+      .catch((error) => {
+        console.error(
+          "There was an error fetching the transaction group data:",
+          error
+        );
+      });
+
+    myStore4(this.props.clientCode) // call the function to fetch data
+      .then((data) => {
+        //console.log("owners in", data);
+
+        this.setState({ ownerData: data.data }, () => {
+          //console.log("owners assigned", this.state.ownerData);
+        });
+      })
+      .catch((error) => {
+        console.error(
+          "There was an error fetching the transaction group data:",
+          error
+        );
+      });
+
+    myStore5(this.props.clientCode) // call the function to fetch data
+      .then((data) => {
+        //console.log("bank types", data);
+        this.setState({ bankTypes: data.data }, () => {
+          //console.log("bank types", this.state.bankTypes);
+        }); // store the data in state
+      })
+      .catch((error) => {
+        console.error(
+          "There was an error fetching the transaction group data:",
+          error
+        );
+      });
+  }
+
+  getClientOwners;
+
   // componentDidMount() {
-  //   mystore2() // call the function to fetch data
+  //   const store = mystore3(this.props.clientCode);
+
+  //   store
+  //     .load()
   //     .then((data) => {
-  //       //console.log("data", data);
-  //       this.setState({ transactionGroupData: data.data }); // store the data in state
+  //       console.log("Data returned from mystore3:", data);
+  //       this.setState({ bankData: data }, () => {
+  //         console.log("bankData:", this.state.bankData);
+  //       });
   //     })
   //     .catch((error) => {
-  //       console.error(
-  //         "There was an error fetching the transaction group data:",
-  //         error
-  //       );
+  //       console.error("There was an error:", error);
   //     });
   // }
 
@@ -83,6 +135,8 @@ class ClientBankAccountsx extends React.Component {
       this.setState({ currentRow: e.selectedRowKeys[0] }); // update the current row
     }
   }
+
+  nameEditorOptions = { disabled: true };
 
   handleEditingStart(e) {
     //console.log("Editing is starting for row", e.data);
@@ -97,25 +151,65 @@ class ClientBankAccountsx extends React.Component {
     }
   }
 
+  handleDetailChange = (newDetailData) => {
+    // Perform necessary state updates or calculations here
+    // For example, recalculate the total sum of details and update state
+  };
+
   render() {
     return (
-      <div className="content-block dx-card responsive-paddings">
+      <div className="content-block2 dx-card ">
         <DataGrid
           dataSource={mystore(this.props.clientCode)}
-          //keyExpr="UNIQUEID"
+          keyExpr="UNIQUEID"
           showBorders={false}
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
           width={"100%"}
+          columnAutoWidth={true}
         >
           <FilterRow
             visible={this.state.showFilterRow}
             applyFilter={this.state.currentFilter}
           />
           <HeaderFilter visible={this.state.showHeaderFilter} />
-          <SearchPanel visible={true} width={240} placeholder="Search..." />
+          <SearchPanel visible={false} width={240} placeholder="Search..." />
           <Paging enabled={true} />
+          <Editing
+            mode="popup"
+            allowUpdating={true}
+            allowAdding={true}
+            allowDeleting={true}
+          >
+            <Popup
+              title="Bank Info"
+              showTitle={true}
+              width={900}
+              height={500}
+            />
+            <Form>
+              <Item dataField={"BANKCODE"} />
+              <Item dataField={"BANKACCOUNTNUMBER"} />
+              <Item dataField={"ACCOUNTDESCRIPTION"} />
+              <Item
+                dataField={"BANKBALANCE"}
+                editorOptions={this.nameEditorOptions}
+              />
+              <Item
+                dataField={"AVAILABLEBALANCE"}
+                editorOptions={this.nameEditorOptions}
+              />
+              <Item dataField={"ACCOUNTLIMIT"} />
+              <Item dataField={"REPORTINGSEQUENCE"} />
+              <Item dataField={"BANKACCOUNTTYPE"} />
+              <Item dataField={"ACCOUNTOWNER"} />
+              <Item
+                dataField={"LASTTRANSACTIONDATE"}
+                editorOptions={this.nameEditorOptions}
+              />
+            </Form>
+          </Editing>
           <Column
             dataField={"UNIQUEID"}
             width={190}
@@ -130,20 +224,20 @@ class ClientBankAccountsx extends React.Component {
             hidingPriority={8}
             visible={false}
           />
+
           <Column
-            dataField={"BANKCODE"}
-            width={40}
-            caption={"Bank Code"}
-            hidingPriority={8}
-            visible={false}
-          />
-          <Column
-            dataField={"BANKNAME"}
-            width={100}
-            caption={"Bank"}
-            hidingPriority={8}
-            visible={true}
-          />
+            dataField="BANKCODE"
+            caption="Bank"
+            width={125}
+            dataType="number"
+          >
+            <Lookup
+              dataSource={this.state.bankData}
+              valueExpr="BANKCODES"
+              displayExpr="BANKNAME"
+            />
+          </Column>
+
           <Column
             dataField={"BANKACCOUNTNUMBER"}
             width={200}
@@ -153,7 +247,7 @@ class ClientBankAccountsx extends React.Component {
           />
           <Column
             dataField={"ACCOUNTDESCRIPTION"}
-            width={400}
+            width={200}
             caption={"Description"}
             hidingPriority={8}
             visible={true}
@@ -166,6 +260,7 @@ class ClientBankAccountsx extends React.Component {
             visible={true}
             format={"$###,###,###.00"}
             alignment="right"
+            edit={false}
           />
           <Column
             dataField={"AVAILABLEBALANCE"}
@@ -175,6 +270,7 @@ class ClientBankAccountsx extends React.Component {
             visible={true}
             format={"$###,###,###.00"}
             alignment="right"
+            edit={false}
           />
           <Column
             dataField={"ACCOUNTLIMIT"}
@@ -185,10 +281,61 @@ class ClientBankAccountsx extends React.Component {
             format={"$###,###,###.00"}
             alignment="right"
           />
+          <Column
+            dataField={"BLANK"}
+            width={200}
+            caption={""}
+            hidingPriority={8}
+            visible={true}
+          />
+          <Column
+            dataField={"REPORTINGSEQUENCE"}
+            width={190}
+            caption={"Reporting Sequence"}
+            hidingPriority={8}
+            visible={false}
+            format={"####"}
+            alignment="right"
+          />
+          <Column
+            dataField={"BANKACCOUNTTYPE"}
+            width={190}
+            caption={"Account Type"}
+            hidingPriority={8}
+            visible={false}
+          >
+            <Lookup
+              dataSource={this.state.bankTypes}
+              valueExpr="BANKACCOUNTTYPES"
+              displayExpr="DESCRIPTION"
+            />
+          </Column>
+          <Column
+            dataField={"ACCOUNTOWNER"}
+            width={190}
+            caption={"Owner"}
+            hidingPriority={8}
+            visible={false}
+          >
+            <Lookup
+              dataSource={this.state.ownerData}
+              valueExpr="SEQUENCE"
+              displayExpr="NAME"
+            />
+          </Column>
+
+          <Column
+            dataField={"LASTTRANSACTIONDATE"}
+            width={190}
+            caption={"Last Transaction Date"}
+            hidingPriority={8}
+            visible={false}
+          />
           <MasterDetail
             enabled={true}
-            render={renderDetail}
+            //render={renderDetail}
             sendor={this.state.filterValue}
+            render={(props) => renderDetail(props, this.handleDetailChange)}
           />
           <Paging defaultPageSize={8} />
           <Pager
@@ -200,24 +347,6 @@ class ClientBankAccountsx extends React.Component {
     );
   }
 }
-// function cellRender(data) {
-//   //console.log("wtf", data.row.data.IMAGE);
-//   if (data.row.data.IMAGE || 0)
-//     return (
-//       <img
-//         src={imagetoshow[data.row.data.IMAGE - 1]}
-//         alt={data.row.data.BANKNAME}
-//         height={40}
-//       />
-//       // <img src={cibc} alt={`${data.row.data.IMAGE}`} height={40} />
-//     );
-// }
-
-// function cellRender(data) {
-//   console.log("sent", data);
-//   return <img src={`${data}`} alt="BANK" height={40} />;
-// }
-
 export default function ClientBankAccounts() {
   const { user } = useAuth();
   //console.log("my user stuff", { user });
@@ -225,59 +354,16 @@ export default function ClientBankAccounts() {
 }
 
 function renderDetail(props) {
-  //console.log("unique", props.data.UNIQUEID, "range: ", pageoption);
   const uniqueid = props.data.UNIQUEID;
-  return <ClientBankSegments rowid={uniqueid} sendit={pageoption} />;
+  const bankAccountNumberid = props.data.BANKACCOUNTNUMBER;
+  const bankAccountUniqueID = props.data.UNIQUEID;
+  return (
+    <ClientBankSegments
+      rowid={uniqueid}
+      sendit={pageoption}
+      bankAccountNumberID={bankAccountNumberid}
+      bankAccountUniqueID={bankAccountUniqueID}
+      //onDetailChange={handleDetailChange}
+    />
+  );
 }
-// {/* <Editing
-// mode="popup"
-// allowUpdating={true}
-// allowAdding={true}
-// allowDeleting={true}
-// >
-// <Popup
-//   title="Type Info"
-//   showTitle={true}
-//   width={900}
-//   height={800}
-// />
-// <Form>
-//   <Item
-//     itemType="group"
-//     colCount={2}
-//     colSpan={2}
-//     showBorders={true}
-//   >
-//     <Item dataField="BANKACCOUNTTYPE" />
-//     <Item dataField="DESCRIPTION" />
-
-//     <Item
-//       dataField="REPORTINGSEQUENCE"
-//       label={{ text: "Reporting Sequence" }}
-//     />
-//   </Item>
-
-//   <Item
-//     itemType="group"
-//     caption="Options"
-//     colCount={2}
-//     colSpan={2}
-//     showBorders={true}
-//   >
-//     <Item dataField={"ASSET"} />
-//     <Item dataField={"LIABILITY"} />
-//     <Item dataField={"PERSONALACCOUNT"} />
-//     <Item dataField={"LOC"} />
-//     <Item dataField={"INVESTMENT"} />
-//     <Item dataField={"SAVINGS"} />
-//     <Item dataField={"INVESTMENTLOANS"} />
-//     <Item dataField={"PERSONALLOANS"} />
-//     <Item dataField={"HOUSE"} />
-//     <Item dataField={"REALESTATEINVESTMENT"} />
-//     <Item dataField={"CFM"} />
-//     <Item dataField={"REALESTATERENTALMORTGAGE"} />
-//     <Item dataField={"SINGLELINESUMMARY"} />
-//     <Item dataField={"BUSINESSLOAN"} />
-//   </Item>
-// </Form>
-// </Editing> */}

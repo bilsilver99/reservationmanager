@@ -22,8 +22,10 @@ import {
   InvestmentBanksPage,
   ClientProfilesPage,
   ClientManagementPage,
-  ClientBankAccountsPage,
+  DebtSummaryPage,
+  DashboardPage,
 } from "./pages";
+
 import { withNavigationWatcher } from "./contexts/navigation";
 
 const routes = [
@@ -118,6 +120,14 @@ const routes = [
   {
     path: "/clientManagement",
     element: ClientManagementPage,
+  },
+  {
+    path: "/clientManagement/debtSummary",
+    element: DebtSummaryPage,
+  },
+  {
+    path: "/dashBoard",
+    element: DashboardPage,
   },
 ];
 

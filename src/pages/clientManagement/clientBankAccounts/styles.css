@@ -1,3 +1,6 @@
+.yellow-background {
+  background-color: yellow;
+}
 #data-grid-demo {
   min-height: 700px;
 }

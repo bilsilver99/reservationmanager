@@ -11,6 +11,7 @@ import DataGrid, {
   HeaderFilter,
   Search,
   SearchPanel,
+  editing,
 } from "devextreme-react/data-grid";
 import { EmptyItem, Item, GroupItem } from "devextreme-react/form";
 import "devextreme-react/text-area";
@@ -101,13 +102,6 @@ class ClientProfilesx extends React.Component {
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
-          id="form"
-          editing={{
-            mode: "row", // or 'batch' or 'cell', depending on what you use
-            allowAdding: false, // Disable adding new rows
-            allowUpdating: false, // Disable updating rows
-            allowDeleting: false, // Disable deleting rows
-          }}
         >
           <FilterRow
             visible={this.state.showFilterRow}
@@ -116,12 +110,39 @@ class ClientProfilesx extends React.Component {
           <HeaderFilter visible={this.state.showHeaderFilter} />
           <SearchPanel visible={true} width={240} placeholder="Search..." />
           <Paging enabled={true} />
-          <Column
-            dataField={"CLIENTCODE"}
-            caption={"Client Code"}
-            hidingPriority={8}
-            visible={true}
-          />
+          <Editing
+            mode="popup"
+            allowUpdating={true}
+            allowAdding={true}
+            allowDeleting={true}
+          >
+            <Popup
+              title="Type Info"
+              showTitle={true}
+              width={900}
+              height={800}
+            />
+            <Form>
+              <Item
+                itemType="group"
+                colCount={2}
+                colSpan={2}
+                showBorders={true}
+              >
+                <Item dataField="CLIENTCODE" />
+                <Item dataField="NAME" />
+                <Item dataField="ADDRESSLINEONE" />
+                <Item dataField="ADDRESSLINETWO" />
+                <Item dataField="ADDRESSLINETHREE" />
+                <Item dataField="ADDRESSLINEFOUR" />
+                <Item dataField="COUNTRY" />
+                <Item dataField="POSTALZIP" />
+                <Item dataField="ASSIGNEDTO" />
+                <Item dataField="INACTIVE" editorType="dxCheckBox" />
+              </Item>
+            </Form>
+          </Editing>
+          <Column dataField="CLIENTCODE" caption="Client Code" />
           <Column
             dataField={"NAME"}
             caption={"Name"}
@@ -144,13 +165,13 @@ class ClientProfilesx extends React.Component {
             dataField={"ADDRESSLINETHREE"}
             caption={"Address Three"}
             hidingPriority={8}
-            visible={true}
+            visible={false}
           />
           <Column
             dataField={"ADDRESSLINEFOUR"}
             caption={"Address Four"}
             hidingPriority={8}
-            visible={true}
+            visible={false}
           />
           <Column
             dataField={"COUNTRY"}
@@ -162,7 +183,7 @@ class ClientProfilesx extends React.Component {
             dataField={"POSTALZIP"}
             caption={"Postal/Zip"}
             hidingPriority={8}
-            visible={true}
+            visible={false}
           />
           <Column
             dataField={"ASSIGNEDTO"}
@@ -177,7 +198,6 @@ class ClientProfilesx extends React.Component {
             caption={"Inactive"}
             hidingPriority={8}
             visible={true}
-            editorType="dxCheckBox"
           />
           <Column
             dataField={"UNIQUEID"}
@@ -187,7 +207,7 @@ class ClientProfilesx extends React.Component {
             visible={false}
             allowEditing={false}
           />
-          <Paging defaultPageSize={8} />
+          <Paging defaultPageSize={24} />
           <Pager
             showPageSizeSelector={true}
             allowedPageSizes={allowedPageSizes}

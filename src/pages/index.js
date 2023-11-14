@@ -22,3 +22,5 @@ export { default as InvestmentBanksPage } from "./investmentBanks/investmentBank
 export { default as ClientProfilesPage } from "./clientProfiles/clientProfiles";
 export { default as ClientManagementPage } from "./clientManagement/clientManagement";
 export { default as ClientBankAccountsPage } from "./clientManagement/clientBankAccounts/clientBankAccounts";
+export { default as DebtSummaryPage } from "./clientManagement/clientBankAccounts/debtSummary";
+export { default as DashboardPage } from "./dashboard/dashboard";

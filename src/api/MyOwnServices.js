@@ -105,7 +105,7 @@ export const fetchcompany = async (companynumber) => {
       return response.json();
     })
     .then((json) => {
-      //console.log(json);
+      console.log(json);
       //throw new Error("invalid username/password");
       return {
         CompanyNumber: json.user_response.R_CompanyNumber,

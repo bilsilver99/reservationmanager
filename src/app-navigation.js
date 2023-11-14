@@ -149,6 +149,43 @@ export const navigation = [
         path: "/clientManagement",
         auth: "Y",
       },
+      {
+        text: "Dashboard",
+        icon: "folder",
+        path: "/clientManagement/debtSummary",
+        auth: "Y",
+      },
+      {
+        text: "Full Dashboard",
+        icon: "folder",
+        path: "/dashBoard",
+        auth: "Y",
+      },
+    ],
+  },
+  {
+    text: "Reporting",
+    icon: "folder",
+    auth: "Y",
+    items: [
+      {
+        text: "Progress",
+        icon: "folder",
+        path: "/clientProgress",
+        auth: "Y",
+      },
+      {
+        text: "Debt Summary",
+        icon: "folder",
+        path: "/clientDebtSummary",
+        auth: "Y",
+      },
+      {
+        text: "Net Worth",
+        icon: "folder",
+        path: "/clientNetWorth",
+        auth: "Y",
+      },
     ],
   },
 ];

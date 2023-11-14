@@ -1,0 +1,69 @@
+.logos-container {
+  margin: 20px 0 40px 0;
+  text-align: center;
+  svg {
+    display: inline-block;
+  }
+}
+
+.devextreme-logo {
+  width: 200px;
+  height: 34px;
+  margin-bottom: 19px;
+}
+
+.react-logo {
+  width: 184px;
+  height: 68px;
+}
+
+.plus {
+  margin: 23px 10px;
+  width: 22px;
+  height: 22px;
+}
+
+.screen-x-small .logos-container {
+  svg {
+    width: 100%;
+    display: block;
+    &.plus {
+      margin: 0;
+    }
+  }
+}
+/* styles.css */
+.highlight-box {
+  border: 2px solid #000000; /* Solid black border */
+  padding: 10px; /* Spacing inside the box */
+  margin: 5px; /* Spacing outside the box */
+  background-color: #f0f0f0; /* Light gray background */
+  font-size: 10px;
+}
+
+.right-container {
+  /* Ensure styles here allow for normal block stacking */
+  margin-bottom: 10px; /* Optional: adds space between the boxes */
+  width: 100%; /* Optional: makes the boxes narrower */
+}
+.App {
+  /* Flexbox example */
+  display: flex;
+  flex-direction: column; /* Stacks children vertically */
+  align-items: center; /* Optional: centers the boxes horizontally */
+  justify-content: start; /* Aligns children to the start of the flex container */
+}
+
+.card {
+  height: 600px;
+  margin-top: 10px;
+  width: 800px;
+  float: left;
+  margin-left: 32px;
+  border-radius: 10px;
+}
+.card-top {
+  padding-top: 5px;
+  color: blue;
+  padding-left: 15px;
+}
