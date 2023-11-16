@@ -5,16 +5,20 @@ import DataGrid, {
   Editing,
   Sorting,
   Lookup,
-  MasterDetail,
-  Popup,
-  Form,
+  //MasterDetail,
+  //Popup,
+  //Form,
   HeaderFilter,
   FilterRow,
-  SearchPanel,
+  //SearchPanel,
   Paging,
   Item,
   AsyncRule,
+  //ValidationRule,
 } from "devextreme-react/data-grid";
+
+import { Validator, RequiredRule } from "devextreme-react/validator";
+
 import "devextreme-react/text-area";
 import "./app.scss";
 import { useAuth } from "../../../contexts/auth";
@@ -33,6 +37,7 @@ function ClientTransactionsx(props) {
   const [bankAccounts, setBankAccounts] = useState(null);
   const [lastBankAccountNumber, setLastBankAccountNumber] = useState("");
   const [lastSegmentNumbmer, setLastSegmentNumber] = useState("");
+  const [clientCode, setClientCode] = useState(props.clientCode);
 
   const onEditorPreparing = (e) => {
     // Check if the row is not new
@@ -65,6 +70,23 @@ function ClientTransactionsx(props) {
   //   console.log(e);
   //   console.log("last bank account number", lastBankAccountNumber);
   // };
+
+  const validateSegment = async (params) => {
+    if (!params.data.SEGMENTNUMBER) {
+      return true;
+    }
+    // console.log(
+    //   "params coming in ",
+    //   params.data.SEGMENTNUMBER,
+    //   params.data.BANKACCOUNTNUMBER,
+    //   clientCode
+    // ); // , "bankid: ", bankUniqueid);
+    return await asyncValidation(
+      params.data.BANKACCOUNTNUMBER,
+      clientCode,
+      params.data.SEGMENTNUMBER
+    );
+  };
 
   const onInitNewRow = (e) => {
     console.log("last bank account number", lastBankAccountNumber);
@@ -113,6 +135,8 @@ function ClientTransactionsx(props) {
             onRowInserted={onRowInserted}
             width={"100%"}
             paging={{ pageSize: 10 }}
+            pagingEnabled={true}
+            remoteOperations={true}
           >
             <Sorting mode="single" />
             <Sorting mode="single" />
@@ -123,6 +147,7 @@ function ClientTransactionsx(props) {
               allowUpdating={true}
               allowAdding={true}
               allowDeleting={true}
+              selectionMode="single"
             >
               {/* <Popup
                   title="Transaction Info"
@@ -166,7 +191,12 @@ function ClientTransactionsx(props) {
               caption={"Segment"}
               hidingPriority={7}
               allowEditing={true}
-            />
+            >
+              <AsyncRule
+                message="Segment Does Not Exists"
+                validationCallback={validateSegment}
+              />
+            </Column>
             <Column
               dataField={"DESCRIPTION"}
               caption="DESCRIPTION"
@@ -183,6 +213,7 @@ function ClientTransactionsx(props) {
               hidingPriority={7}
               allowEditing={true}
             >
+              <RequiredRule message="A Transaction Code is required" />
               <Lookup
                 dataSource={transTypes}
                 valueExpr="FPTRANSACTIONCODE"
@@ -195,7 +226,9 @@ function ClientTransactionsx(props) {
               caption={"Date"}
               hidingPriority={7}
               allowEditing={true}
-            />
+            >
+              <RequiredRule message="A Date is required" />
+            </Column>
             <Column
               dataField={"TRANSACTIONAMOUNT"}
               caption={"Amount"}
@@ -215,6 +248,37 @@ function ClientTransactionsx(props) {
       </div>
     </>
   );
+}
+
+async function asyncValidation(bankAccountNumber, clientCode, segmentNumber) {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentBankAccountNumber: bankAccountNumber,
+      sentSegment: segmentNumber,
+      sentClientCode: clientCode,
+    }),
+  };
+  //console.log("bankID", bankID, "segment", segmentNumber);
+  const url = `${process.env.REACT_APP_BASE_URL}/fetchThisClientSegment`;
+
+  const response = await fetch(url, requestoptions);
+  if (!response.ok) {
+    throw new Error("System did not respond");
+  }
+  const data = await response.json();
+  console.log("data from fetch", data.user_response.response);
+  if (data.user_response.response === "ERROR") {
+    return true; // Validation successful
+  } else if (data.user_response.response === "OK") {
+    return false; // Validation failed
+  } else {
+    throw new Error("Unexpected response");
+  }
 }
 
 //export default ClientTransactions;

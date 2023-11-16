@@ -102,7 +102,7 @@ function ClientBankSegmentTransactions(props) {
               <Editing
                 mode="cell"
                 allowUpdating={true}
-                allowAdding={true}
+                //allowAdding={true}
                 allowDeleting={true}
               >
                 {/* <Popup
