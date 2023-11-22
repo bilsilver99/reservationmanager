@@ -124,6 +124,12 @@ export const navigation = [
         path: "/assetTypes",
       },
       {
+        text: "Banks",
+        icon: "folder",
+        auth: "Y",
+        path: "/banks",
+      },
+      {
         text: "Investment Banks",
         icon: "folder",
         auth: "Y",
@@ -149,14 +155,9 @@ export const navigation = [
         path: "/clientManagement",
         auth: "Y",
       },
+
       {
         text: "Dashboard",
-        icon: "folder",
-        path: "/clientManagement/debtSummary",
-        auth: "Y",
-      },
-      {
-        text: "Full Dashboard",
         icon: "folder",
         path: "/dashBoard",
         auth: "Y",

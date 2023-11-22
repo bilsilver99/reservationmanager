@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 //import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
+import Popup from "devextreme-react/popup";
+import Swal from "sweetalert2";
+
+import withReactContent from "sweetalert2-react-content";
+
 import DataGrid, {
   Column,
   Editing,
@@ -15,82 +20,73 @@ import DataGrid, {
   Item,
   AsyncRule,
   //ValidationRule,
-  SearchPanel,
 } from "devextreme-react/data-grid";
 
-import SelectBox from "devextreme-react/select-box";
-import DateBox from "devextreme-react/date-box";
 import { Validator, RequiredRule } from "devextreme-react/validator";
+import { Button } from "devextreme-react/button";
 
 import "devextreme-react/text-area";
 import "./app.scss";
 import { useAuth } from "../../../contexts/auth";
-
 import "devextreme/data/data_source";
 
 //import DataSource from "devextreme/data/data_source";
 import {
+  mystore6,
   getTransactionTypes,
   getBanks,
-  fetchThisClientData,
+  validateImports,
+  processImports,
 } from "./segmentData";
-import { mystore5 } from "./segmentData2";
 //import { myStore5 } from "./clientBanksAccountsData";
 
-let pageoption = 90;
+//let pageoption = 90;
 
-function ClientTransactionsx(props) {
+function ImportTransactionsx(props) {
   //const [dataSourcex, setDataSource] = useState(null);
   const [transTypes, setTransTypes] = useState(null);
   const [bankAccounts, setBankAccounts] = useState(null);
   const [lastBankAccountNumber, setLastBankAccountNumber] = useState("");
   const [lastSegmentNumbmer, setLastSegmentNumber] = useState("");
   const [clientCode, setClientCode] = useState(props.clientCode);
+  const [transactionsReady, setTransactionsReady] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const [filterValue, setFilterValue] = useState(0); // for dates - the actual number of days
-  const [refreshKey, setRefreshKey] = useState(0); // for dates to refresh grid when date changed
-  const [filterOption, setFilterOption] = useState(90); // for dates - passed to mydate5
-  const [startdate, setStartdate] = useState(null);
-  const [enddate, setEnddate] = useState(null);
+  const MySwal = withReactContent(Swal);
 
-  const handleStartDateChange = (e) => {
-    setStartdate(e.value);
-    setRefreshKey((prevKey) => prevKey + 1);
+  const ProcessImports = () => {
+    validateImports(clientCode).then((data) => {
+      console.log("data from validate imports", data.valid);
+      if (data.valid === 1) {
+        setTransactionsReady(true);
+        processImports(props.clientCode).then(() => {
+          // Show a success message using SweetAlert2
+          MySwal.fire({
+            icon: "success",
+            title: "Import Processed",
+            text: "The import has been processed successfully.",
+          });
+          setRefreshKey((prevKey) => prevKey + 1);
+        });
+      } else {
+        // Show an error message using SweetAlert2
+        MySwal.fire({
+          icon: "error",
+          title: "Import Error",
+          text: "There are errors in the import file. Please correct them.",
+        });
+      }
+    });
   };
 
-  const handleEndDateChange = (e) => {
-    setEnddate(e.value);
-    setRefreshKey((prevKey) => prevKey + 1);
-  };
+  useEffect(() => {
+    // This function will run whenever sharedValue changes
+    const refreshTransactions = () => {
+      // Logic to refresh transactions
+    };
 
-  //const [showFilterRow, setShowFilterRow] = useState(true);
-
-  // const applyFilterTypes = [
-  //   {
-  //     key: "auto",
-  //     name: "Immediately",
-  //   },
-  //   {
-  //     key: "onClick",
-  //     name: "On Button Click",
-  //   },
-  // ];
-
-  //const [currentFilter, setCurrentFilter] = useState(applyFilterTypes[0]);
-  //const [showHeaderFilter, setShowHeaderFilter] = useState(true);
-
-  const dateFilterOptions = [
-    { value: 30, text: "Last 30 days" },
-    { value: 60, text: "Last 60 days" },
-    { value: 90, text: "Last 90 days" },
-    { value: 999999, text: "All Transactions" },
-    { value: 0, text: "Processing Dates" },
-  ];
-
-  const handleFilterChange = (e) => {
-    // Update the filterValue state
-    setFilterValue(e.value);
-  };
+    refreshTransactions();
+  }, [props.sharedValue]);
 
   const onEditorPreparing = (e) => {
     // Check if the row is not new
@@ -107,6 +103,8 @@ function ClientTransactionsx(props) {
       }
     }
   };
+
+  const setFormImport = () => {};
 
   const onRowInserted = useCallback(
     (e) => {
@@ -148,20 +146,6 @@ function ClientTransactionsx(props) {
   };
 
   useEffect(() => {
-    fetchThisClientData(props.clientCode) // call the function to fetch data
-      .then((data) => {
-        console.log("bank numbers", data);
-        setStartdate(data.STARTDATE); // store the data in state
-        setEnddate(data.ENDDATE); // store the data in state
-        setBankAccounts(data.data); // store the data in state
-        //console.log("new types", transTypes);
-      })
-      .catch((error) => {
-        console.error(
-          "There was an error fetching the transaction Types data:",
-          error
-        );
-      });
     getTransactionTypes() // call the function to fetch data
       .then((data) => {
         //console.log("types", data.data);
@@ -187,119 +171,74 @@ function ClientTransactionsx(props) {
         );
       });
   }, []);
-
-  useEffect(() => {
-    getBanks(props.clientCode) // call the function to fetch data
-      .then((data) => {
-        console.log("bank numbers", data);
-        setBankAccounts(data.data); // store the data in state
-        //console.log("new types", transTypes);
-      })
-      .catch((error) => {
-        console.error(
-          "There was an error fetching the transaction Types data:",
-          error
-        );
-      });
-    fetchThisClientData(props.clientCode) // call the function to fetch data
-      .then((data) => {
-        console.log("bank numbers", data);
-        setStartdate(data.STARTDATE); // store the data in state
-        setEnddate(data.ENDDATE); // store the data in state
-        setBankAccounts(data.data); // store the data in state
-        //console.log("new types", transTypes);
-      })
-      .catch((error) => {
-        console.error(
-          "There was an error fetching the transaction Types data:",
-          error
-        );
-      });
-  }, [props]);
-
-  // Use useEffect to perform actions when filterValue changes
-  useEffect(() => {
-    console.log("New filter value:", filterValue);
-    setFilterOption(filterValue);
-    setRefreshKey((prevKey) => prevKey + 1);
-    console.log(refreshKey);
-  }, [filterValue]); // Add filterValue as a dependency
-
-  // Rest of your component
+  //  className="content-block dx-card responsive-paddings red-color"
 
   return (
     <>
-      <div className="red-color responsive-paddingsx">
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span>Bank Transaction Details</span>
-
-          <div>
-            <label>
-              Start Date:
-              <DateBox
-                type="date"
-                value={startdate}
-                onValueChanged={handleStartDateChange}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              End Date:
-              <DateBox
-                type="date"
-                value={enddate}
-                onValueChanged={handleEndDateChange}
-              />
-            </label>
-          </div>
-
-          <SelectBox
-            dataSource={dateFilterOptions}
-            valueExpr="value"
-            displayExpr="text"
-            placeholder="Select date range"
-            value={filterValue}
-            onValueChanged={handleFilterChange}
-            dropDownOptions={{
-              width: 200, // Set the width of the dropdown menu
-              height: 200, // Set the height of the dropdown menu
-            }}
-            width={150} // Set the width of the select box
-          />
-        </div>
-
-        {/* className="content-block dx-card responsive-paddings red-color">*/}
-
-        <p> </p>
+      <div className="red-color">
+        <p></p>
+        &nbsp;&nbsp;
+        <Button text="Process Imports" onClick={ProcessImports} />
+        <p></p>
+      </div>
+      <div className="red-color">
         <div className="custom-container">
           <DataGrid
-            dataSource={mystore5(
-              props.clientCode,
-              filterOption,
-              startdate,
-              enddate
-            )}
             key={refreshKey} // This key will force a refresh when it changes
+            dataSource={mystore6(props.clientCode)}
             columnAutoWidth={true}
             onEditorPreparing={onEditorPreparing}
             onInitNewRow={onInitNewRow}
             onRowInserted={onRowInserted}
             width={"100%"}
-            // paging={{ pageSize: 10 }}
-            // pagingEnabled={true}
+            paging={{ pageSize: 10 }}
+            pagingEnabled={true}
             remoteOperations={true}
           >
+            <Sorting mode="single" />
+            <Sorting mode="single" />
+            <FilterRow visible />
+            <HeaderFilter visible />
             <Editing
-              mode="row"
+              mode="cell"
               allowUpdating={true}
               allowAdding={true}
               allowDeleting={true}
               selectionMode="single"
-            ></Editing>
-
+            >
+              {/* <Popup
+                  title="Transaction Info"
+                  showTitle={true}
+                  width={600}
+                  height={400}
+                />
+                <Form>
+                  <Item itemType="group" colCount={2} colSpan={2}>
+                    <Item
+                      dataField="BANKACCOUNTNUMBER"
+                      editorOptions={{ disabled: true }}
+                    />
+                    <Item
+                      dataField="SEGMENTNUMBER"
+                      editorOptions={{ disabled: true }}
+                    />
+                    <Item dataField="DESCRIPTION" />
+                    <Item dataField="SECONDDESCRIPTION" />
+                    <Item dataField="FPTRANSACTIONCODE" />
+                    <Item dataField="TRANSACTIONDATE" />
+                    <Item dataField="TRANSACTIONAMOUNT" />
+                  </Item>
+                </Form> */}
+            </Editing>
             <Column
-              allowFiltering={true}
+              dataType="boolean"
+              dataField={"ERROR"}
+              caption={"Error"}
+              hidingPriority={7}
+              allowEditing={true}
+            ></Column>
+            <Column
+              width={150}
               dataField={"BANKACCOUNTNUMBER"}
               caption={"Bank Account Number"}
               hidingPriority={7}
@@ -308,15 +247,11 @@ function ClientTransactionsx(props) {
               <Lookup
                 dataSource={bankAccounts}
                 valueExpr="BANKACCOUNTNUMBER"
-                //displayExpr="BANKACCOUNTNUMBER"
-                displayExpr={(item) =>
-                  item
-                    ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
-                    : ""
-                }
+                displayExpr="BANKACCOUNTNUMBER"
               />
             </Column>
             <Column
+              width={100}
               dataField={"SEGMENTNUMBER"}
               caption={"Segment"}
               hidingPriority={7}
@@ -347,7 +282,12 @@ function ClientTransactionsx(props) {
               <Lookup
                 dataSource={transTypes}
                 valueExpr="FPTRANSACTIONCODE"
-                displayExpr="DESCRIPTIONTWO"
+                //displayExpr="DESCRIPTIONTWO"
+                displayExpr={(item) =>
+                  item
+                    ? `${item.TRANSACTIONGROUP} - ${item.DESCRIPTIONTWO}`
+                    : ""
+                }
               />
             </Column>
             <Column
@@ -357,7 +297,7 @@ function ClientTransactionsx(props) {
               hidingPriority={7}
               allowEditing={true}
             >
-              <RequiredRule message="A Date is required" />
+              {/* <RequiredRule message="A Date is required" /> */}
             </Column>
             <Column
               dataField={"TRANSACTIONAMOUNT"}
@@ -413,54 +353,8 @@ async function asyncValidation(bankAccountNumber, clientCode, segmentNumber) {
 
 //export default ClientTransactions;
 
-export default function ClientTransactions() {
+export default function ImportTransactions() {
   const { user } = useAuth();
   //console.log("my user stuff", { user });
-  return <ClientTransactionsx clientCode={user.thisClientcode} />;
+  return <ImportTransactionsx clientCode={user.thisClientcode} />;
 }
-
-// async function getTasks(key, masterField) {
-//   //console.log("call to datasource2", key, "range is", masterField);
-//   // const store = mystore3(key, masterField);
-//   // const loadResult = await store.load();
-//   return new DataSource(mystore3(key));
-// }
-
-/////////////////////////////
-// async function getTasks(key, masterField) {
-//   console.log("call to datasource2", key, "range is", masterField);
-
-//   const store = mystore3(key, masterField);
-//   const loadResult = await store.load();
-//   return new DataSource({ store, load: () => loadResult });
-// }
-
-// <Column
-//   dataField={"TOTALSERVICECOST"}
-//   caption={"Total Service Cost"}
-//   hidingPriority={7}
-//   allowEditing={false}
-//   format="##.00"
-//   calculateCellValue={this.calculateSalary}
-// />
-
-//<Item dataField="TOTALSERVICECOST" />
-//className="content-block dx-card responsive-paddings">
-
-//const { DESCRIPTION } = this.props.data;
-//const dateoptions = 60;
-//const { rowData, masterField } = this.props;
-//console.log("props ", this.props);
-//this.dataSource = getTasks(props.rowid, props.sendit);
-//console.log(this.dataSource);
-
-//const { selectedItem, onItemClicked } = this.props;
-
-// handleDataChanged(e) {
-//   e.component.repaintRows();
-// }
-
-// async componentDidMount() {
-//   const dataSource = await getTasks(this.props.rowid, this.props.sendit);
-//   this.setState({ dataSource });
-// }

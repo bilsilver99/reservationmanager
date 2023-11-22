@@ -108,7 +108,7 @@ class AssetTypesx extends React.Component {
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Asset Types</h3>
+        {/* <h3>Asset Types</h3> */}
         <DataGrid
           dataSource={mystore(this.state.companyCode)}
           keyExpr="UNIQUEID"

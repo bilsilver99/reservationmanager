@@ -20,7 +20,7 @@ import DataGrid, {
   SearchPanel,
 } from "devextreme-react/data-grid";
 
-import { TextBox } from "devextreme-react/text-box";
+//import { TextBox } from "devextreme-react/text-box";
 
 //import SelectBox from "devextreme-react/select-box";
 import "devextreme-react/text-area";
@@ -28,7 +28,7 @@ import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import { useAuth } from "../../contexts/auth";
 import "./app.scss";
-import { mystore } from "./assetGroupMappingData.js";
+import { mystore } from "./banksMappingData.js";
 //import { Button } from "devextreme-react";
 //import { SelectBox } from "devextreme-react";
 //import { Template } from "devextreme-react/core/template";
@@ -37,7 +37,7 @@ const allowedPageSizes = [8, 12, 20];
 
 let pageoption = 90;
 
-class AssetTypeGroupsx extends React.Component {
+class Banksx extends React.Component {
   constructor(props) {
     super(props);
     this.applyFilterTypes = [
@@ -58,9 +58,25 @@ class AssetTypeGroupsx extends React.Component {
       showFilterRow: true,
       showHeaderFilter: true,
       companyCode: 1,
+      assetGroupsCodes: [],
       currentFilter: this.applyFilterTypes[0].key,
       isLoading: true, // Add a loading state
+      includeInactiveBanks: false,
     };
+  }
+
+  componentDidMount() {
+    // Assetgroups() // call the function to fetch data
+    //   .then((data) => {
+    //     console.log("group codes returned", data);
+    //     this.setState({ assetGroupsCodes: data.data }); // store the data in state
+    //   })
+    //   .catch((error) => {
+    //     console.error(
+    //       "There was an error fetching the transaction group data:",
+    //       error
+    //     );
+    //   });
   }
 
   // handleFilterChange = (e) => {
@@ -78,7 +94,7 @@ class AssetTypeGroupsx extends React.Component {
   }
 
   handleEditingStart(e) {
-    console.log("Editing is starting for row", e.data);
+    //console.log("Editing is starting for row", e.data);
 
     // You can access the data of the row that is being edited
     const rowToBeEdited = e.data;
@@ -90,12 +106,28 @@ class AssetTypeGroupsx extends React.Component {
     }
   }
 
+  handleCheckboxChange = (event) => {
+    this.setState({ includeInactiveBanks: event.target.checked });
+  };
+
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        {/* <h3>Asset Groups</h3> */}
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={this.state.includeInactiveBanks}
+              onChange={this.handleCheckboxChange}
+            />
+            Include Inactive Banks
+          </label>
+        </div>
         <DataGrid
-          dataSource={mystore(this.state.companyCode)}
+          dataSource={mystore(
+            this.props.companyCode,
+            this.state.includeInactiveBanks
+          )}
           keyExpr="UNIQUEID"
           showBorders={true}
           remoteOperations={false}
@@ -115,23 +147,29 @@ class AssetTypeGroupsx extends React.Component {
             allowAdding={true}
             allowDeleting={true}
           ></Editing>
-          <Column dataField="ASSETTYPEGROUP" caption="Asset Type" />
-          <Column dataField="DESCRIPTION" caption="Description" />
-          <Column dataField="REPORTSEQUENCE" caption="Report Sequence" />
+          <Column dataField="BANKCODES" caption="Code" width={100} />
+
+          <Column dataField="BANKNAME" caption="Name" />
+          <Column dataField="DATECOLUMN" caption="Date Column" />
+
+          <Column dataField="DESCRIPTIONCOLUMN" caption="Description Column" />
+          <Column dataField="DEPOSITCOLUMN" caption="Deposits Column" />
+          <Column dataField="WITHDRAWALCOLUMN" caption="Withdrawal Column" />
           <Column
-            dataField="SHOWASSETGROUPTOTALSINNETASSETSHEET"
-            caption="Show Group Total In Net Asset Sheet"
-            dataType="string"
-            lookup={{
-              dataSource: [
-                { id: "Y", name: "Yes" },
-                { id: "N", name: "No" },
-                { id: null, name: "(Blank)" }, // or use '' for a truly empty string
-              ],
-              valueExpr: "id",
-              displayExpr: "name",
-              allowClearing: true, // This enables the blank (null) option
-            }}
+            dataField="HASHEADERS"
+            caption="Has Header"
+            dataType="boolean"
+            hidingPriority={8}
+            visible={true}
+            editorType="dxCheckBox"
+          />
+          <Column
+            dataField="ACTIVE"
+            caption="Active"
+            dataType="boolean"
+            hidingPriority={8}
+            visible={true}
+            editorType="dxCheckBox"
           />
 
           <Column
@@ -142,8 +180,7 @@ class AssetTypeGroupsx extends React.Component {
             visible={false}
             allowEditing={false}
           />
-
-          <Paging defaultPageSize={8} />
+          <Paging defaultPageSize={20} />
           <Pager
             showPageSizeSelector={true}
             allowedPageSizes={allowedPageSizes}
@@ -153,10 +190,10 @@ class AssetTypeGroupsx extends React.Component {
     );
   }
 }
-export default function AssetTypeGroups() {
+export default function Banks() {
   const { user } = useAuth();
   //console.log({ user });
-  return <AssetTypeGroupsx companyCode={user.companyCode} />;
+  return <Banksx companyCode={user.companyCode} />;
 }
 
 // <Popup

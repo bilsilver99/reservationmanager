@@ -4,19 +4,36 @@ import Form, { Item, ButtonItem, GroupItem } from "devextreme-react/form";
 import SelectBox from "devextreme-react/select-box";
 import "./clientManagement.scss";
 import { useAuth } from "../../contexts/auth";
-import { fetchThisClientData, getClients } from "./clientManagementData";
+import {
+  fetchThisClientData,
+  getClients,
+  updateClient,
+} from "./clientManagementData";
 import { Button } from "devextreme-react/button";
 import ClientBankAccounts from "./clientBankAccounts/clientBankAccounts";
 import DebtSummary from "./clientBankAccounts/debtSummary";
 import ClientTransactions from "./clientBankAccounts/clientTransactions";
-import ClientImports from "./clientBankAccounts/clientImports";
+import Interest from "./clientBankAccounts/interest";
+//import ClientImports from "./clientBankAccounts/clientExcelImports";
+import CustomerProfile from "./clientBankAccounts/customerProfile";
+
+import ImportTransactions from "./clientBankAccounts/importTransactions";
+//import TestImport from "./clientBankAccounts/testImport";
+import BankCSVImport from "./clientBankAccounts/bankCSVImport";
 //import { set } from "react-hook-form";
 //import { Height } from "devextreme-react/chart";
 //import ClientOwners from "./clientOwners";
+//import { isWithinInterval, set } from "date-fns";
+import ClientOwners from "./clientOwners";
+
+import notify from "devextreme/ui/notify";
+import dxDateBox from "devextreme/ui/date_box";
 import { set } from "date-fns";
 
 const clients = ["sam", "lou"];
 const ClientManagement = () => {
+  const [sharedValue, setSharedValue] = React.useState();
+
   const { user, updateUser } = useAuth();
   const [currentClientCode, setCurrentClientCode] = React.useState("RATTI");
 
@@ -29,6 +46,9 @@ const ClientManagement = () => {
   const [customerData, setCustomerData] = React.useState(clients); // this is the aray of customers
   const [customerList, setCustomerList] = React.useState([]); // this is the aray of customers
   const [customerName, setCustomerName] = React.useState("");
+  const [startdate, setStartDate] = React.useState("");
+  const [enddate, setEndDate] = React.useState("");
+  const [processDates, setProcessDates] = React.useState("");
   const setClientData = async (e) => {
     //console.log("value of e ", e.value);
     if (e.value === null || e.value === undefined || e.value === "") return;
@@ -44,7 +64,7 @@ const ClientManagement = () => {
   const [showInvestments, setShowInvestments] = React.useState(false);
 
   const [showTransfers, setFormTransfers] = React.useState(false);
-  const [showInterest, setFormInterest] = React.useState(false);
+  const [showInterest, setShowInterest] = React.useState(false);
 
   const [showDebtSummary, setFormDebtSummary] = React.useState(false);
   const [showProgress, setFormProgress] = React.useState(false);
@@ -52,23 +72,25 @@ const ClientManagement = () => {
 
   const [ShowTransactions, setShowTransactions] = React.useState(false);
   const [ShowImport, setShowImport] = React.useState(false);
+  const [ShowProcessImport, setShowProcessImport] = React.useState(false);
 
   const [showPrior, setPrior] = React.useState(true);
 
-  const ClientUpdate = (event) => {
-    // updateCompany(props.companynumber, companyValues);
-    // notify(
-    //   {
-    //     message: "You have submitted the form",
-    //     position: {
-    //       my: "center top",
-    //       at: "center top",
-    //     },
-    //   },
-    //   "success",
-    //   3000
-    // );
-    event.preventDefault();
+  const ClientUpdate = (e) => {
+    console.log("client update", customerData);
+    updateClient(currentClientCode, customerData);
+    notify(
+      {
+        message: "You have submitted the form",
+        position: {
+          my: "center top",
+          at: "center top",
+        },
+      },
+      "success",
+      3000
+    );
+    e.preventDefault();
   };
 
   const buttonOptions = {
@@ -98,9 +120,21 @@ const ClientManagement = () => {
         Country: result.COUNTRY,
         PostalZip: result.POSTALZIP,
         UniqueID: result.UNIQUEID,
+        StartDate: result.STARTDATE,
+        EndDate: result.ENDDATE,
       });
       updateUser({ thisClientcode: result.CLIENTCODE });
       setCustomerName(result.NAME);
+      setStartDate(result.STARTDATE);
+      setEndDate(result.ENDDATE);
+      //if (startdate !== null && startdate !== undefined && startdate !== "") {
+      setProcessDates(
+        "Currently Processing from " +
+          result.STARTDATE +
+          " to " +
+          result.ENDDATE
+      );
+      //}
       //console.log("new client code in user", user.thisClientCode);
     })();
     //getemployee(service.getEmployee());
@@ -120,6 +154,9 @@ const ClientManagement = () => {
     setFormDebtSummary(false);
     setShowTransactions(false);
     setShowImport(false);
+    setShowProcessImport(false);
+    setShowBanksForm(false);
+    setShowInterest(false);
   };
 
   const setForm1 = () => {
@@ -174,6 +211,19 @@ const ClientManagement = () => {
     setShowBanks(true);
     setShowBanksForm(false);
     setShowImport(true);
+    setShowProcessImport(false);
+  };
+  const setFormProcessImports = () => {
+    setallflags();
+    setShowBanks(true);
+    setShowBanksForm(false);
+    setShowProcessImport(true);
+  };
+  const setFormInterest = () => {
+    setallflags();
+    setShowBanks(true);
+    setShowBanksForm(false);
+    setShowInterest(true);
   };
   // const toggleDebtSummary = () => {
   //   setShowDebtSummary((prevState) => !prevState);
@@ -192,129 +242,89 @@ const ClientManagement = () => {
     return () => {};
   }, [user]);
 
+  //<div className="content-block2 dx-card responsive-paddings top-section">
+
   return (
     <>
-      <p> </p>
-      <div className="content-block2 dx-card responsive-paddings">
-        <div className="app">
-          <div style={{ display: "flex", alignItems: "left" }}>
-            <p style={{ marginRight: "10px" }}>Client:</p>
-            <SelectBox
-              style={{ width: "200px", height: "40px" }}
-              items={customerList}
-              valueExpr="label"
-              displayExpr="label"
-              value={currentClientCode}
-              searchEnabled={true}
-              //value={currentEmployeeName}
-              onValueChanged={setClientData}
-              //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
-            />
-            <p>&nbsp;&nbsp;&nbsp;{customerName}&nbsp;&nbsp;&nbsp;</p>
-            <div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(6, auto)",
-                  gap: "10px",
-                }}
-              >
-                <Button text="Info" onClick={setForm1} />
-                <Button text="Bank Accounts" onClick={setForm2} />
-                <Button text="Assets" onClick={setForm4} />
-                <Button text="Investments" onClick={setForm5} />
-                <Button text="Dashboard" onClick={setForm6} />
-                {showBanks && (
-                  <>
-                    <div></div>
-                    <Button text="Import" onClick={setFormImport} />
-                    <Button text="Transfers" onClick={setFormTransfers} />
-                    <Button text="Interest" onClick={setFormInterest} />
-                    <Button text="Transactions" onClick={setFormTransactions} />
+      <div className="responsive-paddingsx my-top-section">
+        <div style={{ display: "flex", alignItems: "left" }}>
+          <p style={{ marginRight: "10px" }}>Client:</p>
+          <SelectBox
+            className="white-text-selectbox"
+            style={{ width: "200px", height: "40px", marginTop: "5px" }}
+            items={customerList}
+            valueExpr="label"
+            displayExpr="label"
+            value={currentClientCode}
+            searchEnabled={true}
+            //value={currentEmployeeName}
+            onValueChanged={setClientData}
+            //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
+          />
+          <p>
+            &nbsp;&nbsp;&nbsp;{customerName}&nbsp;&nbsp;&nbsp;{processDates}
+          </p>
+        </div>
+      </div>
 
-                    {/* Empty divs for alignment */}
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                  </>
-                )}{" "}
-                {showDashboard && (
-                  <>
-                    <div></div>
-                    <Button text="Progress" onClick={setShowProgress} />
-                    <Button text="Debt Summary" onClick={setShowDebtSummary} />
-                    <Button text="Net Worth" onClick={setShowNetWorth} />
-                    {/* Empty divs for alignment */}
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                  </>
-                )}
-              </div>
+      <div>
+        <div className="app2 " style={{ display: "flex", alignItems: "left" }}>
+          <div>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(6, auto)",
+                gap: "10px",
+              }}
+            >
+              <Button text="Info" onClick={setForm1} />
+              <Button text="Bank Accounts" onClick={setForm2} />
+              <Button text="Assets" onClick={setForm4} />
+              <Button text="Investments" onClick={setForm5} />
+              <Button text="Dashboard" onClick={setForm6} />
+              {showBanks && (
+                <>
+                  <div></div>
+                  <Button text="Import" onClick={setFormImport} />
+                  <Button text="Transfers" onClick={setFormTransfers} />
+                  <Button text="Interest" onClick={setFormInterest} />
+                  <Button text="Transactions" onClick={setFormTransactions} />
+
+                  {/* Empty divs for alignment */}
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </>
+              )}
+              {showDashboard && (
+                <>
+                  <div></div>
+                  <Button text="Progress" onClick={setShowProgress} />
+                  <Button text="Debt Summary" onClick={setShowDebtSummary} />
+                  <Button text="Net Worth" onClick={setShowNetWorth} />
+                  {/* Empty divs for alignment */}
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </>
+              )}
             </div>
           </div>
         </div>
+
         {showInfo && (
           <>
-            <p></p>
-            <div style={{ display: "flex", alignItems: "top" }}>
-              <div style={{ flexGrow: 1, marginRight: "10px" }}>
-                <div className="content-block2 dx-card responsive-paddings">
-                  <Form id="form" formData={customerData}>
-                    <GroupItem colCount={3}>
-                      <Item labeltext={"Client Code"} dataField="ClientCode" />
-                      <Item
-                        dataField="Name"
-                        //editorType="dxSelectBox"
-                        //editorOptions={this.positionEditorOptions}
-                        //validationRules={this.validationRules.position}
-                      />
-                      <Item
-                        dataField="AddressLineOne"
-                        //editorOptions={nameEditorOptions}
-                      />
-                      <Item
-                        dataField="AddressLineTwo"
-                        //editorType="dxDateBox"
-                        //editorOptions={this.hireDateEditorOptions}
-                        //validationRules={this.validationRules.hireDate}
-                      />
-                      <Item
-                        dataField="AddressLineThree"
-                        //editorType="dxDateBox"
-                        //editorOptions={this.birthDateEditorOptions}
-                      />
-                      <Item dataField="AddressLineFour" />
-                      <Item
-                        dataField="Country"
-                        //colSpan={2}
-                        //editorType="dxTextArea"
-                        //editorOptions={this.notesEditorOptions}
-                      />
-                      <Item
-                        dataField="PostalZip" //editorOptions={this.phonesEditorOptions}
-                      />
-                      <Item dataField="UNIQUEID" visible={false} />
-                    </GroupItem>
-                    <GroupItem>
-                      <ButtonItem
-                        horizontalAlignment="left"
-                        buttonOptions={buttonOptions}
-                      />
-                    </GroupItem>
-                  </Form>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-        {showBanksForm && (
-          <>
-            <p></p>
-            <ClientBankAccounts clientCode={currentClientCode} />
+            <CustomerProfile clientCode={currentClientCode} />
+            <ClientOwners clientCode={currentClientCode} />
           </>
         )}
       </div>
+      {showBanksForm && (
+        <>
+          <p></p>
+          <ClientBankAccounts clientCode={currentClientCode} />
+        </>
+      )}
       {showDebtSummary && (
         <>
           <p></p>
@@ -333,165 +343,23 @@ const ClientManagement = () => {
       )}
       {ShowImport && (
         <>
-          <ClientImports clientCode={currentClientCode} />
+          <BankCSVImport
+            clientCode={currentClientCode}
+            sharedValue={sharedValue}
+            onValueChange={setSharedValue}
+          />
+          <ImportTransactions
+            clientCode={currentClientCode}
+            sharedValue={sharedValue}
+          />
         </>
       )}
+      {showInterest && <Interest clientCode={currentClientCode} />}
     </>
   );
 };
 export default ClientManagement;
-
-// const setCurrentValues = async (e) => {
-//   if (!e || !e.value) return;
-//   console.log("value sent in", e.value);
-//   const getmyvalues = await getCurrentOption(e.value);
-//   //setCurrentTaskName(getmyvalues.label);
-//   setCurrentCellDuration(getmyvalues.duration);
-//   setActivityKey(getmyvalues.keyvalue);
-//   // Use the values directly
-//   console.log(
-//     "duration xx ",
-//     getmyvalues.duration,
-//     "activity key xx",
-//     getmyvalues.keyvalue,
-//     //"Label xx:",
-//     //getmyvalues.label,
-//     "actual: ",
-//     currentCellDuration
-//     //"Name: ",
-//     //currentTaskName
-//   );
-//   setShowScheduler(true); // Show the scheduler when a service is selected
-// };
-
-// const setEmployeeName = async (e) => {
-//   setCurrentEmployeeName(e.value);
-//   console.log("employee name", e.value, "label", e.label);
-//   setShowScheduler2(true); // Show the scheduler when a service is selected
-// };
-
-//////////////////////////////////////////////////////////
-// const handleAppointmentAdded = async (e) => {
-//   try {
-//     const response = await addAppointment(
-//       user.companynumber,
-//       currentEmployeeName,
-//       e.appointmentData.startDate,
-//       e.appointmentData.endDate,
-//       e.appointmentData.description,
-//       e.appointmentData.text,
-//       activitykey
-//       //currentCellkey
-//     );
-//     // handle success (maybe refresh appointments or show a success message)
-//   } catch (error) {
-//     console.error("Error adding appointment:", error);
-//     // handle error (maybe show an error message to the user)
-//   }
-// };
-
-// const handleAppointmentDeleted = async (e) => {
-//   try {
-//     // e.appointmentData contains the data of the deleted appointment
-//     //const response = await deleteAppointment(e.appointmentData);
-//     //console.log("appointment Deleted", e.appointmentData);
-//     // handle success
-//   } catch (error) {
-//     //console.error("Error deleting appointment:", error);
-//     // handle error
-//   }
-// };
-
-// const handleAppointmentUpdated = async (e) => {
-//   try {
-//     // e.newData contains the updated data
-//     // e.oldData contains the data before the update
-//     //const response = await updateAppointment(e.newData);
-//     //console.log("appointment Updated", e.appointmentData);
-//     // handle success
-//   } catch (error) {
-//     //console.error("Error updating appointment:", error);
-//     // handle error
-//   }
-// };
-
-//////////////////////////////////////////////////////////
-//   onContentReady={validateForm}
-//   //colCountByScreen={colCountByScreen}
-//   id="form"
-//   formData={companyValues}
-// ></form>
-// const [username, setUsername] = React.useState("");
-// const [isUserEntered, setIsUserEntered] = React.useState(false); // New state to check if user has been entered
-// // ... [your existing useState declarations]
-
-// const handleUserConfirm = () => {
-//   if (username) {
-//     setIsUserEntered(true); // User has been entered, show the rest of the components
-//   }
-// };
-
-//DebtSummary clientCode={currentClientCode} />}
-
-// <div>
-// {/* First row of buttons */}
-// <div style={{ display: "flex", marginBottom: "10px" }}>
-//   {" "}
-//   {/* Add margin-bottom for spacing between rows */}
-//   <Button
-//     text="Info"
-//     style={{ marginRight: "10px" }}
-//     onClick={setForm1}
-//   />
-//   <Button
-//     text="Bank Accounts"
-//     style={{ marginRight: "10px" }}
-//     onClick={setForm2}
-//   />
-//   <Button
-//     text="Owners"
-//     style={{ marginRight: "10px" }}
-//     onClick={setForm3}
-//   />
-//   <Button
-//     text="Assets"
-//     style={{ marginRight: "10px" }}
-//     onClick={setForm4}
-//   />
-//   <Button
-//     text="Investments"
-//     style={{ marginRight: "10px" }}
-//     onClick={setForm5}
-//   />
-//   <Button
-//     text="Debt Summary"
-//     style={{ marginRight: "10px" }}
-//     onClick={setForm6}
-//   />
-// </div>
-
-// {/* Second row of buttons */}
-// <div style={{ display: "flex" }}>
-//   {showBanks && (
-//     <>
-//       <Button
-//         text="Import"
-//         style={{ marginRight: "10px" }}
-//         onClick={setFormImport}
-//       />
-
-//       <Button
-//         text="Transfers"
-//         style={{ marginRight: "10px" }}
-//         onClick={setFormTransfers}
-//       />
-//       <Button
-//         text="Interest"
-//         style={{ marginRight: "10px" }}
-//         onClick={setFormInterest}
-//       />
-//     </>
-//   )}
-// </div>
-
-//"content-block2 dx-card responsive-paddings">
+// )}
+// {ShowProcessImport && (
+//   <ImportTransactions clientCode={currentClientCode} />
+// )}

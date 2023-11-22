@@ -73,6 +73,45 @@ export const fetchThisClientData = async (clientCode) => {
         COUNTRY: json.user_response.bankq.COUNTRY,
         POSTALZIP: json.user_response.bankq.POSTALZIP,
         UNIQUEID: json.user_response.bankq.UNIQUEID,
+        STARTDATE: json.user_response.bankq.STARTDATE,
+        ENDDATE: json.user_response.bankq.ENDDATE,
       };
+    });
+};
+export const updateClient = async (requestedclientcode, companyValues) => {
+  console.log("client in:", requestedclientcode);
+  //companyValues.AddressLineThree = "corner light";
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      Name: companyValues.Name,
+      AddressLineOne: companyValues.AddressLineOne,
+      AddressLineTwo: companyValues.AddressLineTwo,
+      AddressLineThree: companyValues.AddressLineThree,
+      AddressLineFour: companyValues.AddressLineFour,
+      Country: companyValues.Country,
+      PostalZip: companyValues.PostalZip,
+      UniqueID: companyValues.UniqueID,
+      startdate: companyValues.startdate,
+      enddate: companyValues.enddate,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/updateClientDataAdmin`;
+  return await fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      return {};
     });
 };

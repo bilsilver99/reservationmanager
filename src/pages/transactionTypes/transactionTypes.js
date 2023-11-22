@@ -98,7 +98,7 @@ class TransactionTypesx extends React.Component {
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Transaction Types</h3>
+        {/* <h3>Transaction Types</h3> */}
         <DataGrid
           dataSource={mystore(this.props.companyCode)}
           keyExpr="UNIQUEID"

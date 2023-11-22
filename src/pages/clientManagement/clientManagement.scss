@@ -2,12 +2,23 @@
   display: flex;
   flex-direction: column;
   align-items: left;
-  background-color: red #f0f0f0; /* light gray background */
   justify-content: space-between; /* Added */
   background-color: #ffffff; /* white dropdown */
   border: 1px solid #9e0e0e; /* light gray border */
   border-radius: 10px; /* rounded corners */
   padding: 20px; /* Added */
+}
+
+.app2 {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: space-between; /* Added */
+  background-color: #ffffff; /* white dropdown */
+  border: 1px solid #1c0e9e; /* light gray border */
+
+  padding: 15px; /* Added */
+  padding-left: 20px;
 }
 
 .dropdown {
@@ -24,6 +35,30 @@
 }
 #scheduler .dx-scheduler-cell-sizes-vertical {
   height: 50px !important;
+}
+.responsive-paddingsx {
+  padding: 10px;
+
+  .screen-large & {
+    padding: 10px;
+  }
+  .red-color {
+    color: red;
+  }
+}
+.red-color {
+  color: red;
+}
+.my-top-section {
+  position: sticky;
+  top: 0;
+  background-color: rgb(169, 170, 178);
+  color: white;
+  z-index: 2; /* Set a z-index value higher than other content */
+  padding: 10px; /* Add padding if needed */
+}
+.white-text-selectbox .dx-selectbox-content {
+  color: white;
 }
 // .options {
 //   padding: 20px;

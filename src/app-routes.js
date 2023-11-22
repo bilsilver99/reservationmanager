@@ -24,6 +24,7 @@ import {
   ClientManagementPage,
   DebtSummaryPage,
   DashboardPage,
+  BanksPage,
 } from "./pages";
 
 import { withNavigationWatcher } from "./contexts/navigation";
@@ -128,6 +129,14 @@ const routes = [
   {
     path: "/dashBoard",
     element: DashboardPage,
+  },
+  {
+    path: "/banks",
+    element: BanksPage,
+  },
+  {
+    path: "/",
+    element: HomePage,
   },
 ];
 

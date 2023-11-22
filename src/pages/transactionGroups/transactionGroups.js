@@ -64,7 +64,7 @@ class TransactionGroupsx extends React.Component {
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Transaction Groups</h3>
+        {/* <h3>Transaction Groups</h3> */}
         <DataGrid
           dataSource={mystore(this.state.companyCode)}
           showBorders={true}

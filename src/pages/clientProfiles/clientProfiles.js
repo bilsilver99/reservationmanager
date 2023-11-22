@@ -145,7 +145,7 @@ class ClientProfilesx extends React.Component {
           <Column dataField="CLIENTCODE" caption="Client Code" />
           <Column
             dataField={"NAME"}
-            caption={"Name"}
+            caption={"Namey"}
             hidingPriority={8}
             visible={true}
           />

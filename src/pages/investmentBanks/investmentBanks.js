@@ -93,7 +93,7 @@ class InvestmentBanksx extends React.Component {
   render() {
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Investment Banks</h3>
+        {/* <h3>Investment Banks</h3> */}
         <DataGrid
           dataSource={mystore(this.state.companyCode)}
           keyExpr="UNIQUEID"

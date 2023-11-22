@@ -24,3 +24,4 @@ export { default as ClientManagementPage } from "./clientManagement/clientManage
 export { default as ClientBankAccountsPage } from "./clientManagement/clientBankAccounts/clientBankAccounts";
 export { default as DebtSummaryPage } from "./clientManagement/clientBankAccounts/debtSummary";
 export { default as DashboardPage } from "./dashboard/dashboard";
+export { default as BanksPage } from "./banks/banks";

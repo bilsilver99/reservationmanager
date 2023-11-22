@@ -3,6 +3,85 @@ function isNotEmpty(value) {
   return value !== undefined && value !== null && value !== "";
 }
 
+export const getBanks = (myClient) => {
+  //var myClient = 1;
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: myClient,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/getClientbankAccounts`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      //console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("asset groups", json);
+      return {
+        data: json.user_response.bankq,
+      };
+    });
+};
+
+export const getBankName = (myClient, MybankAccount) => {
+  //var myClient = 1;
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: myClient,
+      sentBankAccount: MybankAccount,
+    }),
+  };
+
+  console.log("client sent", myClient, "bank account sent", MybankAccount);
+
+  const url = `${process.env.REACT_APP_BASE_URL}/getClientbankAccountName`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      //console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log(
+        "client sent",
+        myClient,
+        "bank account",
+        MybankAccount,
+        "bank name ",
+        json
+      );
+      return {
+        data: json.user_response.returnedName,
+        daterow: json.user_response.daterow,
+        descriptionrow: json.user_response.descriptionrow,
+        paymentsrow: json.user_response.paymentsrow,
+        depositsrow: json.user_response.depositsrow,
+      };
+    });
+};
+
 export const mystore = (myClient) =>
   new CustomStore({
     key: "UNIQUEID",
@@ -226,6 +305,127 @@ export const myStore5 = (myClient) => {
     }),
   };
   const url = `${process.env.REACT_APP_BASE_URL}/getBankAccountTypes`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {
+        data: json.user_response.loginq,
+      };
+    });
+};
+
+export const updateImportFile = (clientcode, bankaccount, dataArray) => {
+  console.log("array from web page", dataArray.data);
+  //var myClient = 1;
+  const sentArray = dataArray.data.map(
+    ([date, description, payments, deposits, total]) => ({
+      DATEFIELD: date,
+      DESCRIPTIONFIELD: description,
+      PAYMENTSFIELD: payments,
+      DEPOSITSFIELD: deposits,
+      TOTALFIELD: total,
+    })
+  );
+
+  // Create the final object
+  const dataToSend = {
+    sentArray: sentArray,
+  };
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+      sentBankAccount: bankaccount,
+      sentArray: sentArray,
+    }),
+  };
+  console.log(
+    "client sent",
+    clientcode,
+    "bank account sent",
+    bankaccount,
+    "data sent",
+    dataToSend
+  );
+  const url = `${process.env.REACT_APP_BASE_URL}/SendImportFileData`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {
+        data: json.user_response.loginq,
+      };
+    });
+};
+/////////////////////////////////
+export const updateImportFileV2 = (clientcode, bankaccount, dataArray) => {
+  console.log(
+    "clientcode",
+    clientcode,
+    "banksaccount",
+    bankaccount,
+    "array from web page",
+    dataArray
+  );
+  //var myClient = 1;
+  const sentArray = dataArray.map(
+    ([date, description, payments, deposits, total]) => ({
+      DATEFIELD: date,
+      DESCRIPTIONFIELD: description,
+      PAYMENTSFIELD: payments,
+      DEPOSITSFIELD: deposits,
+      TOTALFIELD: total,
+    })
+  );
+
+  // Create the final object
+  const dataToSend = {
+    sentArray: sentArray,
+  };
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+      sentBankAccount: bankaccount,
+      sentArray: sentArray,
+    }),
+  };
+  console.log(
+    "client sent",
+    clientcode,
+    "bank account sent",
+    bankaccount,
+    "data sent",
+    dataToSend
+  );
+  const url = `${process.env.REACT_APP_BASE_URL}/SendImportFileData`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
       ////console.log("client " + myClient);
