@@ -204,7 +204,7 @@ class CodeMappingx extends React.Component {
     }
     return (
       <div className="content-block dx-card responsive-paddings">
-        <h3>Transaction Matching</h3>
+        <h3>Mapping</h3>
         <DataGrid
           dataSource={mystore(this.state.companyCode)}
           keyExpr="UNIQUEID"
@@ -226,12 +226,7 @@ class CodeMappingx extends React.Component {
             allowAdding={true}
             allowDeleting={true}
           >
-            <Popup
-              title="Type Info"
-              showTitle={true}
-              width={900}
-              height={800}
-            />
+            <Popup title="Map" showTitle={true} width={900} height={800} />
             <Form>
               <Item itemType="group" colCount={2} colSpan={2}>
                 <Item dataField="CLIENTCODE" />

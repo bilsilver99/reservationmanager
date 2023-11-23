@@ -329,12 +329,12 @@ function ClientTransactionsx(props) {
             </Column>
             <Column
               dataField={"DESCRIPTION"}
-              caption="DESCRIPTION"
+              caption="Bank Description"
               allowEditing={true}
             />
             <Column
               dataField={"SECONDDESCRIPTION"}
-              caption="DESCRIPTION"
+              caption="Details"
               allowEditing={true}
             />
             <Column

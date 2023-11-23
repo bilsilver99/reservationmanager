@@ -151,11 +151,17 @@ class BankCSVImportx extends React.Component {
         <p> </p>
         <p>&nbsp;&nbsp;Bank Transactions Import </p>
         <div style={{ display: "flex", alignItems: "left" }}>
-          <p style={{ marginRight: "10px", marginLeft: "10px" }}>
+          <p
+            style={{
+              marginRight: "10px",
+              marginLeft: "10px",
+              marginTop: "6px",
+            }}
+          >
             Bank Account:
           </p>
           <SelectBox
-            style={{ width: "200px", height: "40px" }}
+            style={{ width: "200px", height: "30px" }}
             items={this.state.bankAccountList}
             valueExpr="BANKACCOUNTNUMBER"
             displayExpr={(item) =>

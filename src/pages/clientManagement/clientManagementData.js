@@ -75,6 +75,10 @@ export const fetchThisClientData = async (clientCode) => {
         UNIQUEID: json.user_response.bankq.UNIQUEID,
         STARTDATE: json.user_response.bankq.STARTDATE,
         ENDDATE: json.user_response.bankq.ENDDATE,
+        STARTYEARINTEREST: json.user_response.bankq.STARTYEARINTEREST,
+        STARTMONTHINTEREST: json.user_response.bankq.STARTMONTHINTEREST,
+        ENDYEARINTEREST: json.user_response.bankq.ENDYEARINTEREST,
+        ENDMONTHINTEREST: json.user_response.bankq.ENDMONTHINTEREST,
       };
     });
 };

@@ -15,6 +15,7 @@ export const getBanks = (myClient) => {
       sentclientcode: myClient,
     }),
   };
+  console.log("client sent", myClient);
   const url = `${process.env.REACT_APP_BASE_URL}/getClientbankAccounts`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {

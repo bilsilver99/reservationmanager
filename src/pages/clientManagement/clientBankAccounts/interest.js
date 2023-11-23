@@ -1,108 +1,182 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./profile.scss";
 import "devextreme-react/text-area";
-import Form, { Item, ButtonItem, GroupItem } from "devextreme-react/form";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import Form, {
+  Item,
+  ButtonItem,
+  GroupItem,
+  Lookup,
+  EmptyItem,
+} from "devextreme-react/form";
+import SelectBox from "devextreme-react/select-box";
+import DateBox from "devextreme-react/date-box";
+import TextBox from "devextreme-react/text-box";
+import { Button } from "devextreme-react/button";
 import { fetchThisClientData } from "../clientManagementData";
-//import { useAuth } from "../../contexts/auth";
-import notify from "devextreme/ui/notify";
-import ClientBankSegment from "./clientBankSegments";
-//import SelectBox from "devextreme-react/select-box";
-//import ColorBox from "devextreme-react/color-box";
+
+import { getBanks } from "./clientBanksAccountsData";
 
 const Interestx = (props) => {
-  const [clientCode, setClientCode] = useState(props.sentClientCode);
-  const [clientData, setClientData] = useState({});
-  const [clientBankAccount, setClientBankAccount] = useState("");
-  const [clientBankSegment, setClientBankSegment] = useState("");
+  console.log(props);
+
+  const [myClientCode, setClientCode] = useState(props.sentClientCode);
+  const [bankAccountList, setBankAccountList] = useState([]);
+  const MySwal = withReactContent(Swal);
+
+  //const { register, handleSubmit, errors } = useForm();
+
+  const [currentBankAccount, setCurrentBankAccount] = useState("");
+  const [Segment, setSegment] = useState("");
+  const [startYear, setStartdate] = useState("");
+  const [endYear, setEnddate] = useState("");
+  const [allAccounts, setAllAccounts] = useState(false);
+  const handleStartDateChange = (e) => {
+    setStartdate(e.value);
+  };
+
+  const handleEndDateChange = (e) => {
+    setEnddate(e.value);
+  };
+
+  const handleBankAccountChange = (e) => {
+    setCurrentBankAccount(e.value);
+  };
+
+  const ProcessInterest = (e) => {
+    MySwal.fire({
+      icon: "success",
+      title: "Interest Processed",
+      text: "The Interest has been processed successfully.",
+    });
+  };
+  const ResetInterest = (e) => {
+    MySwal.fire({
+      icon: "success",
+      title: "Interest Processed",
+      text: "The Interest has been processed successfully.",
+    });
+  };
+  // const handleFieldDataChange = (e) => {
+  //   setFormData({ ...formData, [e.dataField]: e.value });
+  // }; // Initialize other fields
 
   useEffect(() => {
-    (async () => {
-      const result = await fetchThisClientData(clientCode);
-      setClientData({
-        clientBankAccount: "",
-        clientBankSegment: "",
-        ClientCode: result.CLIENTCODE,
-        Name: result.NAME,
-        AddressLineOne: result.ADDRESSLINEONE,
-        AddressLineTwo: result.ADDRESSLINETWO,
-        AddressLineThree: result.ADDRESSLINETHREE,
-        AddressLineFour: result.ADDRESSLINEFOUR,
-        Country: result.COUNTRY,
-        PostalZip: result.POSTALZIP,
-        UniqueID: result.UNIQUEID,
-        StartDate: result.STARTDATE,
-        EndDate: result.ENDDATE,
+    console.log("client code value", myClientCode);
+    fetchThisClientData(myClientCode).then((data) => {
+      console.log("client data", data);
+      setStartdate(data.STARTDATE);
+      setEnddate(data.ENDDATE);
+    });
+    getBanks(myClientCode) // call the function to fetch data
+      .then((data) => {
+        console.log("bank accounts ", data);
+        setBankAccountList(data.data);
+        console.log("bank accounts ", bankAccountList);
+      })
+      .catch((error) => {
+        console.error(
+          "There was an error fetching the transaction group data:",
+          error
+        );
       });
-    })();
-    //getemployee(service.getEmployee());
+  }, []);
 
-    return () => {
-      // this now gets called when the component unmounts
-    };
-  }, [clientCode]);
-
-  // const companyUpdate = (event) => {
-  //   updateCompany(props.companynumber, companyValues);
-  //   notify(
-  //     {
-  //       message: "You have submitted the form",
-  //       position: {
-  //         my: "center top",
-  //         at: "center top",
-  //       },
-  //     },
-  //     "success",
-  //     3000
-  //   );
-  //   event.preventDefault();
+  // const setAccountData = (e) => {
+  //   setCurrentBankAccount(e.value);
+  // };
+  // const setSegmentData = (e) => {
+  //   setCurrentSegment(e.value);
   // };
 
-  const handleClientBankAccountChange = (e) => {
-    clientBankAccount(e.value);
-  };
-  const handleClientBankAccountSegmentChange = (e) => {
-    clientBankSegment(e.value);
-  };
-  const validateForm = (event) => {
-    event.component.validate();
-  };
-  const nameEditorOptions = { disabled: false };
-
-  const rules = { X: /[02-9]/ };
-
-  //const handleColorChange = ({ value }) => ({ color: value });
-
-  const phonesEditorOptions = {
-    mask: "(X00) 000-0000",
-    maskRules: rules,
-  };
-
-  const buttonOptions = {
-    text: "Update",
-    type: "success",
-    useSubmitBehavior: true,
-  };
-
   return (
-    <React.Fragment>
-      <h3 className={"content-block"}>Interest Calculations</h3>
-
-      <div className="content-block dx-card responsive-paddings">
-        <form>
-          <Form
-            onContentReady={validateForm}
-            //colCountByScreen={colCountByScreen}
-            id="form"
-          >
-            <Item
-              labeltext={"Bank Account Number"}
-              dataField="clientBankAccount"
+    <>
+      <p>&nbsp;&nbsp;&nbsp;Interest Calculations</p>
+      <div className="red-color responsive-paddingsx">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "65%",
+          }}
+        >
+          <label>
+            Bank Account:
+            <SelectBox
+              className="white-text-selectbox"
+              style={{ width: "250px", height: "30px", marginTop: "5px" }}
+              items={bankAccountList}
+              valueExpr="BANKACCOUNTNUMBER"
+              displayExpr={(item) =>
+                item
+                  ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
+                  : ""
+              }
+              value={currentBankAccount}
+              //searchEnabled={true}
+              //value={currentEmployeeName}
+              onValueChanged={handleBankAccountChange}
+              //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
             />
-            <Item labeltext={"Segment"} dataField="clientBankSegment" />
-          </Form>
-        </form>
+          </label>
+          <label>
+            Segment:
+            <TextBox
+              value={Segment}
+              className="white-text-selectbox"
+              style={{ width: "50px", height: "30px", marginTop: "5px" }}
+            />
+          </label>
+
+          <label>
+            Start Date:
+            <DateBox
+              style={{ width: "150px", height: "30px", marginTop: "5px" }}
+              type="date"
+              value={startYear}
+              onValueChanged={handleStartDateChange}
+            />
+          </label>
+
+          <label>
+            End Date:
+            <DateBox
+              style={{ width: "150px", height: "30px", marginTop: "5px" }}
+              type="date"
+              value={endYear}
+              onValueChanged={handleEndDateChange}
+            />
+          </label>
+          <label style={{ width: "150px", height: "30px", marginTop: "30px" }}>
+            All Accounts:
+            <input
+              type="checkbox"
+              value={allAccounts}
+              onChange={(e) => setAllAccounts(e.target.checked)}
+            />
+          </label>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "34%",
+          }}
+        >
+          <Button
+            text="Process Interest"
+            onClick={ProcessInterest}
+            style={{ width: "250px", height: "30px", marginTop: "30px" }}
+          ></Button>
+          <Button
+            text="Reset Interest"
+            onClick={ResetInterest}
+            style={{ width: "250px", height: "30px", marginTop: "30px" }}
+          ></Button>
+        </div>
       </div>
-    </React.Fragment>
+    </>
   );
 };
 
