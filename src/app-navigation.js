@@ -86,6 +86,7 @@ export const navigation = [
     text: "Administration",
     icon: "folder",
     auth: "Y",
+    expanded: "N",
     items: [
       {
         text: "Company Profile",
@@ -136,6 +137,19 @@ export const navigation = [
         path: "/investmentBanks",
       },
       {
+        text: "Invest Groups",
+        icon: "folder",
+        auth: "Y",
+        path: "/investmentGroups",
+      },
+      {
+        text: "Invest Subgroups",
+        icon: "folder",
+        auth: "Y",
+        path: "/investmentSubGroups",
+      },
+
+      {
         text: "List Clients",
         icon: "folder",
         auth: "Y",
@@ -148,6 +162,7 @@ export const navigation = [
     text: "Client Management",
     icon: "folder",
     auth: "Y",
+    expanded: "Y",
     items: [
       {
         text: "Client",
@@ -168,6 +183,7 @@ export const navigation = [
     text: "Reporting",
     icon: "folder",
     auth: "Y",
+    expanded: "N",
     items: [
       {
         text: "Progress",

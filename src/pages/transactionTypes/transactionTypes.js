@@ -182,10 +182,7 @@ class TransactionTypesx extends React.Component {
                   dataField={"INTERESTALLOCATION"}
                   editorType="dxCheckBox"
                 />
-                <Item
-                  dataField={"CARRYINGCHARGEINTERESTPAID"}
-                  editorType="dxCheckBox"
-                />
+                <Item dataField={"CARRYINGCHARGEINTERESTPAID"} />
                 <Item
                   dataField={"CARRYINGCHARGEDEDUCTIBLEPAYMENT"}
                   editorType="dxCheckBox"

@@ -2,7 +2,8 @@ import CustomStore from "devextreme/data/custom_store";
 function isNotEmpty(value) {
   return value !== undefined && value !== null && value !== "";
 }
-export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
+
+export const mystore = (myClient) =>
   new CustomStore({
     key: "UNIQUEID",
     load: (loadOptions) => {
@@ -22,11 +23,7 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-      //myemployee = "b@b.com";
-      //mycompany = 1;
-      //myemployee = "b@b.com";
-      ////console.log("bank", bankID, "range", rangeValue);
-      ////console.log(rangeValue);
+
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -35,24 +32,14 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
           Accept: "application/json;",
         },
         body: JSON.stringify({
-          sentbankid: bankID,
+          sentclientcode: myClient,
           Parameters: params,
-          daterange: rangeValue,
-          startdate: startdate,
-          enddate: enddate,
         }),
       };
-      console.log(
-        "startdate definite",
-        startdate,
-        "end date definite",
-        enddate
-      );
-      const url = `${process.env.REACT_APP_BASE_URL}/returnClientbanktransactionsOnly`;
-
+      const url = `${process.env.REACT_APP_BASE_URL}/getInvestmentSubGroups`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
-          ////console.log("client " + myClient);
+          //console.log("client " + myClient);
           if (!response.ok) {
             return {
               companyname: "System did not respond",
@@ -62,7 +49,7 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
           return response.json();
         })
         .then((json) => {
-          console.log(json);
+          console.log("types: ", json);
           return {
             data: json.user_response.bankq,
             totalCount: json.user_response.totalCount,
@@ -71,7 +58,6 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
         });
     },
     insert: (values) => {
-      ////console.log(values, bankID);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -81,11 +67,10 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
         body: JSON.stringify({
           ThisFunction: "insert",
           keyvaluepair: values,
-          sentcompany: bankID,
+          sentcompany: myClient,
         }),
       };
-      //console.log("values", values, "ID:", bankID);
-      const url = `${process.env.REACT_APP_BASE_URL}/UpdateClientTransactions`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateInvestmentSubGroups`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -97,12 +82,12 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
           return response.json();
         })
         .then((json) => {
-          return json.user_response.keyvaluepair;
+          return {};
         });
     },
     remove: (key) => {
-      ////console.log(key);
-      ////console.log(values);
+      //console.log(key);
+      //console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -114,8 +99,7 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
           ThisFunction: "delete",
         }),
       };
-      //console.log("Key", key);
-      const url = `${process.env.REACT_APP_BASE_URL}/UpdateClientTransactions`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateInvestmentSubGroups`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -131,8 +115,8 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
         });
     },
     update: (key, values) => {
-      ////console.log(key);
-      ////console.log(values);
+      console.log("key: ", key);
+      console.log("values: ", values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -145,8 +129,7 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
           keyvaluepair: values,
         }),
       };
-
-      const url = `${process.env.REACT_APP_BASE_URL}/UpdateClientTransactions`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateInvestmentSubGroups`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -162,38 +145,6 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
         });
     },
   });
-
-export const getInterest = async ({ myClient }) => {
-  const companynumber = 1;
-  var requestoptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json;",
-    },
-    body: JSON.stringify({
-      SentCompany: myClient,
-    }),
-  };
-  const url = `${process.env.REACT_APP_BASE_URL}/getClientInterest`;
-  return fetch(url, requestoptions) // Request fish
-    .then((response) => {
-      console.log("company:", myClient);
-      if (!response.ok) {
-        return {
-          companyname: "System did not respond",
-          returnaddress: " ",
-        };
-      }
-      return response.json();
-    })
-    .then((json) => {
-      console.log("data stuff", json.user_response.bankq);
-      return {
-        data: json.user_response.bankq,
-        // data: json.user_response.mdata,
-        // totalCount: json.user_response.totalCount,
-        // key: json.user_response.keyname,
-      };
-    });
-};
+//
+//////////////////////////////////////////////////////////////////////////////
+//

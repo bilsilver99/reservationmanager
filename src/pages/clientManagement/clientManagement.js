@@ -14,8 +14,11 @@ import ClientBankAccounts from "./clientBankAccounts/clientBankAccounts";
 import DebtSummary from "./clientBankAccounts/debtSummary";
 import ClientTransactions from "./clientBankAccounts/clientTransactions";
 import Interest from "./clientBankAccounts/interest";
+import ClientInvestments from "./clientBankAccounts/clientInvestments";
+import ClientAssets from "./clientBankAccounts/clientAssets";
 //import ClientImports from "./clientBankAccounts/clientExcelImports";
 import CustomerProfile from "./clientBankAccounts/customerProfile";
+import Transfers from "./clientBankAccounts/transfers";
 
 import ImportTransactions from "./clientBankAccounts/importTransactions";
 //import TestImport from "./clientBankAccounts/testImport";
@@ -35,7 +38,8 @@ const ClientManagement = () => {
   const [sharedValue, setSharedValue] = React.useState();
 
   const { user, updateUser } = useAuth();
-  const [currentClientCode, setCurrentClientCode] = React.useState("RATTI");
+  const [currentClientCode, setCurrentClientCode] =
+    React.useState("BRYDENBRAS");
 
   // const [allowAdding, setAllowAdding] = React.useState(true);
   // const [allowDeleting, setAllowDeleting] = React.useState(true);
@@ -63,7 +67,7 @@ const ClientManagement = () => {
   const [showAssets, setShowAssets] = React.useState(false);
   const [showInvestments, setShowInvestments] = React.useState(false);
 
-  const [showTransfers, setFormTransfers] = React.useState(false);
+  const [showTransfers, setShowTransfers] = React.useState(false);
   const [showInterest, setShowInterest] = React.useState(false);
 
   const [showDebtSummary, setFormDebtSummary] = React.useState(false);
@@ -157,6 +161,7 @@ const ClientManagement = () => {
     setShowProcessImport(false);
     setShowBanksForm(false);
     setShowInterest(false);
+    setShowTransfers(false);
   };
 
   const setForm1 = () => {
@@ -224,6 +229,11 @@ const ClientManagement = () => {
     setShowBanks(true);
     setShowBanksForm(false);
     setShowInterest(true);
+  };
+  const setFormTransfers = () => {
+    setallflags();
+    setShowBanks(true);
+    setShowTransfers(true);
   };
   // const toggleDebtSummary = () => {
   //   setShowDebtSummary((prevState) => !prevState);
@@ -355,6 +365,9 @@ const ClientManagement = () => {
         </>
       )}
       {showInterest && <Interest clientCode={currentClientCode} />}
+      {showTransfers && <Transfers clientCode={currentClientCode} />}
+      {showAssets && <ClientAssets clientCode={currentClientCode} />}
+      {showInvestments && <ClientInvestments clientCode={currentClientCode} />}
     </>
   );
 };

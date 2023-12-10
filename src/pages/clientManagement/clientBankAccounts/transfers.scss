@@ -1,0 +1,32 @@
+.flex-container {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-item {
+  flex: 1; /* Adjust as needed */
+  padding: 10px; /* Spacing between grids */
+}
+
+.dx-datagrid-rowsview .dx-row.dx-selection {
+  background-color: #add8e6;
+}
+.button-container {
+  display: flex;
+  justify-content: space-around; /* Adjust this as needed */
+}
+
+.date-picker-container {
+  display: flex;
+  align-items: center; /* Aligns items vertically in the center */
+}
+
+.date-label {
+  margin-right: 10px; /* Adjust as needed */
+}
+
+.date-box {
+  /* Adjust font size and other styles to make the date input smaller */
+  font-size: 0.8em; /* Example of making the font size smaller */
+  /* Add other styling as necessary */
+}

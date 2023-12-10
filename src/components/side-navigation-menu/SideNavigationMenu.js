@@ -27,10 +27,22 @@ export default function SideNavigationMenu(props) {
       )
       .map((item) => ({
         ...item,
-        expanded: isLarge,
+        expanded: determineIfNodeShouldBeExpanded(item),
         path: item.path && !/^\//.test(item.path) ? `/${item.path}` : item.path,
       }));
   }
+
+  function determineIfNodeShouldBeExpanded(item) {
+    // Example criterion: expand if item has a certain property value
+    // You can replace this with your own logic
+    return item.expanded === "Y";
+  }
+
+  // .map((item) => ({
+  //   ...item,
+  //   expanded: isLarge,
+  //   path: item.path && !/^\//.test(item.path) ? `/${item.path}` : item.path,
+  // }));
 
   const items = useMemo(
     normalizePath,

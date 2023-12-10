@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./profile.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+
 import "devextreme-react/text-area";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -11,15 +14,19 @@ import Form, {
   EmptyItem,
 } from "devextreme-react/form";
 import SelectBox from "devextreme-react/select-box";
-import DateBox from "devextreme-react/date-box";
+//import DateBox from "devextreme-react/date-box";
 import TextBox from "devextreme-react/text-box";
 import { Button } from "devextreme-react/button";
 import { fetchThisClientData } from "../clientManagementData";
+import { updateInterest, resetInterest } from "./interestData";
 
 import { getBanks } from "./clientBanksAccountsData";
+import ClientInterestTransactions from "./clientInterestTransactions";
 
 const Interestx = (props) => {
-  console.log(props);
+  //console.log(props);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [myClientCode, setClientCode] = useState(props.sentClientCode);
   const [bankAccountList, setBankAccountList] = useState([]);
@@ -28,35 +35,84 @@ const Interestx = (props) => {
   //const { register, handleSubmit, errors } = useForm();
 
   const [currentBankAccount, setCurrentBankAccount] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
   const [Segment, setSegment] = useState("");
   const [startYear, setStartdate] = useState("");
   const [endYear, setEnddate] = useState("");
   const [allAccounts, setAllAccounts] = useState(false);
-  const handleStartDateChange = (e) => {
-    setStartdate(e.value);
-  };
-
-  const handleEndDateChange = (e) => {
-    setEnddate(e.value);
-  };
+  const [monthYearList, setMonthYearList] = useState([]);
+  const [startPeriod, setStartPeriod] = useState("");
+  const [endPeriod, setEndPeriod] = useState("");
 
   const handleBankAccountChange = (e) => {
     setCurrentBankAccount(e.value);
   };
 
-  const ProcessInterest = (e) => {
-    MySwal.fire({
-      icon: "success",
-      title: "Interest Processed",
-      text: "The Interest has been processed successfully.",
-    });
+  const ProcessInterest = async (e) => {
+    try {
+      // Wait for the updateInterest routine to finish
+      setIsLoading(true);
+      await updateInterest(
+        myClientCode,
+        currentBankAccount,
+        Segment,
+        startPeriod,
+        endPeriod,
+        allAccounts
+      );
+
+      // After updateInterest resolves, show the success message
+      MySwal.fire({
+        icon: "success",
+        title: "Interest Processed",
+        text: "The Interest has been processed successfully.",
+      });
+      setRefreshKey((oldKey) => oldKey + 1);
+    } catch (error) {
+      // Handle any errors that occur during updateInterest
+      console.error("Error processing interest:", error);
+      // Optionally show an error message to the user
+      MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: "There was an issue processing the interest.",
+      });
+    } finally {
+      // Set loading to false regardless of outcome
+      setIsLoading(false);
+    }
   };
-  const ResetInterest = (e) => {
-    MySwal.fire({
-      icon: "success",
-      title: "Interest Processed",
-      text: "The Interest has been processed successfully.",
-    });
+
+  const ResetInterest = async (e) => {
+    try {
+      // Wait for the updateInterest routine to finish
+      await resetInterest(
+        myClientCode,
+        currentBankAccount,
+        Segment,
+        startPeriod,
+        endPeriod,
+        allAccounts
+      );
+
+      // After updateInterest resolves, show the success message
+      MySwal.fire({
+        icon: "success",
+        title: "Interest Processed",
+        text: "The Interest has been processed successfully.",
+      });
+      setRefreshKey((oldKey) => oldKey + 1);
+    } catch (error) {
+      // Handle any errors that occur during updateInterest
+      console.error("Error processing interest:", error);
+      // Optionally show an error message to the user
+      MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: "There was an issue processing the interest.",
+      });
+    }
   };
   // const handleFieldDataChange = (e) => {
   //   setFormData({ ...formData, [e.dataField]: e.value });
@@ -66,14 +122,17 @@ const Interestx = (props) => {
     console.log("client code value", myClientCode);
     fetchThisClientData(myClientCode).then((data) => {
       console.log("client data", data);
-      setStartdate(data.STARTDATE);
-      setEnddate(data.ENDDATE);
+      //setStartdate(data.STARTDATE);
+      //setEnddate(data.ENDDATE);
+
+      setStartPeriod(data.startinterestperiod);
+      setEndPeriod(data.endinterestperiod);
     });
     getBanks(myClientCode) // call the function to fetch data
       .then((data) => {
-        console.log("bank accounts ", data);
+        //console.log("bank accounts ", data.data);
         setBankAccountList(data.data);
-        console.log("bank accounts ", bankAccountList);
+        //console.log("bank accounts ", bankAccountList);
       })
       .catch((error) => {
         console.error(
@@ -81,24 +140,46 @@ const Interestx = (props) => {
           error
         );
       });
+    generateMonthYearList();
+    //console.log("month year list outside", monthYearList);
   }, []);
 
-  // const setAccountData = (e) => {
-  //   setCurrentBankAccount(e.value);
-  // };
-  // const setSegmentData = (e) => {
-  //   setCurrentSegment(e.value);
-  // };
+  const generateMonthYearList = () => {
+    const monthYears = [];
+    for (let year = 2020; year <= 2030; year++) {
+      for (let month = 1; month <= 12; month++) {
+        monthYears.push(`${year}-${month.toString().padStart(2, "0")}`);
+      }
+    }
+    //console.log("monthYears inside", monthYears);
+    setMonthYearList(monthYears);
+    return monthYears;
+  };
 
   return (
     <>
+      {isLoading && (
+        <div className="spinner-container">
+          {isLoading && (
+            <>
+              <p>Processing please wait &nbsp;&nbsp;</p>
+              <FontAwesomeIcon
+                icon={faSpinner}
+                spin
+                className="large-spinner"
+              />
+            </>
+          )}
+        </div>
+      )}
+
       <p>&nbsp;&nbsp;&nbsp;Interest Calculations</p>
       <div className="red-color responsive-paddingsx">
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            width: "65%",
+            width: "50%",
           }}
         >
           <label>
@@ -128,33 +209,42 @@ const Interestx = (props) => {
               style={{ width: "50px", height: "30px", marginTop: "5px" }}
             />
           </label>
-
           <label>
-            Start Date:
-            <DateBox
-              style={{ width: "150px", height: "30px", marginTop: "5px" }}
-              type="date"
-              value={startYear}
-              onValueChanged={handleStartDateChange}
+            Period:
+            <SelectBox
+              className="white-text-selectbox"
+              style={{ width: "100px", height: "30px", marginTop: "5px" }}
+              items={monthYearList}
+              value={startPeriod}
+              onValueChanged={(e) => setStartPeriod(e.value)}
+            />
+          </label>
+          <label>
+            End Period:
+            <SelectBox
+              className="white-text-selectbox"
+              style={{ width: "100px", height: "30px", marginTop: "5px" }}
+              items={monthYearList}
+              value={endPeriod}
+              onValueChanged={(e) => setEndPeriod(e.value)}
             />
           </label>
 
           <label>
-            End Date:
-            <DateBox
-              style={{ width: "150px", height: "30px", marginTop: "5px" }}
-              type="date"
-              value={endYear}
-              onValueChanged={handleEndDateChange}
-            />
-          </label>
-          <label style={{ width: "150px", height: "30px", marginTop: "30px" }}>
             All Accounts:
-            <input
-              type="checkbox"
-              value={allAccounts}
-              onChange={(e) => setAllAccounts(e.target.checked)}
-            />
+            <div>
+              <input
+                style={{
+                  width: "50px",
+                  height: "20px",
+                  marginTop: "5px",
+                  marginRight: "5px",
+                }}
+                type="checkbox"
+                value={allAccounts}
+                onChange={(e) => setAllAccounts(e.target.checked)}
+              />
+            </div>
           </label>
         </div>
         <div
@@ -176,6 +266,10 @@ const Interestx = (props) => {
           ></Button>
         </div>
       </div>
+      <ClientInterestTransactions
+        myClient={props.sentClientCode}
+        refreshKey={refreshKey}
+      />
     </>
   );
 };

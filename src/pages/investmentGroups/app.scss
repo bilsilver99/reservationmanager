@@ -1,0 +1,33 @@
+.custom-container .dx-datagrid td {
+  font-size: 12px !important;
+}
+
+.custom-container .dx-datagrid-rowsview .dx-row > td {
+  font-size: 12px !important;
+}
+
+.custom-dropdown .dx-overlay-content .small {
+  width: 200px; /* Set the width of the dropdown menu */
+  height: 40px; /* Set the height of the dropdown menu */
+  columns: red;
+}
+.buttonclass {
+  background-color: rgb(126, 208, 133);
+  color: white;
+  font-size: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 5px;
+}
+.buttonclass2 {
+  background-color: rgb(126, 208, 133);
+  color: white;
+  font-size: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 5px;
+  border-left: 10px;
+  position: relative;
+  left: 60px;
+  top: 10px;
+}

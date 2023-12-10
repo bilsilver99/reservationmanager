@@ -261,6 +261,39 @@ export const transactionTypesStore = async () => {
     throw error; // Re-throw the error to be handled by the caller
   }
 };
+export const getBanks = (myClient) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: myClient,
+    }),
+  };
+  console.log("client", myClient);
+  const url = `${process.env.REACT_APP_BASE_URL}/returnbankdataonly`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("bank stuff", json.user_response.bankq);
+      return {
+        data: json.user_response.bankq,
+        totalCount: json.user_response.totalCount,
+        key: json.user_response.keyname,
+      };
+    });
+};
 
 // export const customerStore = () => {
 //   var myClient = 1;

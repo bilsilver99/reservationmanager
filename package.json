@@ -4,10 +4,10 @@
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
-    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/fontawesome-svg-core": "^6.5.0",
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
     "@fortawesome/free-regular-svg-icons": "^6.4.2",
-    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -17,7 +17,6 @@
     "devextreme": "23.1.6",
     "devextreme-aspnet-data": "^2.9.1",
     "devextreme-react": "23.1.6",
-    "node-sass": "^8.0.0",
     "react": "^18.2.0",
     "react-app-polyfill": "^1.0.0",
     "react-csv-importer": "^0.8.1",
@@ -28,8 +27,7 @@
     "react-router-dom": "^6.3.0",
     "react-scripts": "^5.0.1",
     "rrule": "^2.8.1",
-    "sass": "^1.34.1",
-    "sweetalert2": "^11.10.1",
+    "sweetalert2": "^11.6.13",
     "sweetalert2-react-content": "^5.0.7",
     "uuid": "^9.0.1",
     "web-vitals": "^2.1.4",
@@ -63,15 +61,18 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-transform-private-property-in-object": "^7.23.4",
     "@types/whatwg-fetch": "^0.0.33",
     "assert": "^2.1.0",
     "crypto-browserify": "^3.12.0",
-    "devextreme-cli": "1.4.2",
-    "devextreme-themebuilder": "23.1.3",
+    "devextreme-cli": "^1.6.3",
+    "devextreme-themebuilder": "^23.1.3",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
+    "sass": "^1.69.5",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
-    "url": "^0.11.3"
+    "url": "^0.11.3",
+    "webpack": "^5.89.0"
   }
 }

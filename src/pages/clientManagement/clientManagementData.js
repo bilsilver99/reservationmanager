@@ -62,7 +62,7 @@ export const fetchThisClientData = async (clientCode) => {
       return response.json();
     })
     .then((json) => {
-      //console.log("data stuff", json);
+      console.log("data stuff", json);
       return {
         CLIENTCODE: json.user_response.bankq.CLIENTCODE,
         NAME: json.user_response.bankq.NAME,
@@ -79,6 +79,8 @@ export const fetchThisClientData = async (clientCode) => {
         STARTMONTHINTEREST: json.user_response.bankq.STARTMONTHINTEREST,
         ENDYEARINTEREST: json.user_response.bankq.ENDYEARINTEREST,
         ENDMONTHINTEREST: json.user_response.bankq.ENDMONTHINTEREST,
+        startinterestperiod: json.user_response.bankq.STARTINTEREST,
+        endinterestperiod: json.user_response.bankq.ENDINTEREST,
       };
     });
 };

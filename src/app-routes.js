@@ -25,9 +25,12 @@ import {
   DebtSummaryPage,
   DashboardPage,
   BanksPage,
+  InvestmentGroupsPage,
+  InvestmentSubGroupsPage,
 } from "./pages";
 
 import { withNavigationWatcher } from "./contexts/navigation";
+//import InvestmentGroups from "./pages/InvestmentGroups/investmentGroups";
 
 const routes = [
   {
@@ -137,6 +140,14 @@ const routes = [
   {
     path: "/",
     element: HomePage,
+  },
+  {
+    path: "/investmentGroups",
+    element: InvestmentGroupsPage,
+  },
+  {
+    path: "/investmentSubGroups",
+    element: InvestmentSubGroupsPage,
   },
 ];
 

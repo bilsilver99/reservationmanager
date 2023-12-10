@@ -16,3 +16,14 @@
     margin: 0 auto;
   }
 }
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px; /* Adjust the height as needed */
+}
+
+.large-spinner {
+  font-size: 40px; /* or any other size */
+}

@@ -31,6 +31,7 @@ import {
   bankStore,
   customerStore,
   transactionTypesStore,
+  getBanks,
 } from "./codeMappingData.js";
 //import { Button } from "devextreme-react";
 //import { SelectBox } from "devextreme-react";
@@ -55,6 +56,7 @@ class CodeMappingx extends React.Component {
     ];
     this.state = {
       //myClient: this.props.clientCode,
+      clientCode: "",
       currentRow: 0,
       filterValue: "90",
       selectedRowKeys: [],
@@ -66,6 +68,7 @@ class CodeMappingx extends React.Component {
       clientNames: [],
       transactionTypes: [],
       isLoading: true, // Add a loading state
+      clientBankAccounts: [],
     };
   }
 
@@ -109,15 +112,26 @@ class CodeMappingx extends React.Component {
         clientNames: customersData.data,
         transactionTypes: transactionTypesData.data,
         bankAccount: bankAccountsData.data,
-        isLoading: false, // Set loading to false after all data is fetched
+        isLoading: false,
       });
     } catch (error) {
       console.error("There was an error fetching the data:", error);
-      this.setState({
-        isLoading: false,
-      });
+      this.setState({ isLoading: false });
+
+      // Handle error for getBanks if needed here
     }
   }
+
+  fetchClientBankAccounts = async () => {
+    // if (this.state.clientCode) {
+    //   try {
+    //     const bankData = await getBanks(this.state.clientCode);
+    //     this.setState({ clientBankAccounts: bankData.data });
+    //   } catch (error) {
+    //     console.error("Error fetching client bank accounts:", error);
+    //   }
+    // }
+  };
 
   fetchCustomers = async () => {
     try {
@@ -146,57 +160,38 @@ class CodeMappingx extends React.Component {
     }
   };
 
-  // componentDidMount() {
-  //   this.fetchCustomers();
-  //   this.fetchTransactionTypes();
-  //   this.fetchBankAccounts();
-  // }
-  // fetchCustomers = () => {
-  //   customerStore() // call the function to fetch data
-  //     .then((data) => {
-  //       //console.log("data", data);
-  //       this.setState({ clientNames: data.data }); // store the data in state
-  //     })
-  //     .catch((error) => {
-  //       console.error(
-  //         "There was an error fetching the transaction group data:",
-  //         error
-  //       );
-  //     });
+  // onRowUpdating = (e) => {
+  //   if (e.newData.CLIENTCODE) {
+  //     this.setState({ clientCode: e.newData.CLIENTCODE });
+  //     console.log("updating");
+  //   }
+  //   // Handle other fields as needed
   // };
 
-  // fetchTransactionTypes = () => {
-  //   transactionTypesStore() // call the function to fetch data
-  //     .then((data) => {
-  //       //console.log("data", data);
-  //       this.setState({ transactionTypes: data.data }); // store the data in state
-  //     })
-  //     .catch((error) => {
-  //       console.error(
-  //         "There was an error fetching the transaction group data:",
-  //         error
-  //       );
-  //     });
+  // onRowUpdated = async (e) => {
+  //   if ("CLIENTCODE" in e.newData) {
+  //     console.log("updating");
+  //     await this.setState({ clientCode: e.newData.CLIENTCODE });
+  //     await this.fetchClientBankAccounts();
+  //   }
   // };
 
-  // fetchBankAccounts = () => {
-  //   bankStore()
-  //     .then((data) => {
-  //       this.setState({
-  //         bankAccount: data.data,
-  //         isLoading: false, // Update loading state
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       console.error(
-  //         "There was an error fetching the transaction group data:",
-  //         error
-  //       );
-  //       this.setState({
-  //         isLoading: false, // Update loading state even if there's an error
-  //       });
-  //     });
-  // };
+  onEditorPreparing = (e) => {
+    if (e.dataField === "CLIENTCODE" && e.parentType === "dataRow") {
+      e.editorOptions.onValueChanged = async (args) => {
+        // Update client code and fetch bank accounts only if the value has changed
+        if (args.value !== this.state.clientCode) {
+          await this.handleClientCodeChange(args.value);
+        }
+      };
+    }
+  };
+
+  handleClientCodeChange = async (newClientCode) => {
+    await this.setState({ clientCode: newClientCode });
+    console.log("client: ", this.state.clientCode);
+    await this.fetchClientBankAccounts();
+  };
 
   render() {
     if (this.state.isLoading) {
@@ -212,6 +207,9 @@ class CodeMappingx extends React.Component {
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
+          onRowUpdating={this.onRowUpdating}
+          onRowUpdated={this.onRowUpdated}
+          onEditorPreparing={this.onEditorPreparing}
         >
           <FilterRow
             visible={this.state.showFilterRow}
@@ -257,7 +255,18 @@ class CodeMappingx extends React.Component {
             />
           </Column>
 
-          <Column dataField="BANKACCOUNTNUMBER" caption={"Bank Account"} />
+          <Column dataField="BANKACCOUNTNUMBER" caption={"Bank Account"}>
+            <Lookup
+              dataSource={this.state.clientBankAccounts}
+              valueExpr="BANKACCOUNTNUMBER"
+              displayExpr={(item) =>
+                item
+                  ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
+                  : ""
+              }
+            />
+          </Column>
+
           <Column dataField="SEGMENTNUMBER" caption={"Segment"} />
           <Column dataField="DESCRIPTION" caption={"Description"} />
           <Column dataField="DOLLARVALUE" caption={"Dollar Value"} />
