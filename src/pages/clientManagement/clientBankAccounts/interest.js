@@ -99,8 +99,8 @@ const Interestx = (props) => {
       // After updateInterest resolves, show the success message
       MySwal.fire({
         icon: "success",
-        title: "Interest Processed",
-        text: "The Interest has been processed successfully.",
+        title: "Interest Reset",
+        text: "The Interest has been Reset successfully.",
       });
       setRefreshKey((oldKey) => oldKey + 1);
     } catch (error) {

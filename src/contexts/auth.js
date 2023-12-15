@@ -29,7 +29,7 @@ function AuthProvider(props) {
     const result = await sendSignInRequest(email, password);
     if (result.isOk) {
       setUser(result.data);
-      console.log("user values ", result.data);
+      //console.log("inside auth user values ", user.data);
     }
 
     return result;
@@ -41,7 +41,13 @@ function AuthProvider(props) {
 
   return (
     <AuthContext.Provider
-      value={{ user, signIn, signOut, loading, updateUser }}
+      value={{
+        user,
+        signIn,
+        signOut,
+        loading,
+        updateUser,
+      }}
       {...props}
     />
   );

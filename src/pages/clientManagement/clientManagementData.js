@@ -62,7 +62,7 @@ export const fetchThisClientData = async (clientCode) => {
       return response.json();
     })
     .then((json) => {
-      console.log("data stuff", json);
+      //console.log("data stuff", json);
       return {
         CLIENTCODE: json.user_response.bankq.CLIENTCODE,
         NAME: json.user_response.bankq.NAME,
@@ -104,6 +104,39 @@ export const updateClient = async (requestedclientcode, companyValues) => {
       UniqueID: companyValues.UniqueID,
       startdate: companyValues.startdate,
       enddate: companyValues.enddate,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/updateClientDataAdmin`;
+  return await fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      return {};
+    });
+};
+
+///////////////////////////////////////////////////////
+///const updateCurrentClient = (clientCode) => {  }
+//////////////////////////////////////////////////////
+export const updateCurrentUser = async (usercode, clientcode) => {
+  //console.log("client in:", requestedclientcode);
+  //companyValues.AddressLineThree = "corner light";
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      usercode: usercode,
+      clientcode: clientcode,
     }),
   };
   const url = `${process.env.REACT_APP_BASE_URL}/updateClientDataAdmin`;

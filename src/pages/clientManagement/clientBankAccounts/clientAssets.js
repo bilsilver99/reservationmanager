@@ -143,6 +143,7 @@ class ClientAssetsx extends React.Component {
               <Item dataField={"ASSETTYPE"} />
               <Item dataField={"LASTPOSTEDDATE"} />
               <Item
+                cssClass="right-aligned-editor"
                 dataField={"CURRENTVALUE"}
                 editorType={"dxNumberBox"}
                 editorOptions={{

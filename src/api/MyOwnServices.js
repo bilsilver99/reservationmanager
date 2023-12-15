@@ -54,6 +54,8 @@ export const login = async (username, password) => {
           FlinksConnectDomainWealth:
             json.user_response.FlinksConnectDomainWealth,
           FlinksProjectIDWealth: json.user_response.FlinksProjectIDWealth,
+          lastClientUpdated: json.user_response.LastClientUpdated,
+          DateFormat: json.user_response.DateFormat,
         };
       } else {
         //throw new Error("invalid username/password");

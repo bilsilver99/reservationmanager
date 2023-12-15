@@ -8,6 +8,7 @@ import {
   fetchThisClientData,
   getClients,
   updateClient,
+  updateCurrentUser,
 } from "./clientManagementData";
 import { Button } from "devextreme-react/button";
 import ClientBankAccounts from "./clientBankAccounts/clientBankAccounts";
@@ -16,34 +17,25 @@ import ClientTransactions from "./clientBankAccounts/clientTransactions";
 import Interest from "./clientBankAccounts/interest";
 import ClientInvestments from "./clientBankAccounts/clientInvestments";
 import ClientAssets from "./clientBankAccounts/clientAssets";
-//import ClientImports from "./clientBankAccounts/clientExcelImports";
 import CustomerProfile from "./clientBankAccounts/customerProfile";
 import Transfers from "./clientBankAccounts/transfers";
 
 import ImportTransactions from "./clientBankAccounts/importTransactions";
-//import TestImport from "./clientBankAccounts/testImport";
 import BankCSVImport from "./clientBankAccounts/bankCSVImport";
-//import { set } from "react-hook-form";
-//import { Height } from "devextreme-react/chart";
-//import ClientOwners from "./clientOwners";
-//import { isWithinInterval, set } from "date-fns";
+
 import ClientOwners from "./clientOwners";
 
-import notify from "devextreme/ui/notify";
-import dxDateBox from "devextreme/ui/date_box";
-import { set } from "date-fns";
-
 const clients = ["sam", "lou"];
+
 const ClientManagement = () => {
   const [sharedValue, setSharedValue] = React.useState();
 
   const { user, updateUser } = useAuth();
-  const [currentClientCode, setCurrentClientCode] =
-    React.useState("BRYDENBRAS");
 
-  // const [allowAdding, setAllowAdding] = React.useState(true);
-  // const [allowDeleting, setAllowDeleting] = React.useState(true);
-  // const [allowUpdating, setAllowUpdating] = React.useState(false);
+  const [currentClientCode, setCurrentClientCode] = React.useState(
+    user.thisClientCode
+  );
+
   const [thisWidth, setThisWidth] = React.useState("100%");
 
   const [key, setKey] = React.useState(Math.random());
@@ -53,11 +45,7 @@ const ClientManagement = () => {
   const [startdate, setStartDate] = React.useState("");
   const [enddate, setEndDate] = React.useState("");
   const [processDates, setProcessDates] = React.useState("");
-  const setClientData = async (e) => {
-    //console.log("value of e ", e.value);
-    if (e.value === null || e.value === undefined || e.value === "") return;
-    setCurrentClientCode(e.value);
-  };
+
   const [showBanks, setShowBanks] = React.useState(false);
   const [showBanksForm, setShowBanksForm] = React.useState(false);
   const [showInfo, setShowInfo] = React.useState(false);
@@ -80,38 +68,76 @@ const ClientManagement = () => {
 
   const [showPrior, setPrior] = React.useState(true);
 
-  const ClientUpdate = (e) => {
-    console.log("client update", customerData);
-    updateClient(currentClientCode, customerData);
-    notify(
-      {
-        message: "You have submitted the form",
-        position: {
-          my: "center top",
-          at: "center top",
-        },
-      },
-      "success",
-      3000
-    );
-    e.preventDefault();
-  };
-
-  const buttonOptions = {
-    text: "Update",
-    type: "success",
-    useSubmitBehavior: true,
-  };
+  //////
+  // this SHOULD set the current client code to the last client code used by the user
+  //////
 
   useEffect(() => {
-    if (
-      currentClientCode === null ||
-      currentClientCode === undefined ||
-      currentClientCode === ""
-    )
-      return;
     (async () => {
-      //console.log("current client code: " & currentClientCode);
+      const resultCustomerdata = await getClients();
+      setCustomerList(resultCustomerdata.data);
+      setKey(resultCustomerdata.data.key);
+      setThisWidth("70%");
+      //setCurrentClientCode(user.lastClientUpdated);
+      setCurrentClientCode(user.lastClientUpdated);
+      console.log(
+        "inside initial call user values ",
+        user,
+        "and last",
+        user.lastClientUpdated,
+        "and client: ",
+        currentClientCode
+      );
+    })();
+    return () => {};
+  }, []);
+
+  ////
+  // this routine is CALLED when a new customer is selected
+  //
+  const setClientData = async (e) => {
+    if (e.value === null || e.value === undefined || e.value === "") return;
+    if (e.value === null || e.value === undefined || e.value === "") return;
+    setCurrentClientCode(e.value);
+    updateUser(user.lastClientUpdated, e.value);
+    console.log(
+      "value of e ",
+      e.value,
+      "user.lastClientUpdated",
+      user.lastClientUpdated
+    ); //updateUser({ lastClientUpdated: e.value });
+  };
+
+  /////
+  // this is trigered when the user changes
+  ////
+
+  // useEffect(() => {
+  //   // This code will run when `user.lastClientUpdated` changes
+  //   if (user.lastClientUpdated) {
+  //     setCurrentClientCode(user.lastClientUpdated);
+  //   }
+  // }, [user.lastClientUpdated]);
+
+  // const buttonOptions = {
+  //   text: "Update",
+  //   type: "success",
+  //   useSubmitBehavior: true,
+  // };
+
+  ///////
+  ///  this is trigerred when the client code changes
+  /////
+
+  useEffect(() => {
+    // if (
+    //   currentClientCode === null ||
+    //   currentClientCode === undefined ||
+    //   currentClientCode === ""
+    // )
+    //   return;
+    (async () => {
+      console.log("current client code: ", currentClientCode);
       const result = await fetchThisClientData(currentClientCode);
       //console.log("passsed back", result);
       setCustomerData({
@@ -127,10 +153,19 @@ const ClientManagement = () => {
         StartDate: result.STARTDATE,
         EndDate: result.ENDDATE,
       });
+
+      //const resultCustomerdata = await getClients();
+      //setCustomerList(resultCustomerdata.data);
+      //setKey(resultCustomerdata.data.key);
+      //setThisWidth("70%");
+
       updateUser({ thisClientcode: result.CLIENTCODE });
+      updateUser({ lastClientUpdated: result.CLIENTCODE });
       setCustomerName(result.NAME);
       setStartDate(result.STARTDATE);
       setEndDate(result.ENDDATE);
+      updateCurrentUser(user.UserCode, currentClientCode);
+
       //if (startdate !== null && startdate !== undefined && startdate !== "") {
       setProcessDates(
         "Currently Processing from " +
@@ -138,14 +173,9 @@ const ClientManagement = () => {
           " to " +
           result.ENDDATE
       );
-      //}
-      //console.log("new client code in user", user.thisClientCode);
     })();
-    //getemployee(service.getEmployee());
 
-    return () => {
-      // this now gets called when the component unmounts
-    };
+    return () => {};
   }, [currentClientCode]);
 
   const setallflags = () => {
@@ -235,24 +265,6 @@ const ClientManagement = () => {
     setShowBanks(true);
     setShowTransfers(true);
   };
-  // const toggleDebtSummary = () => {
-  //   setShowDebtSummary((prevState) => !prevState);
-  // };
-
-  useEffect(() => {
-    (async () => {
-      // Fetching customer data
-      const resultCustomerdata = await getClients();
-      setCustomerList(resultCustomerdata.data);
-      //console.log("Customer", resultCustomerdata.data);
-      setKey(resultCustomerdata.data.key);
-    })();
-    setThisWidth("70%");
-
-    return () => {};
-  }, [user]);
-
-  //<div className="content-block2 dx-card responsive-paddings top-section">
 
   return (
     <>
@@ -287,7 +299,7 @@ const ClientManagement = () => {
                 gap: "10px",
               }}
             >
-              <Button text="Info" onClick={setForm1} />
+              <Button text="Client Info" onClick={setForm1} />
               <Button text="Bank Accounts" onClick={setForm2} />
               <Button text="Assets" onClick={setForm4} />
               <Button text="Investments" onClick={setForm5} />

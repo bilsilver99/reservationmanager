@@ -15,7 +15,7 @@ function Card() {
   );
 }
 function Card2({ thisUser, thisWidthOut, showPrior }) {
-  console.log("thisUser", { thisUser }, "thisWidthOut", thisWidthOut);
+  //console.log("thisUser", { thisUser }, "thisWidthOut", thisWidthOut);
   return (
     <div>
       <h4>Debt Summary </h4>

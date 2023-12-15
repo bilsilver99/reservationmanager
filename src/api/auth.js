@@ -31,12 +31,16 @@ export async function signIn(email, password) {
         response.FlinksConnectDomainWealth;
       currentUser.FlinksProjectIDWealth = response.FlinksProjectIDWealth;
       currentUser.thisClientcode = response.thisClientcode;
+      currentUser.lastClientUpdated = response.lastClientUpdated;
+      currentUser.DateFormat = response.DateFormat;
 
       console.log(
         "this:",
         currentUser.thisClientcode,
         "sent",
-        currentUser.clientCode
+        currentUser.clientCode,
+        "client",
+        currentUser.lastClientUpdated
       );
     });
     if (thisOK === "1") {
