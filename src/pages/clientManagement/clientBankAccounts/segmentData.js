@@ -682,7 +682,7 @@ export const getTransactionTypes = (bankID, segment) => {
       return response.json();
     })
     .then((json) => {
-      ////console.log(json);
+      console.log(json);
       return {
         data: json.user_response.loginq,
         totalCount: json.user_response.totalCount,
@@ -934,6 +934,7 @@ export const mystore6 = (bankID, rangeValue) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
+      console.log("inside mystore6 looking for ", bankID, rangeValue);
       //myemployee = "b@b.com";
       //mycompany = 1;
       //myemployee = "b@b.com";
@@ -1131,7 +1132,7 @@ export const validateImports = (bankID) => {
     });
 };
 
-export const processImports = (bankID) => {
+export const processImports = (bankID, startdate, enddate) => {
   var requestoptions = {
     method: "POST",
     headers: {
@@ -1140,9 +1141,11 @@ export const processImports = (bankID) => {
     },
     body: JSON.stringify({
       sentbankID: bankID,
+      startdate: startdate,
+      enddate: enddate,
     }),
   };
-  console.log("customer", bankID);
+  console.log("customer", bankID, startdate, enddate);
   const url = `${process.env.REACT_APP_BASE_URL}/processImports`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
@@ -1162,6 +1165,40 @@ export const processImports = (bankID) => {
       };
     });
 };
+
+///////////////////////////////
+export const deleteImports = (bankID) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentbankID: bankID,
+    }),
+  };
+  console.log("customer", bankID);
+  const url = `${process.env.REACT_APP_BASE_URL}/deleteImports`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      ////console.log(json);
+      return {
+        valid: json.user_response.valid,
+      };
+    });
+};
+
 //////////////////////////////////////////
 export const fetchThisClientData = async (clientCode) => {
   //console.log("client in:", clientCode);
@@ -1201,6 +1238,7 @@ export const fetchThisClientData = async (clientCode) => {
         UNIQUEID: json.user_response.bankq.UNIQUEID,
         STARTDATE: json.user_response.bankq.STARTDATE,
         ENDDATE: json.user_response.bankq.ENDDATE,
+        COPPERID: json.user_response.bankq.COPPERID,
       };
     });
 };
@@ -1214,6 +1252,7 @@ export const updateClient = async (requestedclientcode, companyValues) => {
       Accept: "application/json;",
     },
     body: JSON.stringify({
+      clientcode: requestedclientcode,
       Name: companyValues.Name,
       AddressLineOne: companyValues.AddressLineOne,
       AddressLineTwo: companyValues.AddressLineTwo,
@@ -1224,6 +1263,7 @@ export const updateClient = async (requestedclientcode, companyValues) => {
       UniqueID: companyValues.UniqueID,
       startdate: companyValues.StartDate,
       enddate: companyValues.EndDate,
+      copperid: companyValues.CopperID,
     }),
   };
   const url = `${process.env.REACT_APP_BASE_URL}/updateClientDataAdmin`;

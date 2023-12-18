@@ -94,6 +94,7 @@ export const updateClient = async (requestedclientcode, companyValues) => {
       Accept: "application/json;",
     },
     body: JSON.stringify({
+      clientcode: requestedclientcode,
       Name: companyValues.Name,
       AddressLineOne: companyValues.AddressLineOne,
       AddressLineTwo: companyValues.AddressLineTwo,

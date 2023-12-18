@@ -167,7 +167,7 @@ function ClientBankSegmentTransactions(props) {
               <Column
                 dataType="date"
                 dataField={"TRANSACTIONDATE"}
-                caption={"Date"}
+                caption="Date (MM/DD/YYYY)"
                 hidingPriority={7}
                 allowEditing={true}
               />

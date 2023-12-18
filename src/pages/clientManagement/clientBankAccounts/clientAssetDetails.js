@@ -153,7 +153,7 @@ function ClientAssetDetails(props) {
               <Column
                 dataType="date"
                 dataField={"TRANSACTIONDATE"}
-                caption={"Transaction Date"}
+                caption={"Transaction Date (MM/DD/YYYY)"}
                 hidingPriority={7}
                 allowEditing={true}
               />

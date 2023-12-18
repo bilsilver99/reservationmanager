@@ -2,7 +2,13 @@ import CustomStore from "devextreme/data/custom_store";
 function isNotEmpty(value) {
   return value !== undefined && value !== null && value !== "";
 }
-export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
+export const mystore5 = (
+  bankID,
+  rangeValue,
+  startdate,
+  enddate,
+  currentBankAccount
+) =>
   new CustomStore({
     key: "UNIQUEID",
     load: (loadOptions) => {
@@ -40,6 +46,7 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
           daterange: rangeValue,
           startdate: startdate,
           enddate: enddate,
+          currentBankAccount: currentBankAccount,
         }),
       };
       console.log(
@@ -141,7 +148,7 @@ export const mystore5 = (bankID, rangeValue, startdate, enddate) =>
         },
         body: JSON.stringify({
           ThisFunction: "change",
-          SentCompany: key,
+          sentcompany: key,
           keyvaluepair: values,
         }),
       };

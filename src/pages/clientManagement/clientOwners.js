@@ -107,7 +107,7 @@ class ClientOwnersx extends React.Component {
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
-          width={"55%"}
+          width={"100%"}
           columnAutoWidth={true}
         >
           <Paging enabled={true} />
@@ -145,6 +145,21 @@ class ClientOwnersx extends React.Component {
             hidingPriority={8}
             visible={true}
           />
+          <Column
+            dataField={"ALLOCATIONPERCENTAGE"}
+            width={180}
+            caption={"Allocation"}
+            hidingPriority={8}
+            visible={true}
+          />
+          <Column
+            dataField={"EMAILADDRESS"}
+            width={250}
+            caption={"Email"}
+            hidingPriority={8}
+            visible={true}
+          />
+
           <Column
             dataField={"USERNAME"}
             width={200}

@@ -35,6 +35,7 @@ import {
   fetchThisClientData,
 } from "./segmentData";
 import { mystore5 } from "./segmentData2";
+import { Button } from "devextreme-react";
 //import { myStore5 } from "./clientBanksAccountsData";
 
 let pageoption = 90;
@@ -46,6 +47,7 @@ function ClientTransactionsx(props) {
   const [lastBankAccountNumber, setLastBankAccountNumber] = useState("");
   const [lastSegmentNumbmer, setLastSegmentNumber] = useState("");
   const [clientCode, setClientCode] = useState(props.clientCode);
+  const [currentBankAccount, setCurrentBankAccount] = useState(null);
 
   const [filterValue, setFilterValue] = useState(0); // for dates - the actual number of days
   const [refreshKey, setRefreshKey] = useState(0); // for dates to refresh grid when date changed
@@ -63,21 +65,21 @@ function ClientTransactionsx(props) {
     setRefreshKey((prevKey) => prevKey + 1);
   };
 
-  //const [showFilterRow, setShowFilterRow] = useState(true);
+  const [showFilterRow, setShowFilterRow] = useState(true);
 
-  // const applyFilterTypes = [
-  //   {
-  //     key: "auto",
-  //     name: "Immediately",
-  //   },
-  //   {
-  //     key: "onClick",
-  //     name: "On Button Click",
-  //   },
-  // ];
+  const applyFilterTypes = [
+    {
+      key: "auto",
+      name: "Immediately",
+    },
+    {
+      key: "onClick",
+      name: "On Button Click",
+    },
+  ];
 
-  //const [currentFilter, setCurrentFilter] = useState(applyFilterTypes[0]);
-  //const [showHeaderFilter, setShowHeaderFilter] = useState(true);
+  const [currentFilter, setCurrentFilter] = useState(applyFilterTypes[0]);
+  const [showHeaderFilter, setShowHeaderFilter] = useState(true);
 
   const dateFilterOptions = [
     { value: 30, text: "Last 30 days" },
@@ -227,15 +229,44 @@ function ClientTransactionsx(props) {
 
   // Rest of your component
 
+  const setAccountData = (e) => {
+    setCurrentBankAccount(e.value);
+  };
+  const clearBankAccount = (e) => {
+    setCurrentBankAccount("");
+  };
+
   return (
     <>
       <div className="red-color responsive-paddingsx">
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span>Bank Transaction Details</span>
+          <span>Bank Transactions</span>
+          <div>
+            <label>Bank Account:</label>
+            <SelectBox
+              style={{ width: "250px", height: "30px" }}
+              items={bankAccounts}
+              valueExpr="BANKACCOUNTNUMBER"
+              displayExpr={(item) =>
+                item
+                  ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
+                  : ""
+              }
+              //displayExpr="BANKACCOUNTNUMBER"
+              //displayExpr={(item) =>
+              //  `${item.BANKACCOUNTNUMBER} - ${item.DESCRIPTION}`
+              // }
+              value={currentBankAccount}
+              searchEnabled={true}
+              //value={currentEmployeeName}
+              onValueChanged={setAccountData}
+              //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
+            />
+          </div>
 
           <div>
             <label>
-              Start Date:
+              Start Date (MM/DD/YYYY):
               <DateBox
                 type="date"
                 value={startdate}
@@ -245,7 +276,7 @@ function ClientTransactionsx(props) {
           </div>
           <div>
             <label>
-              End Date:
+              End Date (MM/DD/YYYY):
               <DateBox
                 type="date"
                 value={enddate}
@@ -262,12 +293,13 @@ function ClientTransactionsx(props) {
             value={filterValue}
             onValueChanged={handleFilterChange}
             dropDownOptions={{
-              width: 200, // Set the width of the dropdown menu
+              width: 250, // Set the width of the dropdown menu
               height: 200, // Set the height of the dropdown menu
             }}
-            width={150} // Set the width of the select box
+            width={250} // Set the width of the select box
           />
         </div>
+        <Button text="Clear Bank Account" onClick={clearBankAccount} />
 
         {/* className="content-block dx-card responsive-paddings red-color">*/}
 
@@ -278,7 +310,8 @@ function ClientTransactionsx(props) {
               props.clientCode,
               filterOption,
               startdate,
-              enddate
+              enddate,
+              currentBankAccount
             )}
             key={refreshKey} // This key will force a refresh when it changes
             columnAutoWidth={true}
@@ -288,10 +321,13 @@ function ClientTransactionsx(props) {
             width={"100%"}
             // paging={{ pageSize: 10 }}
             // pagingEnabled={true}
-            remoteOperations={true}
+            remoteOperations={false}
           >
+            <FilterRow visible={showFilterRow} applyFilter={currentFilter} />
+            <HeaderFilter visible={showHeaderFilter} />
+            <SearchPanel visible={false} width={240} placeholder="Search..." />
             <Editing
-              mode="row"
+              mode="cell"
               allowUpdating={true}
               allowAdding={true}
               allowDeleting={true}
@@ -328,6 +364,15 @@ function ClientTransactionsx(props) {
               />
             </Column>
             <Column
+              dataType="date"
+              dataField={"TRANSACTIONDATE"}
+              caption={"Date (MM/DD/YYYY)"}
+              hidingPriority={7}
+              allowEditing={true}
+            >
+              <RequiredRule message="A Date is required" />
+            </Column>
+            <Column
               dataField={"DESCRIPTION"}
               caption="Bank Description"
               allowEditing={true}
@@ -350,15 +395,7 @@ function ClientTransactionsx(props) {
                 displayExpr="DESCRIPTIONTWO"
               />
             </Column>
-            <Column
-              dataType="date"
-              dataField={"TRANSACTIONDATE"}
-              caption={"Date"}
-              hidingPriority={7}
-              allowEditing={true}
-            >
-              <RequiredRule message="A Date is required" />
-            </Column>
+
             <Column
               dataField={"TRANSACTIONAMOUNT"}
               caption={"Amount"}

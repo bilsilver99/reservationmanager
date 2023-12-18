@@ -38,36 +38,39 @@ function formatCurrency(number, locale = "en-US", currency = "USD") {
   }).format(number);
 }
 
-const ConfirmationModal = ({ isOpen, onRequestClose, onConfirm, balance }) => (
-  <Modal
-    isOpen={isOpen}
-    onRequestClose={onRequestClose}
-    className="react-modal"
-  >
-    <div className="react-modal-header">Confirm Deletion</div>
-    <div className="react-modal-content">
-      <p>
-        Are you sure you want to delete this record? The balance is&nbsp;&nbsp;
-        {formatCurrency(balance)}.
-      </p>
-    </div>
-    <button
-      className="react-modal-button react-modal-button-confirm"
-      onClick={onConfirm}
+const ConfirmationModal = ({ isOpen, onRequestClose, onConfirm, balance }) => {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      className="react-modal"
+      // other props
     >
-      Yes, Delete
-    </button>
-    <button
-      className="react-modal-button react-modal-button-cancel"
-      onClick={onRequestClose}
-    >
-      Cancel
-    </button>
-    <span className="close-button" onClick={onRequestClose}>
-      X
-    </span>
-  </Modal>
-);
+      <div className="react-modal-header">Confirm Deletion</div>
+      <div className="react-modal-content">
+        <p>
+          Are you sure you want to delete this record? The balance is{" "}
+          {formatCurrency(balance)}.
+        </p>
+      </div>
+      <button
+        className="react-modal-button react-modal-button-confirm"
+        onClick={onConfirm}
+      >
+        Yes, Delete
+      </button>
+      <button
+        className="react-modal-button react-modal-button-cancel"
+        onClick={onRequestClose}
+      >
+        Cancel
+      </button>
+      <span className="close-button" onClick={onRequestClose}>
+        X
+      </span>
+    </Modal>
+  );
+};
 
 let pageoption = 90;
 
@@ -89,7 +92,7 @@ function ClientBankSegment(props) {
     return await asyncValidation(params.value, bankUniqueid);
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setisModalOpen] = useState(false);
   const [currentBalance, setCurrentBalance] = useState(0);
 
   const onEditorPreparing = (e) => {
@@ -111,32 +114,32 @@ function ClientBankSegment(props) {
     fetchData();
   }, [props.rowid, props.sendit]);
 
-  const deleteClick = (e) => {
-    if (e.data.SEGMENTBALANCE !== 0) {
-      setIsModalOpen(true);
-      setCurrentBalance(e.data.SEGMENTBALANCE);
+  deleteClick = (e) => {
+    if (e.data.BANKBALANCE !== 0) {
+      this.setState({ isModalOpen: true, currentBalance: e.data.BANKBALANCE });
       e.cancel = true; // Prevent immediate deletion
     } else {
-      e.cancel = false; // Delete the row directly
+      // Delete the row directly
+      e.cancel = false;
     }
   };
 
-  const handleModalConfirm = () => {
-    setIsModalOpen(false);
+  handleModalConfirm = () => {
+    this.setState({ isModalOpen: false });
     // Add your deletion logic here
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  handleModalClose = () => {
+    this.setState({ isModalOpen: false });
   };
 
   return (
     <>
       <ConfirmationModal
-        isOpen={isModalOpen}
-        onRequestClose={handleModalClose}
-        onConfirm={handleModalConfirm}
-        balance={currentBalance}
+        isOpen={this.state.isModalOpen}
+        onRequestClose={this.handleModalClose}
+        onConfirm={this.handleModalConfirm}
+        balance={this.state.currentBalance}
       />
       {dataSourcex ? (
         <div className="red-color">
@@ -147,7 +150,7 @@ function ClientBankSegment(props) {
               columnAutoWidth={true}
               width={"100%"}
               onEditorPreparing={onEditorPreparing}
-              onRowRemoving={deleteClick}
+              onRowRemoving={this.deleteClick.bind(this)}
             >
               <Sorting mode="single" />
               <Paging enabled={true} />
@@ -258,7 +261,7 @@ function ClientBankSegment(props) {
               </Column>
               <Column
                 dataField={"CURRENTBANKRATE"}
-                caption={"Current Prime Interest Rate"}
+                caption={"Current Bank Interest Rate"}
                 hidingPriority={7}
                 allowEditing={false}
                 format={"###.00"}

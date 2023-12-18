@@ -180,7 +180,7 @@ function TransferDetailsx(props) {
               myClientCode,
               skipbuild
             )}
-            //key={props.resetkey}
+            key={props.onresetkey}
             //keyExpr="ID"
             showBorders={true}
             width={"100%"}
@@ -257,7 +257,7 @@ function TransferDetailsx(props) {
               myClientCode,
               skipbuild
             )}
-            //key={props.resetkey}
+            key={props.resetkey}
             //keyExpr="ID"
             showBorders={true}
             width={"60%"}
@@ -330,7 +330,7 @@ export default function TransfersDetails(props) {
     "skip",
     props.skipbuild,
     "reset",
-    props.resetkey
+    props.onresetkey
   );
   return (
     <TransferDetailsx
@@ -342,6 +342,7 @@ export default function TransfersDetails(props) {
       resetkey={props.resetkey}
       effectiveDate={props.effectiveDate}
       onRefreshGrid={props.onRefreshGrid}
+      onresetkey={props.onresetkey}
     />
   );
 }

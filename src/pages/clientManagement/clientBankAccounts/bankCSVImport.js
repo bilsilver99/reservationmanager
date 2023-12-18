@@ -38,6 +38,10 @@ class BankCSVImportx extends React.Component {
     ],
   };
 
+  /////////////////////////////////////////// from the manual mapping
+  //////////////// this is working
+  ////////////////////////////////////////////
+
   handleImportedData = (importedData) => {
     console.log("Received data in parent component:", importedData);
     const transformedData = [];
@@ -53,13 +57,38 @@ class BankCSVImportx extends React.Component {
     });
 
     console.log("transformed before sending to data call", transformedData);
-    // onCompleteImport = (importedData) => {
-    //   console.log("Received  data:", importedData);
 
     updateImportFileV2(
       this.props.clientCode,
       this.state.currentBankAccount,
       transformedData
+    );
+
+    this.setState(
+      (prevState) => ({
+        sharedValue: prevState.sharedValue + 1,
+      }),
+      () => {
+        // After state update, call the parent's callback to update its state as well
+        this.props.onValueChange(this.state.sharedValue);
+      }
+    );
+
+    console.log("new value:", this.state.newValue);
+    this.props.onValueChange(this.state.newValue);
+  };
+
+  /////////////////////////////////////////////////////////////
+  //// this is the auto receive not working
+  /////////////////////////////////////////////////////////////
+
+  onDataReceived = (data) => {
+    console.log("Received data:", data);
+
+    updateImportFile(
+      this.props.clientCode,
+      this.state.currentBankAccount,
+      data
     );
     this.setState(
       (prevState) => ({
@@ -72,7 +101,10 @@ class BankCSVImportx extends React.Component {
     );
     console.log("new value:", this.state.newValue);
     this.props.onValueChange(this.state.newValue);
+    // Update the state or perform any other actions as needed
   };
+
+  ///////////////////////////////
 
   componentDidMount() {
     getBanks(this.props.clientCode) // call the function to fetch data
@@ -120,30 +152,9 @@ class BankCSVImportx extends React.Component {
     // Should return a promise that resolves to bank name data
   };
 
-  onDataReceived = (data) => {
-    // Handle the received data here
-    console.log("Received data:", data);
-    // if (this.state.hasheaders === true) {
-    //   data.shift();
-    // }
-    updateImportFile(
-      this.props.clientCode,
-      this.state.currentBankAccount,
-      data
-    );
-    this.setState(
-      (prevState) => ({
-        sharedValue: prevState.sharedValue + 1,
-      }),
-      () => {
-        // After state update, call the parent's callback to update its state as well
-        this.props.onValueChange(this.state.sharedValue);
-      }
-    );
-    console.log("new value:", this.state.newValue);
-    this.props.onValueChange(this.state.newValue);
-    // Update the state or perform any other actions as needed
-  };
+  ////
+  // this is called after the import file is processed
+  ////
 
   render() {
     return (
@@ -181,8 +192,8 @@ class BankCSVImportx extends React.Component {
           />
           <p>&nbsp;&nbsp;&nbsp;{this.state.currentBankAccountName}</p>
         </div>
-        {this.state.dateRow === 0 &&
-        this.state.currentBankAccountName !== "" ? (
+
+        {this.state.dateRow === 0 ? (
           <DataImporter
             onCompleteImport={this.handleImportedData}
             reset={false}
@@ -193,6 +204,14 @@ class BankCSVImportx extends React.Component {
       </div>
     );
   }
+
+  // {this.state.dateRow === 0 &&
+  //   this.state.currentBankAccountName !== "" ? (
+  //     <DataImporter
+  //       onCompleteImport={this.handleImportedData}
+  //       reset={false}
+  //     />
+
   //  <DataImporter onCompleteImport={this.handleImportedData} />
 
   onDrop() {
@@ -248,8 +267,8 @@ function DataImporter(props) {
           <ImporterField name="date" label="date" />
           <ImporterField name="Description" label="Description" />
           <ImporterField name="Payments" label="Payments" optional />
-          <ImporterField name="Deposits" label="Deposits" />
-          <ImporterField name="Total" label="Total" optional />
+          <ImporterField name="Deposits" label="Deposits / Combined" />
+          <ImporterField name="Total" label="Balance" optional />
         </Importer>
       )}
     </div>

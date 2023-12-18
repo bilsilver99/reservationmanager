@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./profile.scss";
 import "devextreme-react/text-area";
-import Form, { Item, ButtonItem, GroupItem } from "devextreme-react/form";
+import Form, {
+  Item,
+  ButtonItem,
+  GroupItem,
+  label,
+} from "devextreme-react/form";
 import { fetchThisClientData, updateClient } from "./segmentData";
 //import { useAuth } from "../../contexts/auth";
 import notify from "devextreme/ui/notify";
@@ -19,6 +24,7 @@ function CustomerProfilex(props) {
     UNIQUEID: "",
     STARTDATE: "",
     ENDDATE: "",
+    COPPERID: "",
   });
   //const [employee, getemployee] = useState();
 
@@ -43,6 +49,7 @@ function CustomerProfilex(props) {
         UniqueID: result.UNIQUEID,
         StartDate: result.STARTDATE,
         EndDate: result.ENDDATE,
+        CopperID: result.COPPERID,
       });
     })();
     //getemployee(service.getEmployee());
@@ -103,41 +110,52 @@ function CustomerProfilex(props) {
                 editorOptions={nameEditorOptions}
               />
               <Item
-                dataField="Name"
+                dataField="Family"
                 //editorType="dxSelectBox"
                 //editorOptions={this.positionEditorOptions}
                 //validationRules={this.validationRules.position}
               />
               <Item
+                dataField="CopperID"
+                //editorOptions={nameEditorOptions}
+              />
+              <Item
+                label={{ text: "Street Address" }}
                 dataField="AddressLineOne"
                 //editorOptions={nameEditorOptions}
               />
               <Item
+                label={{ text: "City" }}
                 dataField="AddressLineTwo"
                 //editorType="dxDateBox"
                 //editorOptions={this.hireDateEditorOptions}
                 //validationRules={this.validationRules.hireDate}
               />
               <Item
+                label={{ text: "Province" }}
                 dataField="AddressLineThree"
                 //editorType="dxDateBox"
                 //editorOptions={this.birthDateEditorOptions}
               />
-              <Item dataField="AddressLineFour" />
+              {/* <Item dataField="AddressLineFour" />
               <Item
                 dataField="Country"
                 //colSpan={2}
                 //editorType="dxTextArea"
                 //editorOptions={this.notesEditorOptions}
-              />
+              /> */}
               <Item
                 dataField="PostalZip" //editorOptions={this.phonesEditorOptions}
               />
+              <Item itemType="empty" />
+              <Item itemType="empty" />
               <Item
+                label={{ text: "Start Date (MM/DD/YYYY)" }}
                 dataField="StartDate"
                 editorType="dxDateBox" //editorOptions={this.phonesEditorOptions}
               />
               <Item
+                label={{ text: "End Date (MM/DD/YYYY)" }}
                 dataField="EndDate"
                 editorType="dxDateBox" //editorOptions={this.phonesEditorOptions}
               />

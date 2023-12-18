@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 //import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 import Popup from "devextreme-react/popup";
 import Swal from "sweetalert2";
+import DateBox from "devextreme-react/date-box";
 
 import withReactContent from "sweetalert2-react-content";
 
@@ -19,6 +20,7 @@ import DataGrid, {
   Paging,
   Item,
   AsyncRule,
+  Form,
   //ValidationRule,
 } from "devextreme-react/data-grid";
 
@@ -37,7 +39,10 @@ import {
   getBanks,
   validateImports,
   processImports,
+  deleteImports,
+  fetchThisClientData,
 } from "./segmentData";
+
 //import { myStore5 } from "./clientBanksAccountsData";
 
 //let pageoption = 90;
@@ -51,7 +56,8 @@ function ImportTransactionsx(props) {
   const [clientCode, setClientCode] = useState(props.clientCode);
   const [transactionsReady, setTransactionsReady] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-
+  const [startdate, setStartdate] = useState(null);
+  const [enddate, setEnddate] = useState(null);
   const MySwal = withReactContent(Swal);
 
   const ProcessImports = () => {
@@ -59,7 +65,7 @@ function ImportTransactionsx(props) {
       console.log("data from validate imports", data.valid);
       if (data.valid === 1) {
         setTransactionsReady(true);
-        processImports(props.clientCode).then(() => {
+        processImports(props.clientCode, startdate, enddate).then(() => {
           // Show a success message using SweetAlert2
           MySwal.fire({
             icon: "success",
@@ -79,9 +85,22 @@ function ImportTransactionsx(props) {
     });
   };
 
+  const DeleteImportsButton = () => {
+    deleteImports(props.clientCode).then(() => {
+      // Show a success message using SweetAlert2
+      MySwal.fire({
+        icon: "success",
+        title: "Imports Deleted",
+        text: "The imports has been removed",
+      });
+      setRefreshKey((prevKey) => prevKey + 1);
+    });
+  };
+
   useEffect(() => {
     // This function will run whenever sharedValue changes
     const refreshTransactions = () => {
+      setRefreshKey((prevKey) => prevKey + 1);
       // Logic to refresh transactions
     };
 
@@ -89,32 +108,31 @@ function ImportTransactionsx(props) {
   }, [props.sharedValue]);
 
   const onEditorPreparing = (e) => {
-    // Check if the row is not new
-    if (e.parentType === "dataRow" && !e.row.isNewRow) {
-      //Disable editing for a specific field
-      if (e.dataField === "SEGMENTNUMBER") {
-        e.editorOptions.disabled = true;
-      }
-      if (e.dataField === "BANKACCOUNTNUMBER") {
-        e.editorOptions.disabled = true;
-      }
-      if (e.dataField === "DESCRIPTION") {
-        e.editorOptions.disabled = true;
-      }
-    }
+    // // Check if the row is not new
+    // if (e.parentType === "dataRow" && !e.row.isNewRow) {
+    //   //Disable editing for a specific field
+    //   if (e.dataField === "SEGMENTNUMBER") {
+    //     e.editorOptions.disabled = true;
+    //   }
+    //   if (e.dataField === "BANKACCOUNTNUMBER") {
+    //     e.editorOptions.disabled = true;
+    //   }
+    //   if (e.dataField === "DESCRIPTION") {
+    //     e.editorOptions.disabled = true;
+    //   }
+    // }
   };
 
-  const setFormImport = () => {};
+  //const setFormImport = () => {};
 
-  const onRowInserted = useCallback(
-    (e) => {
-      setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
-      //console.log(e);
-      setLastSegmentNumber(e.data.SEGMENTNUMBER);
-      //console.log("last bank account number", lastBankAccountNumber);
-    },
-    [lastBankAccountNumber]
-  );
+  const onRowInserted = useCallback();
+  //   (e) => {
+  //     setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
+  //     //console.log(e);
+  //     setLastSegmentNumber(e.data.SEGMENTNUMBER);
+  //     //console.log("last bank account number", lastBankAccountNumber);
+  //   },
+  //   [lastBankAccountNumber]
 
   // old version const onRowInserted = (e) => {
   //   setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
@@ -140,9 +158,9 @@ function ImportTransactionsx(props) {
   };
 
   const onInitNewRow = (e) => {
-    console.log("last bank account number", lastBankAccountNumber);
-    e.data.BANKACCOUNTNUMBER = lastBankAccountNumber;
-    e.data.SEGMENTNUMBER = lastSegmentNumbmer;
+    // console.log("last bank account number", lastBankAccountNumber);
+    // e.data.BANKACCOUNTNUMBER = lastBankAccountNumber;
+    // e.data.SEGMENTNUMBER = lastSegmentNumbmer;
   };
 
   useEffect(() => {
@@ -170,16 +188,70 @@ function ImportTransactionsx(props) {
           error
         );
       });
+
+    fetchThisClientData(props.clientCode) // call the function to fetch data
+      .then((data) => {
+        console.log("bank numbers", data);
+        setStartdate(data.STARTDATE); // store the data in state
+        setEnddate(data.ENDDATE); // store the data in state
+        setBankAccounts(data.data); // store the data in state
+        //console.log("new types", transTypes);
+      })
+      .catch((error) => {
+        console.error(
+          "There was an error fetching the transaction Types data:",
+          error
+        );
+      });
   }, []);
   //  className="content-block dx-card responsive-paddings red-color"
 
+  const handleStartDateChange = (e) => {
+    setStartdate(e.value);
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  const handleEndDateChange = (e) => {
+    setEnddate(e.value);
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
+
   return (
     <>
-      <div className="red-color">
-        <p></p>
-        &nbsp;&nbsp;
-        <Button text="Process Imports" onClick={ProcessImports} />
-        <p></p>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <Button
+          text="Process Imports"
+          onClick={ProcessImports}
+          style={{ marginRight: "30px" }} // Add right margin to the button
+        />
+        <Button
+          text="Delete All Imports"
+          onClick={DeleteImportsButton}
+          style={{ marginRight: "30px" }} // Add right margin to the button
+        />
+
+        <div style={{ marginRight: "40px" }}>
+          {" "}
+          {/* Add right margin to this div */}
+          <label>
+            Start Date (MM/DD/YYYY):
+            <DateBox
+              type="date"
+              value={startdate}
+              onValueChanged={handleStartDateChange}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            End Date (MM/DD/YYYY):
+            <DateBox
+              type="date"
+              value={enddate}
+              onValueChanged={handleEndDateChange}
+            />
+          </label>
+        </div>
       </div>
       <div className="red-color">
         <div className="custom-container">
@@ -191,12 +263,12 @@ function ImportTransactionsx(props) {
             onInitNewRow={onInitNewRow}
             onRowInserted={onRowInserted}
             width={"100%"}
-            paging={{ pageSize: 10 }}
-            pagingEnabled={true}
-            remoteOperations={true}
+            //paging={{ pageSize: 10 }}
+            //pagingEnabled={true}
+            remoteOperations={false}
           >
             <Sorting mode="single" />
-            <Sorting mode="single" />
+
             <FilterRow visible />
             <HeaderFilter visible />
             <Editing
@@ -204,44 +276,24 @@ function ImportTransactionsx(props) {
               allowUpdating={true}
               allowAdding={true}
               allowDeleting={true}
-              selectionMode="single"
-            >
-              {/* <Popup
-                  title="Transaction Info"
-                  showTitle={true}
-                  width={600}
-                  height={400}
-                />
-                <Form>
-                  <Item itemType="group" colCount={2} colSpan={2}>
-                    <Item
-                      dataField="BANKACCOUNTNUMBER"
-                      editorOptions={{ disabled: true }}
-                    />
-                    <Item
-                      dataField="SEGMENTNUMBER"
-                      editorOptions={{ disabled: true }}
-                    />
-                    <Item dataField="DESCRIPTION" />
-                    <Item dataField="SECONDDESCRIPTION" />
-                    <Item dataField="FPTRANSACTIONCODE" />
-                    <Item dataField="TRANSACTIONDATE" />
-                    <Item dataField="TRANSACTIONAMOUNT" />
-                  </Item>
-                </Form> */}
-            </Editing>
+              //selectionMode="single"
+            ></Editing>
             <Column
               dataType="boolean"
               dataField={"ERROR"}
               caption={"Error"}
               hidingPriority={7}
               allowEditing={true}
+              width={100}
             ></Column>
             <Column
-              width={150}
+              dataField={"ERRORDESCRIPTION"}
+              caption="Error"
+              allowEditing={false}
+            />
+            <Column
               dataField={"BANKACCOUNTNUMBER"}
-              caption={"Bank Account Number"}
-              hidingPriority={7}
+              caption="Bank Account"
               allowEditing={true}
             >
               <Lookup
@@ -250,6 +302,7 @@ function ImportTransactionsx(props) {
                 displayExpr="BANKACCOUNTNUMBER"
               />
             </Column>
+
             <Column
               width={100}
               dataField={"SEGMENTNUMBER"}
@@ -261,6 +314,15 @@ function ImportTransactionsx(props) {
                 message="Segment Does Not Exists"
                 validationCallback={validateSegment}
               />
+            </Column>
+            <Column
+              dataType="date"
+              dataField={"TRANSACTIONDATE"}
+              caption={"Date"}
+              hidingPriority={7}
+              allowEditing={true}
+            >
+              {/* <RequiredRule message="A Date is required" /> */}
             </Column>
             <Column
               dataField={"DESCRIPTION"}
@@ -282,23 +344,10 @@ function ImportTransactionsx(props) {
               <Lookup
                 dataSource={transTypes}
                 valueExpr="FPTRANSACTIONCODE"
-                //displayExpr="DESCRIPTIONTWO"
-                displayExpr={(item) =>
-                  item
-                    ? `${item.TRANSACTIONGROUP} - ${item.DESCRIPTIONTWO}`
-                    : ""
-                }
+                displayExpr="LONGDESCRIPTION"
               />
             </Column>
-            <Column
-              dataType="date"
-              dataField={"TRANSACTIONDATE"}
-              caption={"Date"}
-              hidingPriority={7}
-              allowEditing={true}
-            >
-              {/* <RequiredRule message="A Date is required" /> */}
-            </Column>
+
             <Column
               dataField={"TRANSACTIONAMOUNT"}
               caption={"Amount"}

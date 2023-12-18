@@ -50,6 +50,7 @@ function Transfersx(props) {
   const [selectedUniqueIDsIn, setSelectedUniqueIDsIn] = useState([]);
   const [skipbuild, setSkipBuild] = useState(false);
   const [startdate, setStartdate] = useState(null);
+  const [onresetkey, setOnResetKey] = useState(0);
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -106,6 +107,8 @@ function Transfersx(props) {
   ////////////////////////////////////  change out /////////////////////////////
 
   const handleSelectionChangeOut = (e) => {
+    setOnResetKey((prevKey) => prevKey + 1);
+    setShowDetailTransfer(false);
     setSelectedRowKeys(e.selectedRowKeys);
 
     // Extract UNIQUEIDs from the selected rows
@@ -129,6 +132,8 @@ function Transfersx(props) {
   ///////////////////////////////////// change in   /////////////////////////////
 
   const handleSelectionChangeIn = (e) => {
+    setOnResetKey((prevKey) => prevKey + 1);
+    setShowDetailTransfer(false);
     setSelectedRowKeys2(e.selectedRowKeys);
 
     // Extract UNIQUEIDs from the selected rows
@@ -154,6 +159,7 @@ function Transfersx(props) {
   ///////////////////////////// processing transactions ////////////////////////
 
   const processTransfers = () => {
+    setResetKey((prevKey) => prevKey + 1);
     // Check if both selections have been made
     if (selectedRowKeys.length === 0 || selectedRowKeys2.length === 0) {
       MySwal.fire({
@@ -415,7 +421,7 @@ function Transfersx(props) {
         <div className="red-color">
           <p></p>
           &nbsp;&nbsp;
-          <Button text="Process Transfers" onClick={processTransfers} />
+          <Button text="Show Account Values" onClick={processTransfers} />
           &nbsp;&nbsp;
           <Button text="Reset" onClick={resetTransfers} />
           <p></p>
@@ -430,6 +436,7 @@ function Transfersx(props) {
             resetkey={refreshKey}
             effectiveDate={startdate}
             onRefreshGrid={refreshDataGrid}
+            onresetkey={onresetkey}
           />
         )}
       </div>
