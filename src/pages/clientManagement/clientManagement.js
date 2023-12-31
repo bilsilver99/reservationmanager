@@ -80,14 +80,14 @@ const ClientManagement = () => {
       setThisWidth("70%");
       //setCurrentClientCode(user.lastClientUpdated);
       setCurrentClientCode(user.lastClientUpdated);
-      console.log(
-        "inside initial call user values ",
-        user,
-        "and last",
-        user.lastClientUpdated,
-        "and client: ",
-        currentClientCode
-      );
+      // console.log(
+      //   "inside initial call user values ",
+      //   user,
+      //   "and last",
+      //   user.lastClientUpdated,
+      //   "and client: ",
+      //   currentClientCode
+      // );
     })();
     return () => {};
   }, []);
@@ -98,14 +98,15 @@ const ClientManagement = () => {
   const setClientData = async (e) => {
     if (e.value === null || e.value === undefined || e.value === "") return;
     if (e.value === null || e.value === undefined || e.value === "") return;
+    setSharedValue((prevKey) => prevKey + 1);
     setCurrentClientCode(e.value);
     updateUser(user.lastClientUpdated, e.value);
-    console.log(
-      "value of e ",
-      e.value,
-      "user.lastClientUpdated",
-      user.lastClientUpdated
-    ); //updateUser({ lastClientUpdated: e.value });
+    // console.log(
+    //   "value of e ",
+    //   e.value,
+    //   "user.lastClientUpdated",
+    //   user.lastClientUpdated
+    // ); //updateUser({ lastClientUpdated: e.value });
   };
 
   /////
@@ -137,7 +138,7 @@ const ClientManagement = () => {
     // )
     //   return;
     (async () => {
-      console.log("current client code: ", currentClientCode);
+      //      console.log("current client code: ", currentClientCode);
       const result = await fetchThisClientData(currentClientCode);
       //console.log("passsed back", result);
       setCustomerData({
@@ -165,6 +166,7 @@ const ClientManagement = () => {
       setStartDate(result.STARTDATE);
       setEndDate(result.ENDDATE);
       updateCurrentUser(user.UserCode, currentClientCode);
+      setallflags();
 
       //if (startdate !== null && startdate !== undefined && startdate !== "") {
       setProcessDates(
@@ -376,10 +378,24 @@ const ClientManagement = () => {
           />
         </>
       )}
-      {showInterest && <Interest clientCode={currentClientCode} />}
-      {showTransfers && <Transfers clientCode={currentClientCode} />}
-      {showAssets && <ClientAssets clientCode={currentClientCode} />}
-      {showInvestments && <ClientInvestments clientCode={currentClientCode} />}
+      {showInterest && (
+        <Interest clientCode={currentClientCode} sharedValue={sharedValue} />
+      )}
+      {showTransfers && (
+        <Transfers clientCode={currentClientCode} sharedValue={sharedValue} />
+      )}
+      {showAssets && (
+        <ClientAssets
+          clientCode={currentClientCode}
+          sharedValue={sharedValue}
+        />
+      )}
+      {showInvestments && (
+        <ClientInvestments
+          clientCode={currentClientCode}
+          sharedValue={sharedValue}
+        />
+      )}
     </>
   );
 };

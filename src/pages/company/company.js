@@ -2,7 +2,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import "./companyProfile.scss";
 import "devextreme-react/text-area";
 import Form, { Item, ButtonItem, GroupItem } from "devextreme-react/form";
-import { fetchcompany, updateCompany } from "../../api/MyOwnServices";
+import { Lookup } from "devextreme-react/lookup";
+import {
+  fetchcompany,
+  updateCompany,
+  getStockTypes,
+} from "../../api/MyOwnServices";
 import { useAuth } from "../../contexts/auth";
 import notify from "devextreme/ui/notify";
 //import SelectBox from "devextreme-react/select-box";
@@ -41,11 +46,24 @@ function Companyx(props) {
     developmentURL: "",
     productionURL: "",
     UsingLive: false,
+    CashInvestmentStockCode: "",
+    PurchaseTransactionType: "",
+    SaleTransactionType: "",
+    CostTransactionType: "",
+    NoncashTransactionType: "",
   });
 
   const companynumbersent = props.companynumber; //CompanyContext; //{companyvalue};
+  const [investmenttypes, setInvestmentTypes] = useState([]);
 
   useEffect(() => {
+    getStockTypes()
+      .then((data) => {
+        setInvestmentTypes(data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching investment types:", error);
+      });
     (async () => {
       console.log("companynumbersent", companynumbersent);
       const result = await fetchcompany(companynumbersent);
@@ -89,6 +107,11 @@ function Companyx(props) {
         enddateforreports: result.enddateforreports,
         primerate: result.primerate,
         lastpdffile: result.lastpdffile,
+        CashInvestmentStockCode: result.CashInvestmentStockCode,
+        PurchaseTransactionType: result.PurchaseTransactionType,
+        SaleTransactionType: result.SaleTransactionType,
+        CostTransactionType: result.CostTransactionType,
+        NoncashTransactionType: result.NoncashTransactionType,
       });
     })();
     //getemployee(service.getEmployee());
@@ -165,25 +188,34 @@ function Companyx(props) {
               />
             </GroupItem>
             <GroupItem>
-              <Item dataField="DataDirectoryLocation" />
-              <Item dataField="LastProcessingDate" editorType="dxDateBox" />
-              <Item dataField="InputSheetName" />
-              <Item dataField="CarryingChargesSheetname" />
               <GroupItem caption="Colors" colCount={4} cssClass="group-border">
                 <Item dataField="HeaderColourDescription" />
                 <Item dataField="HeaderColourColumns" />
                 <Item dataField="FooterColourDescription" />
                 <Item dataField="FooterColourColumns" />
               </GroupItem>
-              <Item dataField="NetAssetsName" />
-              <Item dataField="NetWorthName" />
-              <Item dataField="DebtSummaryName" />
-              <Item dataField="CarryingChargesName" />
-              <Item
-                dataField="CarryingChargesStartDate"
-                editorType="dxDateBox"
-              />
-              <Item dataField="CarryingChargesEndDate" editorType="dxDateBox" />
+              <GroupItem
+                caption="Excel Setup"
+                colCount={2}
+                cssClass="group-border"
+              >
+                <Item dataField="DataDirectoryLocation" />
+                <Item dataField="LastProcessingDate" editorType="dxDateBox" />
+                <Item dataField="InputSheetName" />
+                <Item dataField="CarryingChargesSheetname" />
+                <Item dataField="NetAssetsName" />
+                <Item dataField="NetWorthName" />
+                <Item dataField="DebtSummaryName" />
+                <Item dataField="CarryingChargesName" />
+                <Item
+                  dataField="CarryingChargesStartDate"
+                  editorType="dxDateBox"
+                />
+                <Item
+                  dataField="CarryingChargesEndDate"
+                  editorType="dxDateBox"
+                />
+              </GroupItem>
               <GroupItem
                 caption="Plaid Info"
                 colCount={3}
@@ -195,40 +227,116 @@ function Companyx(props) {
                 <Item dataField="developmentURL" />
                 <Item dataField="productionURL" />
                 <Item dataField="sandboxURL" />
+              </GroupItem>
+              <GroupItem
+                caption="Data Setup"
+                colCount={3}
+                cssClass="group-border"
+              >
                 <Item
-                  dataField="UsingLive"
-                  editorType="dxCheckBox"
-                  cssClass="tight-spacing"
-                  label={{ text: "Using Live", location: "left" }}
+                  dataField="basecurrency"
+                  label={{ text: "Base Currency" }}
+                />
+                <Item
+                  dataField="personalrealestatecode"
+                  label={{ text: "Personal Real Estate Code" }}
+                />
+                <Item
+                  dataField="startdateforreports"
+                  editorType="dxDateBox"
+                  label={{ text: "Start Date For Reports" }}
+                />
+                <Item
+                  dataField="enddateforreports"
+                  editorType="dxDateBox"
+                  label={{ text: "End Date For Reports" }}
+                />
+                <Item dataField="primerate" label={{ text: "Prime Rate" }} />
+                <Item
+                  dataField="lastpdffile"
+                  label={{ text: "Last PDF File" }}
+                />
+                <Item
+                  dataField="CashInvestmentStockCode"
+                  label={{ text: "Cash Stock Code" }}
                 />
               </GroupItem>
 
-              <Item
-                dataField="basecurrency"
-                label={{ text: "Base Currency" }}
-              />
-              <Item
-                dataField="personalrealestatecode"
-                label={{ text: "Personal Real Estate Code" }}
-              />
-              <Item
-                dataField="startdateforreports"
-                editorType="dxDateBox"
-                label={{ text: "Start Date For Reports" }}
-              />
-              <Item
-                dataField="enddateforreports"
-                editorType="dxDateBox"
-                label={{ text: "End Date For Reports" }}
-              />
-              <Item dataField="primerate" label={{ text: "Prime Rate" }} />
-              <Item dataField="lastpdffile" label={{ text: "Last PDF File" }} />
-            </GroupItem>
-            <GroupItem>
-              <ButtonItem
-                horizontalAlignment="left"
-                buttonOptions={buttonOptions}
-              />
+              <GroupItem caption="Investment Setup" colCount={3}>
+                <Item
+                  dataField="PurchaseTransactionType"
+                  label={{ text: "Purchase Transaction Type" }}
+                  editorType="dxSelectBox" // if Lookup doesn't work, try using dxSelectBox
+                  editorOptions={{
+                    dataSource: investmenttypes,
+                    valueExpr: "STOCKTRANSACTIONCODE",
+                    displayExpr: "STOCKTRANSACTIONCODE",
+                    onValueChanged: (e) => {
+                      setCompanyValues({
+                        ...companyValues,
+                        PurchaseTransactionType: e.value,
+                      });
+                    },
+                  }}
+                />
+                <Item
+                  dataField="SaleTransactionType"
+                  label={{ text: "Sale Transaction Type" }}
+                  editorType="dxSelectBox" // if Lookup doesn't work, try using dxSelectBox
+                  editorOptions={{
+                    dataSource: investmenttypes,
+                    valueExpr: "STOCKTRANSACTIONCODE",
+                    displayExpr: "STOCKTRANSACTIONCODE",
+                    onValueChanged: (e) => {
+                      setCompanyValues({
+                        ...companyValues,
+                        SaleTransactionType: e.value,
+                      });
+                    },
+                  }}
+                />
+
+                <Item
+                  dataField="CostTransactionType"
+                  label={{ text: "Cost Transaction Type" }}
+                  editorType="dxSelectBox" // if Lookup doesn't work, try using dxSelectBox
+                  editorOptions={{
+                    dataSource: investmenttypes,
+                    valueExpr: "STOCKTRANSACTIONCODE",
+                    displayExpr: "STOCKTRANSACTIONCODE",
+                    onValueChanged: (e) => {
+                      setCompanyValues({
+                        ...companyValues,
+                        CostTransactionType: e.value,
+                      });
+                    },
+                  }}
+                />
+
+                <Item
+                  dataField="NoncashTransactionType"
+                  label={{ text: "Non Cash Transaction Type" }}
+                  editorType="dxSelectBox" // if Lookup doesn't work, try using dxSelectBox
+                  editorOptions={{
+                    dataSource: investmenttypes,
+                    valueExpr: "STOCKTRANSACTIONCODE",
+                    displayExpr: "STOCKTRANSACTIONCODE",
+                    onValueChanged: (e) => {
+                      setCompanyValues({
+                        ...companyValues,
+                        NoncashTransactionType: e.value,
+                      });
+                    },
+                  }}
+                />
+              </GroupItem>
+
+              <GroupItem>
+                <ButtonItem
+                  horizontalAlignment="left"
+                  buttonOptions={buttonOptions}
+                />
+              </GroupItem>
             </GroupItem>
           </Form>
         </form>

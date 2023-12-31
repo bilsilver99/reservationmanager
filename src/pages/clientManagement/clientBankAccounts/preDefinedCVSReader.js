@@ -89,9 +89,9 @@ function CSVReader({ onDataReceived }) {
   const [isClosed, setIsClosed] = useState(false);
 
   const handleUploadAccepted = (results) => {
-    console.log("---------------------------");
-    console.log(results);
-    console.log("---------------------------");
+    //console.log("---------------------------");
+    //console.log(results);
+    //console.log("---------------------------");
     setZoneHover(false);
     setDataset(results);
     setIsClosed(true);

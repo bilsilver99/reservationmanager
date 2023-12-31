@@ -11,6 +11,8 @@ import React from "react";
 
 import Modal from "react-modal";
 
+import Swal from "sweetalert2";
+
 import DataGrid, {
   Column,
   Editing,
@@ -36,6 +38,7 @@ import { mystore } from "./clientBanksAccountsData";
 import { myStore3, myStore4, myStore5 } from "./clientBanksAccountsData";
 import "whatwg-fetch";
 import ClientBankSegments from "./clientBankSegments";
+import withReactContent from "sweetalert2-react-content";
 //import { isCancelable } from "react-query/types/core/retryer";
 //import CustomStore from "devextreme/data/custom_store";
 //import SelectBox from "devextreme-react/select-box";
@@ -91,6 +94,7 @@ const ConfirmationModal = ({ isOpen, onRequestClose, onConfirm, balance }) => {
 class ClientBankAccountsx extends React.Component {
   constructor(props) {
     super(props);
+    this.MySwal = withReactContent(Swal);
     this.applyFilterTypes = [
       {
         key: "auto",
@@ -118,11 +122,23 @@ class ClientBankAccountsx extends React.Component {
       isModalOpen: false,
       currentBalance: 0,
       activeOnly: true,
+      activeSegmentOnly: true,
       resetKey: 0,
 
       //bankNameToAuthorize: "", // add new state variable
     };
   }
+
+  // ProcessBalance = (e) => {
+  //     if (e.data.BANKBALANCE !== 0) {
+  //       this.MySwal.fire({
+  //         icon: "error",
+  //         title: "Bank Error",
+  //         text: "This Bank balance is not zero and cannot be set to inactive.",
+  //       });
+  //     }
+
+  // };
 
   componentDidMount() {
     myStore3() // call the function to fetch data
@@ -243,12 +259,44 @@ class ClientBankAccountsx extends React.Component {
     );
   };
 
+  toggleActiveSegmentOnly = () => {
+    this.setState(
+      (prevState) => ({
+        activeSegmentOnly: !prevState.activeSegmentOnly,
+      }),
+      () => {
+        this.incrementResetKey();
+      }
+    );
+  };
+
   incrementResetKey = () => {
     this.setState((prevState) => ({
       resetKey: prevState.resetKey + 1,
     }));
   };
 
+  onRowUpdating = (e) => {
+    const { oldData, newData } = e;
+    console.log(e);
+    if (newData.IMPORTMX === false) {
+      // Assuming BANKBALANCE is a field in your data
+      if (oldData.BANKBALANCE !== undefined && oldData.BANKBALANCE !== 0) {
+        // Preventing the update
+        e.cancel = true;
+
+        // Displaying an error message
+        this.MySwal.fire({
+          icon: "error",
+          title: "Bank Error",
+          text: "This Bank balance is not zero and cannot be set to inactive.",
+          customClass: {
+            container: "high-z-index",
+          },
+        });
+      }
+    }
+  };
   // refreshData = () => {
   //   // Fetch data based on the new 'activeOnly' state
   //   // For example:
@@ -271,7 +319,6 @@ class ClientBankAccountsx extends React.Component {
           balance={this.state.currentBalance}
         />
         <div className="checkbox-container">
-          <p></p>
           <input
             className="checkbox-marginx"
             type="checkbox"
@@ -280,12 +327,21 @@ class ClientBankAccountsx extends React.Component {
             style={{ marginLeft: "50px" }}
           />
           <label>Show Active Only</label>
-          <p></p>
+          <input
+            className="checkbox-marginx"
+            type="checkbox"
+            checked={this.state.activeSegmentOnly}
+            onChange={this.toggleActiveSegmentOnly}
+            style={{ marginLeft: "50px" }}
+          />
+          <label>Show Active Segments Only</label>
         </div>
+        <p></p>
+        <p></p>
         <div className="content-block2 dx-card ">
           <DataGrid
             dataSource={mystore(this.props.clientCode, this.state.activeOnly)}
-            keyExpr="UNIQUEID"
+            //keyExpr="UNIQUEID"
             showBorders={false}
             remoteOperations={false}
             onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
@@ -293,7 +349,8 @@ class ClientBankAccountsx extends React.Component {
             width={"100%"}
             columnAutoWidth={true}
             onRowRemoving={this.deleteClick.bind(this)}
-            key={this.state.resetkey}
+            key={this.state.resetKey}
+            onRowUpdating={this.onRowUpdating}
           >
             <FilterRow
               visible={this.state.showFilterRow}
@@ -320,7 +377,7 @@ class ClientBankAccountsx extends React.Component {
                 title="Bank Info"
                 showTitle={true}
                 width={900}
-                height={500}
+                height={550}
               />
               <Form>
                 <Item dataField={"BANKCODE"} />
@@ -341,6 +398,12 @@ class ClientBankAccountsx extends React.Component {
                 <Item
                   dataField={"LASTTRANSACTIONDATE"}
                   editorOptions={this.nameEditorOptions}
+                />
+                <Item
+                  dataField="IMPORTMX"
+                  editorType="dxCheckBox"
+                  cssClass="tight-spacing"
+                  label={{ text: "Active", location: "left" }}
                 />
               </Form>
             </Editing>
@@ -478,7 +541,13 @@ class ClientBankAccountsx extends React.Component {
               enabled={true}
               //render={renderDetail}
               sendor={this.state.filterValue}
-              render={(props) => renderDetail(props, this.handleDetailChange)}
+              render={(props) =>
+                renderDetail(
+                  props,
+                  this.handleDetailChange,
+                  this.state.activeSegmentOnly
+                )
+              }
             />
             <Paging defaultPageSize={8} />
             <Pager
@@ -497,16 +566,20 @@ export default function ClientBankAccounts() {
   return <ClientBankAccountsx clientCode={user.thisClientcode} />;
 }
 
-function renderDetail(props) {
+function renderDetail(props, handleDetailChange, activeSegmentOnlynow) {
   const uniqueid = props.data.UNIQUEID;
   const bankAccountNumberid = props.data.BANKACCOUNTNUMBER;
   const bankAccountUniqueID = props.data.UNIQUEID;
+  const activeOnly = activeSegmentOnlynow;
+  console.log("activeOnly for render detail", props, "active flag", activeOnly);
   return (
     <ClientBankSegments
       rowid={uniqueid}
       sendit={pageoption}
       bankAccountNumberID={bankAccountNumberid}
       bankAccountUniqueID={bankAccountUniqueID}
+      activeOnly={activeOnly}
+
       //onDetailChange={handleDetailChange}
     />
   );

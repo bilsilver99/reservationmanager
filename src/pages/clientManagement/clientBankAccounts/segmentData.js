@@ -41,7 +41,6 @@ export const mystore = (myClient) =>
       const url = `${process.env.REACT_APP_BASE_URL}/returnbankdataonly`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
-          ////console.log("client " + myClient);
           if (!response.ok) {
             return {
               companyname: "System did not respond",
@@ -51,7 +50,6 @@ export const mystore = (myClient) =>
           return response.json();
         })
         .then((json) => {
-          ////console.log(json);
           return {
             data: json.user_response.bankq,
             totalCount: json.user_response.totalCount,
@@ -88,8 +86,6 @@ export const mystore = (myClient) =>
         });
     },
     remove: (key) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -117,8 +113,6 @@ export const mystore = (myClient) =>
         });
     },
     update: (key, values) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -171,7 +165,7 @@ const fetchData = (bankID, params, rangeValue) => {
     return response.json();
   });
 };
-export const mystore2 = (bankID, rangeValue) =>
+export const mystore2 = (bankID, activeOnly, rangeValue) =>
   new CustomStore({
     key: "UNIQUEID",
     load: (loadOptions) => {
@@ -194,8 +188,6 @@ export const mystore2 = (bankID, rangeValue) =>
       //myemployee = "b@b.com";
       //mycompany = 1;
       //myemployee = "b@b.com";
-      ////console.log("bank", bankID, "range", rangeValue);
-      ////console.log(rangeValue);
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -206,7 +198,8 @@ export const mystore2 = (bankID, rangeValue) =>
         body: JSON.stringify({
           sentbankid: bankID,
           Parameters: params,
-          daterange: rangeValue,
+          //daterange: rangeValue,
+          activeOnly: activeOnly,
         }),
       };
       const url = `${process.env.REACT_APP_BASE_URL}/returnbankSegmentsOnly`;
@@ -219,16 +212,6 @@ export const mystore2 = (bankID, rangeValue) =>
             return response.json();
           })
           .then((json) => {
-            // console.log(
-            //   "bank: ",
-            //   bankID,
-            //   "data",
-            //   json.user_response.bankq,
-            //   "total count",
-            //   json.user_response.totalCount,
-            //   "key",
-            //   json.user_response.keyname
-            // );
             resolve(json.user_response.bankq);
           })
           .catch((error) => {
@@ -265,7 +248,6 @@ export const mystore2 = (bankID, rangeValue) =>
     },
 
     insert: (values) => {
-      ////console.log(values, bankID);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -294,8 +276,6 @@ export const mystore2 = (bankID, rangeValue) =>
         });
     },
     remove: (key) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -323,8 +303,6 @@ export const mystore2 = (bankID, rangeValue) =>
         });
     },
     update: (key, values) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -337,7 +315,6 @@ export const mystore2 = (bankID, rangeValue) =>
           keyvaluepair: values,
         }),
       };
-      //console.log("update", requestoptions, "key:", key, "values:", values);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdatebankSegmentsOnly`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -375,11 +352,6 @@ export const mystore3 = (bankID, rangeValue) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-      //myemployee = "b@b.com";
-      //mycompany = 1;
-      //myemployee = "b@b.com";
-      ////console.log("bank", bankID, "range", rangeValue);
-      ////console.log(rangeValue);
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -403,16 +375,6 @@ export const mystore3 = (bankID, rangeValue) =>
             return response.json();
           })
           .then((json) => {
-            // console.log(
-            //   "bank: ",
-            //   bankID,
-            //   "data",
-            //   json.user_response.bankq,
-            //   "total count",
-            //   json.user_response.totalCount,
-            //   "key",
-            //   json.user_response.keyname
-            // );
             resolve(json.user_response.bankq);
           })
           .catch((error) => {
@@ -449,7 +411,6 @@ export const mystore3 = (bankID, rangeValue) =>
     },
 
     insert: (values) => {
-      ////console.log(values, bankID);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -462,7 +423,6 @@ export const mystore3 = (bankID, rangeValue) =>
           sentbankID: bankID,
         }),
       };
-      console.log("values", values, "ID:", bankID);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdatebankSegmentTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -479,8 +439,6 @@ export const mystore3 = (bankID, rangeValue) =>
         });
     },
     remove: (key) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -492,7 +450,6 @@ export const mystore3 = (bankID, rangeValue) =>
           ThisFunction: "delete",
         }),
       };
-      console.log("Key", key);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdatebankSegmentTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -509,8 +466,6 @@ export const mystore3 = (bankID, rangeValue) =>
         });
     },
     update: (key, values) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -560,11 +515,6 @@ export const mystore4 = (ClientCode, rangeValue) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-      //myemployee = "b@b.com";
-      //mycompany = 1;
-      //myemployee = "b@b.com";
-      ////console.log("bank", bankID, "range", rangeValue);
-      ////console.log(rangeValue);
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -587,16 +537,6 @@ export const mystore4 = (ClientCode, rangeValue) =>
             return response.json();
           })
           .then((json) => {
-            // console.log(
-            //   "client: ",
-            //   ClientCode,
-            //   "data",
-            //   json.user_response.FPTransq,
-            //   "total count",
-            //   json.user_response.totalCount,
-            //   "key",
-            //   json.user_response.keyname
-            // );
             resolve(json.user_response.FPTransq);
           })
           .catch((error) => {
@@ -668,11 +608,9 @@ export const getTransactionTypes = (bankID, segment) => {
       sentSegment: segment,
     }),
   };
-  //console("bankID", bankID, "segment", segment);
   const url = `${process.env.REACT_APP_BASE_URL}/getTransactionTypes`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      ////console.log("client " + myClient);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -682,7 +620,6 @@ export const getTransactionTypes = (bankID, segment) => {
       return response.json();
     })
     .then((json) => {
-      console.log(json);
       return {
         data: json.user_response.loginq,
         totalCount: json.user_response.totalCount,
@@ -710,11 +647,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-      //myemployee = "b@b.com";
-      //mycompany = 1;
-      //myemployee = "b@b.com";
-      ////console.log("bank", bankID, "range", rangeValue);
-      ////console.log(rangeValue);
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -730,7 +662,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
           enddate: enddate,
         }),
       };
-      console.log("startdate definite", startdate);
       const url = `${process.env.REACT_APP_BASE_URL}/returnClientbanktransactionsOnly`;
 
       return new Promise((resolve, reject) => {
@@ -742,17 +673,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
             return response.json();
           })
           .then((json) => {
-            console.log(
-              "bank: ",
-              bankID,
-              "data",
-              json.user_response.bankq,
-              "total count",
-              json.user_response.totalCount,
-              "key",
-              json.user_response.keyname
-            );
-            //alert("after call");
             resolve(json.user_response.bankq);
           })
           .catch((error) => {
@@ -789,7 +709,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
     },
 
     insert: (values) => {
-      ////console.log(values, bankID);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -802,7 +721,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
           sentcompany: bankID,
         }),
       };
-      //console.log("values", values, "ID:", bankID);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdateClientTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -819,8 +737,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
         });
     },
     remove: (key) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -832,7 +748,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
           ThisFunction: "delete",
         }),
       };
-      //console.log("Key", key);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdateClientTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -849,8 +764,6 @@ export const mystore5nope = (bankID, rangeValue, startdate, enddate) =>
         });
     },
     update: (key, values) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -891,11 +804,9 @@ export const getBanks = (myClient) => {
       sentclientcode: myClient,
     }),
   };
-  //console("bankID", bankID, "segment", segment);
   const url = `${process.env.REACT_APP_BASE_URL}/returnbankdataonly`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      ////console.log("client " + myClient);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -905,7 +816,6 @@ export const getBanks = (myClient) => {
       return response.json();
     })
     .then((json) => {
-      //console.log("bank stuff", json);
       return {
         data: json.user_response.bankq,
         totalCount: json.user_response.totalCount,
@@ -934,12 +844,6 @@ export const mystore6 = (bankID, rangeValue) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-      console.log("inside mystore6 looking for ", bankID, rangeValue);
-      //myemployee = "b@b.com";
-      //mycompany = 1;
-      //myemployee = "b@b.com";
-      ////console.log("bank", bankID, "range", rangeValue);
-      ////console.log(rangeValue);
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -963,16 +867,6 @@ export const mystore6 = (bankID, rangeValue) =>
             return response.json();
           })
           .then((json) => {
-            console.log(
-              "sentbankid: ",
-              bankID,
-              "data",
-              json.user_response.bankq,
-              "total count",
-              json.user_response.totalCount,
-              "key",
-              json.user_response.keyname
-            );
             resolve(json.user_response.bankq);
           })
           .catch((error) => {
@@ -1009,7 +903,6 @@ export const mystore6 = (bankID, rangeValue) =>
     },
 
     insert: (values) => {
-      ////console.log(values, bankID);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -1022,7 +915,6 @@ export const mystore6 = (bankID, rangeValue) =>
           sentcompany: bankID,
         }),
       };
-      //console.log("values", values, "ID:", bankID);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdateImportClientTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1039,8 +931,6 @@ export const mystore6 = (bankID, rangeValue) =>
         });
     },
     remove: (key) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -1052,7 +942,6 @@ export const mystore6 = (bankID, rangeValue) =>
           ThisFunction: "delete",
         }),
       };
-      //console.log("Key", key);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdateImportClientTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1069,8 +958,6 @@ export const mystore6 = (bankID, rangeValue) =>
         });
     },
     update: (key, values) => {
-      ////console.log(key);
-      ////console.log(values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -1083,7 +970,6 @@ export const mystore6 = (bankID, rangeValue) =>
           keyvaluepair: values,
         }),
       };
-      console.log("update", requestoptions, "key:", key, "values:", values);
       const url = `${process.env.REACT_APP_BASE_URL}/UpdateImportClientTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1111,11 +997,9 @@ export const validateImports = (bankID) => {
       sentbankID: bankID,
     }),
   };
-  //console("bankID", bankID, "segment", segment);
   const url = `${process.env.REACT_APP_BASE_URL}/validateImports`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      ////console.log("client " + myClient);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -1125,7 +1009,6 @@ export const validateImports = (bankID) => {
       return response.json();
     })
     .then((json) => {
-      ////console.log(json);
       return {
         valid: json.user_response.valid,
       };
@@ -1145,11 +1028,9 @@ export const processImports = (bankID, startdate, enddate) => {
       enddate: enddate,
     }),
   };
-  console.log("customer", bankID, startdate, enddate);
   const url = `${process.env.REACT_APP_BASE_URL}/processImports`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      ////console.log("client " + myClient);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -1159,7 +1040,6 @@ export const processImports = (bankID, startdate, enddate) => {
       return response.json();
     })
     .then((json) => {
-      ////console.log(json);
       return {
         valid: json.user_response.valid,
       };
@@ -1178,11 +1058,9 @@ export const deleteImports = (bankID) => {
       sentbankID: bankID,
     }),
   };
-  console.log("customer", bankID);
   const url = `${process.env.REACT_APP_BASE_URL}/deleteImports`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      ////console.log("client " + myClient);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -1192,7 +1070,6 @@ export const deleteImports = (bankID) => {
       return response.json();
     })
     .then((json) => {
-      ////console.log(json);
       return {
         valid: json.user_response.valid,
       };
@@ -1201,7 +1078,6 @@ export const deleteImports = (bankID) => {
 
 //////////////////////////////////////////
 export const fetchThisClientData = async (clientCode) => {
-  //console.log("client in:", clientCode);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -1215,7 +1091,6 @@ export const fetchThisClientData = async (clientCode) => {
   const url = `${process.env.REACT_APP_BASE_URL}/getClientCode`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
-      //console.log("company:", companynumber);
       if (!response.ok) {
         return {
           companyname: "System did not respond",
@@ -1225,7 +1100,6 @@ export const fetchThisClientData = async (clientCode) => {
       return response.json();
     })
     .then((json) => {
-      console.log("data stuff", json);
       return {
         CLIENTCODE: json.user_response.bankq.CLIENTCODE,
         NAME: json.user_response.bankq.NAME,
@@ -1243,8 +1117,6 @@ export const fetchThisClientData = async (clientCode) => {
     });
 };
 export const updateClient = async (requestedclientcode, companyValues) => {
-  //console.log("client in:", requestedclientcode, companyValues);
-  //companyValues.AddressLineThree = "corner light";
   var requestoptions = {
     method: "POST",
     headers: {
@@ -1279,5 +1151,35 @@ export const updateClient = async (requestedclientcode, companyValues) => {
     })
     .then((json) => {
       return {};
+    });
+};
+
+export const getInvestmentRecords = (myClient) => {
+  var requestoptions = {
+    key: "UNIQUEID",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentbankid: myClient,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/getInvestmentRecords`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      return {
+        data: json.user_response.bankq,
+      };
     });
 };

@@ -1,54 +1,106 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../../contexts/auth";
 import DataGrid, {
   Column,
   Paging,
   FilterRow,
   HeaderFilter,
+  Editing,
 } from "devextreme-react/data-grid";
 
-import { mystore14 } from "./clientInvestmentsData";
+import {
+  Validator,
+  RequiredRule,
+  CompareRule,
+  EmailRule,
+  PatternRule,
+  StringLengthRule,
+  RangeRule,
+  AsyncRule,
+  CustomRule,
+} from "devextreme-react/validator";
+
+import { mystore14, checkStocks } from "./clientInvestmentsData";
 import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import "./debtSummaryStyles.scss";
 
 function ClientInvestmentsStocks(props) {
-  console.log("props", props.StockID);
+  //console.log("props in ClientInvestmentsStocks", props.StockID);
   //const [StockID, setStockID] = React.useState(props.stockID);
   //console.log("stockID", StockID);
 
+  const [refreshKey, setRefreshKey] = useState(props.sharedValue);
+
+  const onEditorPreparing = (e) => {
+    // Check if the row is not new
+    if (e.parentType === "dataRow" && !e.row.isNewRow) {
+      // Disable editing for a specific field
+      if (e.dataField === "STOCKCODE") {
+        e.editorOptions.disabled = true;
+      }
+    }
+  };
+
+  const validateSegment = async (params) => {
+    console.log(
+      "params coming in stock code: ",
+      params.value,
+      "stockid",
+      props.StockID
+    );
+    return await checkStocks(params.value, props.StockID);
+  };
+
+  const refreshData = () => {
+    setRefreshKey((oldKey) => oldKey + 1);
+  };
+
   return (
-    <>
-      <h4>Stocks</h4>
+    <div className="red-color">
+      <p>Stocks&nbsp;&nbsp;{props.StockID}</p>
       <DataGrid
         dataSource={mystore14(props.StockID)}
-        //keyExpr="UNIQUEID"
         showBorders={true}
         remoteOperations={false}
-        //onSelectionChanged={handleSelectionChanged.bind(this)} // add this line
-        //onEditingStart={handleEditingStart}
         width={"100%"}
         columnAutoWidth={true}
-        //height={300}
         paging={{ pageSize: 5 }}
         colCount={10}
         colSpan={20}
+        onEditorPreparing={onEditorPreparing}
+        key={refreshKey}
+        style={{ border: "1px solid black" }}
       >
+        <Editing
+          mode="row"
+          allowUpdating={true}
+          allowAdding={true}
+          allowDeleting={false}
+        ></Editing>
         <Column
           dataField={"INVESTMENTNAME"}
           width={150}
           caption={"Investment"}
           hidingPriority={8}
           visible={false}
+          allowEditing={false}
         />
+
         <Column
           dataField={"STOCKCODE"}
-          width={100}
           caption={"Stock"}
           hidingPriority={8}
-          visible={true}
-        />
+          allowEditing={true}
+          width={100}
+        >
+          <AsyncRule
+            message="Stock Code Already Exists in this Investment"
+            validationCallback={validateSegment}
+          />
+        </Column>
         <Column
+          dataType="date"
           dataField={"TRANSACTIONDATE"}
           width={150}
           caption={"Purchase Date "}
@@ -57,14 +109,14 @@ function ClientInvestmentsStocks(props) {
         />
         <Column
           dataField={"DESCRIPTION"}
-          width={200}
+          width={100}
           caption={"Description"}
           hidingPriority={8}
-          visible={true}
+          visible={false}
         />
         <Column
           dataField={"QUANTITY"}
-          width={100}
+          width={140}
           caption={"Units"}
           hidingPriority={8}
           visible={true}
@@ -72,7 +124,7 @@ function ClientInvestmentsStocks(props) {
         />
         <Column
           dataField={"UNITPRICE"}
-          width={150}
+          width={140}
           caption={"Price/Per"}
           hidingPriority={8}
           visible={true}
@@ -80,14 +132,86 @@ function ClientInvestmentsStocks(props) {
         />
         <Column
           dataField={"AMOUNT"}
-          width={150}
+          width={140}
           caption={"Value"}
           hidingPriority={8}
           visible={true}
           format={"$###,###,###.00"}
         />
+        <Column
+          dataField={"TOTALUNITSPURCHASED"}
+          width={140}
+          caption={"Units Purchased"}
+          hidingPriority={8}
+          visible={true}
+          format={"###,###,###.0000"}
+        />
+        <Column
+          dataField={"TOTALUNITSSOLD"}
+          width={140}
+          caption={"Units Sold"}
+          hidingPriority={8}
+          visible={true}
+          format={"###,###,###.0000"}
+        />
+        <Column
+          dataField={"TOTALPURCHASECOST"}
+          width={140}
+          caption={"Total Purchase Cost"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
+        <Column
+          dataField={"TOTALSALESVALUE"}
+          width={140}
+          caption={"Total Sales Value"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
+        <Column
+          dataField={"TOTALCOMMISSIONCOSTS"}
+          width={140}
+          caption={"Commission Costs"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
+        <Column
+          dataField={"TOTALCOMMISSIONCOSTSREMOVED"}
+          width={140}
+          caption={"Commission Costs Removed"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
+        <Column
+          dataField={"CURRENTACBVALUE"}
+          width={140}
+          caption={"Current ACB Value"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
+        <Column
+          dataField={"CURRENTSTOCKUNITPRICE"}
+          width={140}
+          caption={"Current Unit Price"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
+        <Column
+          dataField={"TOTALSTOCKCURRENTPRICE"}
+          width={140}
+          caption={"Current Value"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
       </DataGrid>
-    </>
+    </div>
   );
 }
 

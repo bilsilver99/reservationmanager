@@ -52,7 +52,7 @@ let pageoption = 90;
 function ClientInvestments(props) {
   const { user } = useAuth();
 
-  console.log("client passed in", props);
+  //console.log("client passed in", props);
   //const [applyFilterTypes, setFilterTypes] = useState("90");
   //   {
   //     key: "auto",
@@ -92,7 +92,9 @@ function ClientInvestments(props) {
     "GROUP",
   ]);
   const [currentID, setCurrentID] = useState(0);
+  const [currentStock, setCurrentStock] = useState("");
   const [rowToBeEdited, setRowToBeEdited] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(props.sharedValue);
 
   // const [transactionGroupData, setTransactionGroupData] = useState([]);
 
@@ -105,7 +107,14 @@ function ClientInvestments(props) {
   // const [thisWidthOut, setwidthOut] = useState("50%");
   // const [showPrior, setPrior] = useState(false);
 
+  const handleRowUpdating = (e) => {
+    const { oldData, newData } = e;
+    // Update logic here, e.g., call an API to update the data
+    // Refresh the DataGrid's data source if necessary
+  };
+
   useEffect(() => {
+    setRefreshKey((prevKey) => prevKey + 1);
     mystore8() // call the function to fetch data
       .then((data) => {
         //console.log("banks", data);
@@ -157,9 +166,14 @@ function ClientInvestments(props) {
   }, []);
 
   const handleEditingStart = (e) => {
-    console.log("editing start", e);
+    //console.log("editing start", e);
     setRowToBeEdited(e.data.UNIQUEID);
     setCurrentID(e.data.UNIQUEID);
+    setCurrentStock(e.data.INVESTMENTNAME);
+  };
+
+  const refreshData = () => {
+    setRefreshKey((oldKey) => oldKey + 1);
   };
 
   return (
@@ -168,12 +182,14 @@ function ClientInvestments(props) {
         id="maindatagrid"
         dataSource={InvestmentStore(myClient)}
         keyExpr="UNIQUEID"
+        key={refreshKey}
         showBorders={false}
         remoteOperations={false}
         width={"100%"}
         columnAutoWidth={true}
         height={"auto"}
         onEditingStart={handleEditingStart}
+        onRowUpdating={handleRowUpdating}
       >
         <HeaderFilter visible={showHeaderFilter} />
         <SearchPanel visible={false} width={240} placeholder="Search..." />
@@ -191,7 +207,7 @@ function ClientInvestments(props) {
             width={"100%"}
             height={900}
           />
-          <Form>
+          <Form colCount={4}>
             <Item itemType="group" colCount={4} colSpan={2} showBorders={true}>
               <Item dataField={"INVESTMENTNAME"} />
               <Item dataField={"INVESTMENTBANKCODE"} />
@@ -215,36 +231,61 @@ function ClientInvestments(props) {
               />
               <Item dataField={"OWNER"} />
               <Item dataField={"TAG"} />
-              <Item
-                colSpan={2}
-                colCount={1}
-                render={() => (
-                  <React.Fragment>
-                    <ClientInvestmentsStocks StockID={currentID} />
-                  </React.Fragment>
-                )}
-              />
-              <Item
-                colSpan={2}
-                colCount={1}
-                render={() => (
-                  <React.Fragment>
-                    <ClientInvestmentsSummary StockID={currentID} />
-                  </React.Fragment>
-                )}
-              />
-              <Item
-                colSpan={3}
-                colCount={1}
-                render={() => (
-                  <React.Fragment>
-                    <ClientInvestmentsTransactions StockID={currentID} />
-                  </React.Fragment>
-                )}
-              />
             </Item>
+            <Item
+              colSpan={2}
+              colCount={1}
+              render={() => (
+                <React.Fragment>
+                  <ClientInvestmentsSummary
+                    StockID={currentID}
+                    StockName={currentStock}
+                    ClientCode={myClient}
+                    Key={refreshKey}
+                    onRefresh={refreshData}
+                  />
+                </React.Fragment>
+              )}
+            />
+            <Item
+              colSpan={4}
+              colCount={1}
+              render={() => (
+                <React.Fragment>
+                  <ClientInvestmentsStocks
+                    StockID={currentID}
+                    StockName={currentStock}
+                    ClientCode={myClient}
+                    Key={refreshKey}
+                    onRefresh={refreshData}
+                  />
+                </React.Fragment>
+              )}
+            />
+
+            <Item
+              colSpan={4}
+              colCount={1}
+              render={() => (
+                <React.Fragment>
+                  <ClientInvestmentsTransactions
+                    StockID={currentID}
+                    Key={refreshKey}
+                    onRefresh={refreshData}
+                  />
+                </React.Fragment>
+              )}
+            />
           </Form>
         </Editing>
+        <Column dataField={"INVESTMENTBANKCODE"} caption="Bank" width={250}>
+          <Lookup
+            dataSource={BankNames}
+            valueExpr="INVESTMENTBANKCODE"
+            displayExpr="BANKNAME"
+          />
+        </Column>
+
         <Column
           dataField={"INVESTMENTNAME"}
           width={150}
@@ -257,21 +298,15 @@ function ClientInvestments(props) {
           width={50}
           caption={"Currency"}
           hidingPriority={8}
-          visible={true}
+          visible={false}
         />
-        <Column
-          dataField={"DESCRIPTION"}
-          width={190}
-          caption={"Description"}
-          hidingPriority={8}
-          visible={true}
-        />
+
         <Column
           dataField={"INVESTMENTGROUP"}
           width={150}
           caption={"Inv Group"}
           hidingPriority={8}
-          visible={true}
+          visible={false}
         >
           <Lookup
             dataSource={InvestGroup}
@@ -281,7 +316,7 @@ function ClientInvestments(props) {
         </Column>
         <Column
           dataField={"INVESTMENTSUBGROUP"}
-          width={120}
+          width={200}
           caption={"Sub "}
           hidingPriority={8}
           visible={true}
@@ -292,14 +327,7 @@ function ClientInvestments(props) {
             displayExpr="LONGDESCRIPTION"
           />
         </Column>
-        <Column dataField={"INVESTMENTBANKCODE"} caption="Bank" width={150}>
-          <Lookup
-            dataSource={BankNames}
-            valueExpr="INVESTMENTBANKCODE"
-            displayExpr="BANKNAME"
-          />
-        </Column>
-        <Column dataField={"OWNER"} width={150}>
+        <Column dataField={"OWNER"} width={250}>
           <Lookup
             dataSource={OwnerNames}
             valueExpr="SEQUENCE"
@@ -307,10 +335,17 @@ function ClientInvestments(props) {
           />
         </Column>
         <Column
+          dataField={"DESCRIPTION"}
+          width={260}
+          caption={"Description"}
+          hidingPriority={8}
+          visible={true}
+        />
+        <Column
           format={"$###,###,###.00"}
           dataField={"CURRENTVALUE"}
           width={100}
-          caption={"Current Value"}
+          caption={"Value"}
           hidingPriority={8}
           visible={true}
         />

@@ -12,6 +12,7 @@ import { mystore4 } from "./segmentData";
 import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import "./debtSummaryStyles.scss";
+import "./debtsummary.css";
 
 //const allowedPageSizes = [8, 12, 20];
 

@@ -208,7 +208,7 @@ function TransferDetailsx(props) {
               <Lookup
                 dataSource={transTypes}
                 valueExpr="FPTRANSACTIONCODE"
-                displayExpr="DESCRIPTIONTWO"
+                displayExpr="LONGDESCRIPTION"
               />
             </Column>
 
@@ -277,7 +277,7 @@ function TransferDetailsx(props) {
               <Lookup
                 dataSource={transTypes}
                 valueExpr="FPTRANSACTIONCODE"
-                displayExpr="DESCRIPTIONTWO"
+                displayExpr="LONGDESCRIPTION"
               />
             </Column>
 

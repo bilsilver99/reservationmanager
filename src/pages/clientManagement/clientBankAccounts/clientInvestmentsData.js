@@ -149,7 +149,7 @@ export const InvestmentStore = (myClient) =>
           Parameters: params,
         }),
       };
-      console.log("client sent", myClient, "params", params);
+      //console.log("client sent", myClient, "params", params);
       const url = `${process.env.REACT_APP_BASE_URL}/getClientInvestmentsHeader`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1046,7 +1046,7 @@ export const mystore12 = (myClient) =>
           Parameters: params,
         }),
       };
-      console.log("client sent", myClient, "params", params);
+      //console.log("client sent", myClient, "params", params);
       const url = `${process.env.REACT_APP_BASE_URL}/getClientInvestmentTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1078,10 +1078,10 @@ export const mystore12 = (myClient) =>
         body: JSON.stringify({
           ThisFunction: "insert",
           keyvaluepair: values,
-          SentCompany: myClient,
+          sentcompany: myClient,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1106,11 +1106,11 @@ export const mystore12 = (myClient) =>
           Accept: "application/json;",
         },
         body: JSON.stringify({
-          SentCompany: key,
+          sentcompany: key,
           ThisFunction: "delete",
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1136,12 +1136,12 @@ export const mystore12 = (myClient) =>
         },
         body: JSON.stringify({
           ThisFunction: "change",
-          SentCompany: key,
+          sentcompany: key,
           keyvaluepair: values,
         }),
       };
       ////console.log("key: ', key", "values", values);
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactions`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1192,7 +1192,7 @@ export const mystore13 = (myClient) =>
           Parameters: params,
         }),
       };
-      console.log("client sent", myClient, "params", params);
+      //console.log("client sent", myClient, "params", params);
       const url = `${process.env.REACT_APP_BASE_URL}/getClientInvestmentTransactionsDetails`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1224,10 +1224,10 @@ export const mystore13 = (myClient) =>
         body: JSON.stringify({
           ThisFunction: "insert",
           keyvaluepair: values,
-          SentCompany: myClient,
+          sentcompany: myClient,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactionsDetails`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1252,11 +1252,11 @@ export const mystore13 = (myClient) =>
           Accept: "application/json;",
         },
         body: JSON.stringify({
-          SentCompany: key,
+          sentcompany: key,
           ThisFunction: "delete",
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactionsDetails`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1282,12 +1282,12 @@ export const mystore13 = (myClient) =>
         },
         body: JSON.stringify({
           ThisFunction: "change",
-          SentCompany: key,
+          sentcompany: key,
           keyvaluepair: values,
         }),
       };
       ////console.log("key: ', key", "values", values);
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactionsDetails`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1338,11 +1338,11 @@ export const mystore14 = (myClient) =>
           Parameters: params,
         }),
       };
-      console.log("client sent", myClient, "params", params);
+      //console.log("client sent", myClient, "params", params);
       const url = `${process.env.REACT_APP_BASE_URL}/getClientInvestmentTransactionsStocks`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
-          //////console.log("client " + myClient);
+          console.log("client " + myClient);
           if (!response.ok) {
             return {
               companyname: "System did not respond",
@@ -1370,10 +1370,10 @@ export const mystore14 = (myClient) =>
         body: JSON.stringify({
           ThisFunction: "insert",
           keyvaluepair: values,
-          SentCompany: myClient,
+          sentcompany: myClient,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactionsStocks`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1389,7 +1389,7 @@ export const mystore14 = (myClient) =>
         });
     },
     remove: (key) => {
-      ////console.log(key);
+      //console.log(key);
       //////console.log(values);
       var requestoptions = {
         method: "POST",
@@ -1398,11 +1398,11 @@ export const mystore14 = (myClient) =>
           Accept: "application/json;",
         },
         body: JSON.stringify({
-          SentCompany: key,
+          sentcompany: key,
           ThisFunction: "delete",
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactionsStocks`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1428,12 +1428,12 @@ export const mystore14 = (myClient) =>
         },
         body: JSON.stringify({
           ThisFunction: "change",
-          SentCompany: key,
+          sentcompany: key,
           keyvaluepair: values,
         }),
       };
       ////console.log("key: ', key", "values", values);
-      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentHeader`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateClientInvestmentTransactionsStocks`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -1449,3 +1449,65 @@ export const mystore14 = (myClient) =>
         });
     },
   });
+
+export const checkStocks = async (stockCode, stockID) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentStockCode: stockCode,
+      sentInvestmentID: stockID,
+    }),
+  };
+  //console.log("bankID", bankID, "segment", segmentNumber);
+  const url = `${process.env.REACT_APP_BASE_URL}/fetchThisStock`;
+
+  const response = await fetch(url, requestoptions);
+  if (!response.ok) {
+    throw new Error("System did not respond");
+  }
+  const data = await response.json();
+  console.log("data from fetch", data.user_response.response);
+  if (data.user_response.response === "OK") {
+    return true; // Validation successful
+  } else if (data.user_response.response === "ERROR") {
+    return false; // Validation failed
+  } else {
+    throw new Error("Unexpected response");
+  }
+};
+
+export const getStockTypes = () => {
+  var myClient = 1;
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: myClient,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/getStockTransactionTypes`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      //console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("transaction types", json);
+      return {
+        data: json.user_response.loginq,
+      };
+    });
+};

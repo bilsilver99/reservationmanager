@@ -9,7 +9,7 @@ export async function signIn(email, password) {
     //console.log(email, password);
     await login(email, password).then((response) => {
       thisOK = response.returnOK;
-      console.log("response", response);
+      //console.log("response", response);
       currentUser.name = response.clientname;
       currentUser.clientCode = response.clientcode;
       currentUser.administrator = response.administrator;
@@ -34,14 +34,14 @@ export async function signIn(email, password) {
       currentUser.lastClientUpdated = response.lastClientUpdated;
       currentUser.DateFormat = response.DateFormat;
 
-      console.log(
-        "this:",
-        currentUser.thisClientcode,
-        "sent",
-        currentUser.clientCode,
-        "client",
-        currentUser.lastClientUpdated
-      );
+      // console.log(
+      //   "this:",
+      //   currentUser.thisClientcode,
+      //   "sent",
+      //   currentUser.clientCode,
+      //   "client",
+      //   currentUser.lastClientUpdated
+      // );
     });
     if (thisOK === "1") {
       return {

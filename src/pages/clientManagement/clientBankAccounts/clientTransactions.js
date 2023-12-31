@@ -299,7 +299,7 @@ function ClientTransactionsx(props) {
             width={250} // Set the width of the select box
           />
         </div>
-        <Button text="Clear Bank Account" onClick={clearBankAccount} />
+        <Button text="Clear Account Selection" onClick={clearBankAccount} />
 
         {/* className="content-block dx-card responsive-paddings red-color">*/}
 
@@ -392,7 +392,7 @@ function ClientTransactionsx(props) {
               <Lookup
                 dataSource={transTypes}
                 valueExpr="FPTRANSACTIONCODE"
-                displayExpr="DESCRIPTIONTWO"
+                displayExpr="LONGDESCRIPTION"
               />
             </Column>
 

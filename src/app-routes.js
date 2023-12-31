@@ -27,6 +27,7 @@ import {
   BanksPage,
   InvestmentGroupsPage,
   InvestmentSubGroupsPage,
+  StockTransactionTypesPage,
 } from "./pages";
 
 import { withNavigationWatcher } from "./contexts/navigation";
@@ -148,6 +149,10 @@ const routes = [
   {
     path: "/investmentSubGroups",
     element: InvestmentSubGroupsPage,
+  },
+  {
+    path: "/stockTransactionTypes",
+    element: StockTransactionTypesPage,
   },
 ];
 

@@ -15,7 +15,7 @@ export default function SideNavigationMenu(props) {
 
   const { isLarge } = useScreenSize();
   function normalizePath() {
-    console.log("user ", user);
+    //console.log("user ", user);
     return navigation
       .filter(
         (item) =>

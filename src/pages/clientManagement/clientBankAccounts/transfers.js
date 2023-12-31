@@ -159,7 +159,6 @@ function Transfersx(props) {
   ///////////////////////////// processing transactions ////////////////////////
 
   const processTransfers = () => {
-    setResetKey((prevKey) => prevKey + 1);
     // Check if both selections have been made
     if (selectedRowKeys.length === 0 || selectedRowKeys2.length === 0) {
       MySwal.fire({
@@ -192,6 +191,7 @@ function Transfersx(props) {
         text: `The Input value must equal the Output and at least one line must be selected (It is out of Balance by ${thistotal})`,
       });
     }
+    //setResetKey((prevKey) => prevKey + 1);
   };
 
   // else if (totalAmountIn === 0) {
@@ -270,6 +270,7 @@ function Transfersx(props) {
               }}
               selectedRowKeys2={selectedRowKeys2}
               onSelectionChanged={handleSelectionChangeIn}
+              key={resetkey}
             >
               <Editing
                 mode="row"

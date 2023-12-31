@@ -1,27 +1,23 @@
-import React, { useState, useEffect, useCallback } from "react";
-//import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
-import Popup from "devextreme-react/popup";
+//// getInvestmentRecords
+
+import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import DateBox from "devextreme-react/date-box";
 
 import withReactContent from "sweetalert2-react-content";
-
+import DropDownBox from "devextreme-react/drop-down-box";
 import DataGrid, {
   Column,
   Editing,
   Sorting,
   Lookup,
-  //MasterDetail,
-  //Popup,
-  //Form,
+  Scrolling,
+  Selection,
   HeaderFilter,
   FilterRow,
-  //SearchPanel,
   Paging,
-  Item,
   AsyncRule,
   Form,
-  //ValidationRule,
 } from "devextreme-react/data-grid";
 
 import { Validator, RequiredRule } from "devextreme-react/validator";
@@ -41,28 +37,31 @@ import {
   processImports,
   deleteImports,
   fetchThisClientData,
+  getInvestmentRecords,
 } from "./segmentData";
 
-//import { myStore5 } from "./clientBanksAccountsData";
-
-//let pageoption = 90;
+const dropDownOptions = { width: 500 };
+const ownerLabel = { "aria-label": "Owner" };
 
 function ImportTransactionsx(props) {
   //const [dataSourcex, setDataSource] = useState(null);
   const [transTypes, setTransTypes] = useState(null);
   const [bankAccounts, setBankAccounts] = useState(null);
-  const [lastBankAccountNumber, setLastBankAccountNumber] = useState("");
-  const [lastSegmentNumbmer, setLastSegmentNumber] = useState("");
   const [clientCode, setClientCode] = useState(props.clientCode);
   const [transactionsReady, setTransactionsReady] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [startdate, setStartdate] = useState(null);
   const [enddate, setEnddate] = useState(null);
+  const [investmentlist, setInvestmentList] = useState(null);
+  const dataGridRef = useRef(null);
+
+  const [totalEntries, setTotalEntries] = useState(0);
+  const [errorEntries, setErrorEntries] = useState(0);
+
   const MySwal = withReactContent(Swal);
 
   const ProcessImports = () => {
     validateImports(clientCode).then((data) => {
-      console.log("data from validate imports", data.valid);
       if (data.valid === 1) {
         setTransactionsReady(true);
         processImports(props.clientCode, startdate, enddate).then(() => {
@@ -85,13 +84,29 @@ function ImportTransactionsx(props) {
     });
   };
 
+  const renderFPTransactionCell = (data) => {
+    const { data: rowData } = data;
+
+    let style = {};
+    if (rowData.ERRORDESCRIPTION === "Transaction Type not found") {
+      style = { backgroundColor: "lightblue" }; // Apply blue color
+      const formattedTransactionAmount = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(rowData.TRANSACTIONAMOUNT);
+      return <div style={style}>{formattedTransactionAmount}</div>;
+    } else return <div style={style}>{rowData.TRANSACTIONAMOUNT}</div>;
+  };
+
   const DeleteImportsButton = () => {
     deleteImports(props.clientCode).then(() => {
       // Show a success message using SweetAlert2
       MySwal.fire({
         icon: "success",
         title: "Imports Deleted",
-        text: "The imports has been removed",
+        text: "The imports have been removed",
       });
       setRefreshKey((prevKey) => prevKey + 1);
     });
@@ -107,49 +122,26 @@ function ImportTransactionsx(props) {
     refreshTransactions();
   }, [props.sharedValue]);
 
-  const onEditorPreparing = (e) => {
-    // // Check if the row is not new
-    // if (e.parentType === "dataRow" && !e.row.isNewRow) {
-    //   //Disable editing for a specific field
-    //   if (e.dataField === "SEGMENTNUMBER") {
-    //     e.editorOptions.disabled = true;
-    //   }
-    //   if (e.dataField === "BANKACCOUNTNUMBER") {
-    //     e.editorOptions.disabled = true;
-    //   }
-    //   if (e.dataField === "DESCRIPTION") {
-    //     e.editorOptions.disabled = true;
-    //   }
-    // }
-  };
-
-  //const setFormImport = () => {};
-
-  const onRowInserted = useCallback();
-  //   (e) => {
-  //     setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
-  //     //console.log(e);
-  //     setLastSegmentNumber(e.data.SEGMENTNUMBER);
-  //     //console.log("last bank account number", lastBankAccountNumber);
-  //   },
-  //   [lastBankAccountNumber]
-
-  // old version const onRowInserted = (e) => {
-  //   setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
-  //   console.log(e);
-  //   console.log("last bank account number", lastBankAccountNumber);
+  // const onRowValidating = (e) => {
+  //   const transactionCode =
+  //     e.newData.FPTRANSACTIONCODE || e.oldData.FPTRANSACTIONCODE;
+  //   const transactionType = transTypes.find(
+  //     (type) => type.FPTRANSACTIONCODE === transactionCode
+  //   );
+  //   if (
+  //     transactionType &&
+  //     transactionType.INVESTMENTTRANSACTION &&
+  //     !e.newData.INVESTMENTID
+  //   ) {
+  //     e.errorText = "Investment ID is required for this transaction type.";
+  //     e.isValid = false;
+  //   }
   // };
 
   const validateSegment = async (params) => {
     if (!params.data.SEGMENTNUMBER) {
       return true;
     }
-    // console.log(
-    //   "params coming in ",
-    //   params.data.SEGMENTNUMBER,
-    //   params.data.BANKACCOUNTNUMBER,
-    //   clientCode
-    // ); // , "bankid: ", bankUniqueid);
     return await asyncValidation(
       params.data.BANKACCOUNTNUMBER,
       clientCode,
@@ -157,18 +149,12 @@ function ImportTransactionsx(props) {
     );
   };
 
-  const onInitNewRow = (e) => {
-    // console.log("last bank account number", lastBankAccountNumber);
-    // e.data.BANKACCOUNTNUMBER = lastBankAccountNumber;
-    // e.data.SEGMENTNUMBER = lastSegmentNumbmer;
-  };
+  const onInitNewRow = (e) => {};
 
   useEffect(() => {
     getTransactionTypes() // call the function to fetch data
       .then((data) => {
-        //console.log("types", data.data);
         setTransTypes(data.data); // store the data in state
-        //console.log("new types", transTypes);
       })
       .catch((error) => {
         console.error(
@@ -178,9 +164,7 @@ function ImportTransactionsx(props) {
       });
     getBanks(props.clientCode) // call the function to fetch data
       .then((data) => {
-        console.log("bank numbers", data);
         setBankAccounts(data.data); // store the data in state
-        //console.log("new types", transTypes);
       })
       .catch((error) => {
         console.error(
@@ -191,11 +175,9 @@ function ImportTransactionsx(props) {
 
     fetchThisClientData(props.clientCode) // call the function to fetch data
       .then((data) => {
-        console.log("bank numbers", data);
         setStartdate(data.STARTDATE); // store the data in state
         setEnddate(data.ENDDATE); // store the data in state
         setBankAccounts(data.data); // store the data in state
-        //console.log("new types", transTypes);
       })
       .catch((error) => {
         console.error(
@@ -203,8 +185,18 @@ function ImportTransactionsx(props) {
           error
         );
       });
+    getInvestmentRecords(props.clientCode) // call the function to fetch data
+      .then((data) => {
+        setInvestmentList(data.data); // store the data in state
+      })
+      .catch((error) => {
+        console.error(
+          "There was an error fetching the transaction Types data:",
+          error
+        );
+      });
+    setRefreshKey((prevKey) => prevKey + 1);
   }, []);
-  //  className="content-block dx-card responsive-paddings red-color"
 
   const handleStartDateChange = (e) => {
     setStartdate(e.value);
@@ -215,6 +207,23 @@ function ImportTransactionsx(props) {
     setEnddate(e.value);
     setRefreshKey((prevKey) => prevKey + 1);
   };
+
+  // const countRows = () => {
+  //   const gridData = dataGridRef.current.instance.getDataSource().items();
+  //   //console.log("grid", gridData);
+  //   const total = gridData.length;
+  //   const errorCount = gridData.filter((row) => row.ERROR === 1).length;
+
+  //   setTotalEntries(total);
+  //   setErrorEntries(errorCount);
+  //   //console.log("total", total, "errors:", errorCount);
+  // };
+
+  // useEffect(() => {
+  //   // Assuming you want to count rows whenever the grid is refreshed
+  //   // You can call countRows here or in response to some grid event
+  //   countRows();
+  // }, [refreshKey]); // Dependency on refreshKey if needed
 
   return (
     <>
@@ -231,8 +240,6 @@ function ImportTransactionsx(props) {
         />
 
         <div style={{ marginRight: "40px" }}>
-          {" "}
-          {/* Add right margin to this div */}
           <label>
             Start Date (MM/DD/YYYY):
             <DateBox
@@ -252,17 +259,36 @@ function ImportTransactionsx(props) {
             />
           </label>
         </div>
+        <div
+          style={{
+            backgroundColor: "lightblue",
+            marginTop: "10px",
+            marginLeft: "10px",
+          }}
+        >
+          <p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Amounts in blue indicate an
+            invalid transaction type&nbsp;&nbsp;
+          </p>
+        </div>
       </div>
       <div className="red-color">
-        <div className="custom-container">
+        <div className="custom-container" style={{ height: "800px" }}>
           <DataGrid
+            ref={dataGridRef}
             key={refreshKey} // This key will force a refresh when it changes
             dataSource={mystore6(props.clientCode)}
             columnAutoWidth={true}
-            onEditorPreparing={onEditorPreparing}
+            //onEditorPreparing={onEditorPreparing}
+            //onRowValidating={onRowValidating}
             onInitNewRow={onInitNewRow}
-            onRowInserted={onRowInserted}
+            //onRowInserted={onRowInserted}
             width={"100%"}
+            scrolling={{ mode: "virtual" }} // or 'standard', based on your preference
+            //keyExpr="UNIQUEID"
+            showBorders={true}
+            height={"100%"}
+            rowHeight={"70px"} // Set the row height to 70px
             //paging={{ pageSize: 10 }}
             //pagingEnabled={true}
             remoteOperations={false}
@@ -272,7 +298,7 @@ function ImportTransactionsx(props) {
             <FilterRow visible />
             <HeaderFilter visible />
             <Editing
-              mode="cell"
+              mode="row"
               allowUpdating={true}
               allowAdding={true}
               allowDeleting={true}
@@ -287,26 +313,27 @@ function ImportTransactionsx(props) {
               width={100}
             ></Column>
             <Column
-              dataField={"ERRORDESCRIPTION"}
-              caption="Error"
-              allowEditing={false}
-            />
-            <Column
               dataField={"BANKACCOUNTNUMBER"}
               caption="Bank Account"
               allowEditing={true}
+              //width={180}
             >
               <Lookup
                 dataSource={bankAccounts}
                 valueExpr="BANKACCOUNTNUMBER"
-                displayExpr="BANKACCOUNTNUMBER"
+                //displayExpr="BANKACCOUNTNUMBER"
+                displayExpr={(item) =>
+                  item
+                    ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
+                    : ""
+                }
               />
             </Column>
 
             <Column
-              width={100}
+              width={70}
               dataField={"SEGMENTNUMBER"}
-              caption={"Segment"}
+              caption={"Seg"}
               hidingPriority={7}
               allowEditing={true}
             >
@@ -347,6 +374,18 @@ function ImportTransactionsx(props) {
                 displayExpr="LONGDESCRIPTION"
               />
             </Column>
+            <Column
+              dataField={"INVESTMENTID"}
+              caption="id"
+              allowEditing={true}
+              //editCellComponent={PrepareInvestmentID}
+            >
+              <Lookup
+                dataSource={investmentlist}
+                valueExpr="UNIQUEID"
+                displayExpr="INVESTMENTNAME"
+              />
+            </Column>
 
             <Column
               dataField={"TRANSACTIONAMOUNT"}
@@ -354,10 +393,12 @@ function ImportTransactionsx(props) {
               hidingPriority={7}
               allowEditing={true}
               format="$###,###,###.00"
+              width={100}
+              cellRender={renderFPTransactionCell}
             />
             <Column
               dataField={"UNIQUEID"}
-              caption={"Amount"}
+              caption={"ID"}
               hidingPriority={7}
               allowEditing={true}
               visible={false}
@@ -382,7 +423,6 @@ async function asyncValidation(bankAccountNumber, clientCode, segmentNumber) {
       sentClientCode: clientCode,
     }),
   };
-  //console.log("bankID", bankID, "segment", segmentNumber);
   const url = `${process.env.REACT_APP_BASE_URL}/fetchThisClientSegment`;
 
   const response = await fetch(url, requestoptions);
@@ -390,7 +430,6 @@ async function asyncValidation(bankAccountNumber, clientCode, segmentNumber) {
     throw new Error("System did not respond");
   }
   const data = await response.json();
-  console.log("data from fetch", data.user_response.response);
   if (data.user_response.response === "ERROR") {
     return true; // Validation successful
   } else if (data.user_response.response === "OK") {
@@ -404,6 +443,106 @@ async function asyncValidation(bankAccountNumber, clientCode, segmentNumber) {
 
 export default function ImportTransactions() {
   const { user } = useAuth();
-  //console.log("my user stuff", { user });
   return <ImportTransactionsx clientCode={user.thisClientcode} />;
 }
+
+// //
+// const PrepareInvestmentID = (props) => {
+//   const [investmentlist, setInvestmentList] = useState(null);
+//   const [selectedRowKeys, setSelectedRowKeys] = useState([props.data.value]);
+//   const [isDropDownOpened, setDropDownOpened] = useState(false);
+//   const [transTypes, setTransTypes] = useState(null);
+//   const [isEditable, setIsEditable] = useState(false);
+//   useEffect(() => {
+//     getInvestmentRecords(props.data.data.CLIENTCODE) // call the function to fetch data
+//       .then((data) => {
+//         setInvestmentList(data.data); // store the data in state
+//       })
+//       .catch((error) => {
+//         console.error(
+//           "There was an error fetching the transaction Types data:",
+//           error
+//         );
+//       });
+//     getTransactionTypes()
+//       .then((data) => {
+//         setTransTypes(data.data);
+
+//         // Find the transaction type for the current row
+//         const currentTransactionType = data.data.find(
+//           (type) => type.FPTRANSACTIONCODE === props.data.data.FPTRANSACTIONCODE
+//         );
+
+//         // Enable or disable editing based on investmenttype
+//         setIsEditable(
+//           currentTransactionType && currentTransactionType.investmenttype === 1
+//         );
+//       })
+//       .catch((error) => {
+//         console.error(
+//           "There was an error fetching the transaction Types data:",
+//           error
+//         );
+//       });
+//   }, [props.data.selectedRowKeys]);
+
+//   const boxOptionChanged = useCallback((e) => {
+//     if (e.name === "opened") {
+//       setDropDownOpened(e.value);
+//     }
+//   }, []);
+//   const contentRender = useCallback(() => {
+//     const onSelectionChanged = (args) => {
+//       setSelectedRowKeys(args.selectedRowKeys);
+//       setDropDownOpened(false);
+//       props.data.setValue(args.selectedRowKeys[0]);
+//     };
+
+//     return (
+//       <DataGrid
+//         keyExpr={"UNIQUEID"}
+//         dataSource={investmentlist}
+//         remoteOperations={true}
+//         height={250}
+//         selectedRowKeys={selectedRowKeys}
+//         hoverStateEnabled={true}
+//         onSelectionChanged={onSelectionChanged}
+//         focusedRowEnabled={true}
+//         defaultFocusedRowKey={selectedRowKeys[0]}
+//       >
+//         <Column dataField="INVESTMENTNAME" />
+//         <Paging enabled={true} defaultPageSize={10} />
+//         <Scrolling mode="virtual" />
+//         <Selection mode="single" />
+//       </DataGrid>
+//     );
+//   }, [props.data, selectedRowKeys]);
+//   return (
+//     <DropDownBox
+//       //disabled={!isEditable}
+//       onOptionChanged={boxOptionChanged}
+//       opened={isDropDownOpened}
+//       dropDownOptions={dropDownOptions}
+//       dataSource={investmentlist}
+//       value={selectedRowKeys[0]}
+//       displayExpr="INVESTMENTNAME"
+//       valueExpr="UNIQUEID"
+//       inputAttr={ownerLabel}
+//       contentRender={contentRender}
+//     ></DropDownBox>
+//   );
+// };
+
+// ////////////////////////////////////////////////
+// //const setFormImport = () => {};
+
+// //const onRowInserted = useCallback();
+// //   (e) => {
+// //     setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
+// //     setLastSegmentNumber(e.data.SEGMENTNUMBER);
+// //   },
+// //   [lastBankAccountNumber]
+
+// // old version const onRowInserted = (e) => {
+// //   setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
+// // };

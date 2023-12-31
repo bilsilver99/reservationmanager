@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   return (
     <div className="App">
-      <div className="right-container">
+      <div className="right-container ">
         <Card />
       </div>
       <div className="right-container">

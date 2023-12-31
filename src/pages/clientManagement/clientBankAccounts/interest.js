@@ -19,6 +19,7 @@ import TextBox from "devextreme-react/text-box";
 import { Button } from "devextreme-react/button";
 import { fetchThisClientData } from "../clientManagementData";
 import { updateInterest, resetInterest } from "./interestData";
+import ClientUnpostedInterestTransactions from "./clientUnpostedInterestTransactions";
 
 import { getBanks } from "./clientBanksAccountsData";
 import ClientInterestTransactions from "./clientInterestTransactions";
@@ -47,6 +48,8 @@ const Interestx = (props) => {
 
   const handleBankAccountChange = (e) => {
     setCurrentBankAccount(e.value);
+    setRefreshKey((prevKey) => prevKey + 1);
+    console.log("reset the refesh key", refreshKey);
   };
 
   const ProcessInterest = async (e) => {
@@ -266,9 +269,10 @@ const Interestx = (props) => {
           ></Button>
         </div>
       </div>
-      <ClientInterestTransactions
-        myClient={props.sentClientCode}
-        refreshKey={refreshKey}
+      <ClientUnpostedInterestTransactions
+        myClient={myClientCode}
+        Key={refreshKey}
+        bankaccount={currentBankAccount}
       />
     </>
   );
@@ -276,5 +280,6 @@ const Interestx = (props) => {
 
 export default function Interest(props) {
   //const { user } = useAuth();
+  //console.log("props coming in", props);
   return <Interestx sentClientCode={props.clientCode} />;
 }

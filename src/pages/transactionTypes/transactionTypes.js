@@ -194,6 +194,10 @@ class TransactionTypesx extends React.Component {
                   dataField={"CARRYINGCHARGEDEDUCTIBLEINTEREST"}
                   editorType="dxCheckBox"
                 />
+                <Item
+                  dataField={"INVESTMENTTRANSACTION"}
+                  editorType="dxCheckBox"
+                />
               </Item>
             </Form>
           </Editing>
@@ -336,6 +340,14 @@ class TransactionTypesx extends React.Component {
             dataType="boolean"
             dataField={"CARRYINGCHARGEDEDUCTIBLEINTEREST"}
             caption={"Carrying Charge Deductible Interest"}
+            hidingPriority={8}
+            visible={false}
+            //onCellClick={this.handleActionRequiredClick}
+          />
+          <Column
+            dataType="boolean"
+            dataField={"INVESTMENTTRANSACTION"}
+            caption={"Investment Transaction"}
             hidingPriority={8}
             visible={false}
             //onCellClick={this.handleActionRequiredClick}

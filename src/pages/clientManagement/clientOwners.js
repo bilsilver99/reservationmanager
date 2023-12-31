@@ -148,7 +148,7 @@ class ClientOwnersx extends React.Component {
           <Column
             dataField={"ALLOCATIONPERCENTAGE"}
             width={180}
-            caption={"Allocation"}
+            caption={"Allocation %"}
             hidingPriority={8}
             visible={true}
           />

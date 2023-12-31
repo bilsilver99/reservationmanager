@@ -21,8 +21,10 @@ import DataGrid, {
 import "devextreme-react/text-area";
 import "./app.scss";
 
-import "devextreme/data/data_source";
+import Swal from "sweetalert2";
 
+import "devextreme/data/data_source";
+import withReactContent from "sweetalert2-react-content";
 import DataSource from "devextreme/data/data_source";
 import { mystore2 } from "./segmentData";
 import ClientBankSegmentTransactions from "./clientBankSegmentTransactions";
@@ -72,6 +74,7 @@ const ConfirmationModal = ({ isOpen, onRequestClose, onConfirm, balance }) => (
 let pageoption = 90;
 
 function ClientBankSegment(props) {
+  //console.log(props);
   const bankRateTypes = [
     { BANKACCOUNTTYPES: "Fixed", DESCRIPTION: "Fixed" },
     { BANKACCOUNTTYPES: "Variable", DESCRIPTION: "Variable" },
@@ -92,6 +95,8 @@ function ClientBankSegment(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentBalance, setCurrentBalance] = useState(0);
 
+  const MySwal = withReactContent(Swal);
+
   const onEditorPreparing = (e) => {
     // Check if the row is not new
     if (e.parentType === "dataRow" && !e.row.isNewRow) {
@@ -104,7 +109,7 @@ function ClientBankSegment(props) {
 
   useEffect(() => {
     async function fetchData() {
-      const data = await getTasks(props.rowid, props.sendit);
+      const data = await getTasks(props.rowid, props.sendit, props.activeOnly);
       setDataSource(data);
     }
 
@@ -130,6 +135,35 @@ function ClientBankSegment(props) {
     setIsModalOpen(false);
   };
 
+  const onRowUpdating = (e) => {
+    const { oldData, newData } = e;
+    console.log(e);
+    if (newData.ACTIVE === false) {
+      // Assuming BANKBALANCE is a field in your data
+      if (
+        oldData.SEGMENTBALANCE !== undefined &&
+        oldData.SEGMENTBALANCE !== 0
+      ) {
+        // Preventing the update
+        e.cancel = true;
+
+        // Displaying an error message
+        MySwal.fire({
+          icon: "error",
+          title: "Segment Error",
+          text: "This segment balance is not zero and cannot be set to inactive.",
+          customClass: {
+            container: "high-z-index",
+          },
+        });
+      }
+    }
+  };
+
+  const onInitNewRow = (e) => {
+    e.data.ACTIVE = true;
+  };
+
   return (
     <>
       <ConfirmationModal
@@ -148,6 +182,9 @@ function ClientBankSegment(props) {
               width={"100%"}
               onEditorPreparing={onEditorPreparing}
               onRowRemoving={deleteClick}
+              style={{ border: "1px solid blue" }}
+              onRowUpdating={onRowUpdating}
+              onInitNewRow={onInitNewRow}
             >
               <Sorting mode="single" />
               <Paging enabled={true} />
@@ -198,6 +235,13 @@ function ClientBankSegment(props) {
                     />
 
                     <Item dataField={"MATURITYDATE"} />
+                    <Item
+                      dataField={"ACTIVE"}
+                      Caption="Active"
+                      editorType="dxCheckBox"
+                      cssClass="tight-spacing"
+                      label={{ text: "Active", location: "left" }}
+                    />
                   </Item>
                 </Form>
               </Editing>
@@ -238,7 +282,7 @@ function ClientBankSegment(props) {
                 type="number"
                 dataField={"SEGMENTBALANCE"}
                 caption="Balance"
-                allowEditing={true}
+                allowEditing={false}
                 format={"$###,###,###.00"}
                 alignment="right"
               />
@@ -280,10 +324,10 @@ function ClientBankSegment(props) {
                 hidingPriority={7}
                 allowEditing={true}
               />
-              {/* <Column
+              <Column
                 dataType="boolean"
-                dataField={"FIXED"}
-                caption={"Fixed Rate"}
+                dataField={"ACTIVE"}
+                caption={"Active"}
                 hidingPriority={7}
                 allowEditing={true}
               />
@@ -293,7 +337,7 @@ function ClientBankSegment(props) {
                 caption={"Variable Rate"}
                 hidingPriority={7}
                 allowEditing={true}
-              /> */}
+              />
               <MasterDetail
                 enabled={true}
                 render={renderDetail}
@@ -349,9 +393,9 @@ async function asyncValidation(segmentNumber, bankID) {
 
 export default ClientBankSegment;
 
-async function getTasks(key, masterField) {
-  //console.log("call to datasource", key, "range is", masterField);
-  return new DataSource(mystore2(key));
+async function getTasks(key, masterField, activeOnly) {
+  console.log("call to getTask - active only", activeOnly);
+  return new DataSource(mystore2(key, activeOnly));
   // const store = mystore2(key, masterField);
   // const loadResult = await store.load();
   // return new DataSource({ store, load: () => loadResult });

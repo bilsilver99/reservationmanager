@@ -162,7 +162,7 @@ export const assetStore = (myClient) =>
           return response.json();
         })
         .then((json) => {
-          console.log("from client: ", myClient, "assets go bang: ", json);
+          //console.log("from client: ", myClient, "assets go bang: ", json);
           return {
             data: json.user_response.bankq,
             totalCount: json.user_response.totalCount,

@@ -3,6 +3,10 @@ import { Importer, ImporterField } from "react-csv-importer";
 import "react-csv-importer/dist/index.css";
 import "./index.css";
 import SelectBox from "devextreme-react/select-box";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+
+import Swal from "sweetalert2";
 import {
   getBanks,
   getBankName,
@@ -11,6 +15,7 @@ import {
 } from "./clientBanksAccountsData";
 //import { useAuth } from "../../../contexts/auth";
 import PredefinedCSVReader from "./preDefinedCVSReader";
+import withReactContent from "sweetalert2-react-content";
 
 //import { on } from "devextreme/events";
 //import { json } from "react-router-dom";
@@ -18,6 +23,7 @@ import PredefinedCSVReader from "./preDefinedCVSReader";
 class BankCSVImportx extends React.Component {
   constructor(props) {
     super(props);
+    this.MySwal = withReactContent(Swal);
     this.onDrop = this.onDrop.bind(this);
   }
   state = {
@@ -33,6 +39,7 @@ class BankCSVImportx extends React.Component {
     mydataarray: [],
     importedData: [],
     newValue: 0,
+    isLoading: false,
     transactionArray: [
       { date: "", description: "", payments: "", deposits: "" },
     ],
@@ -43,65 +50,97 @@ class BankCSVImportx extends React.Component {
   ////////////////////////////////////////////
 
   handleImportedData = (importedData) => {
-    console.log("Received data in parent component:", importedData);
-    const transformedData = [];
-    importedData.forEach((item) => {
-      const row = [
-        item.date,
-        item.Description,
-        item.Payments,
-        item.Deposits,
-        item.Total,
-      ];
-      transformedData.push(row);
-    });
+    this.setState({ isLoading: true });
 
-    console.log("transformed before sending to data call", transformedData);
+    const transformedData = importedData.map((item) => [
+      item.date,
+      item.Description,
+      item.Payments,
+      item.Deposits,
+      item.Total,
+    ]);
 
     updateImportFileV2(
       this.props.clientCode,
       this.state.currentBankAccount,
       transformedData
-    );
+    )
+      .then((response) => {
+        this.MySwal.fire({
+          icon: "success",
+          title: "Import Complete",
+          text: `There were ${response.count} records imported and ${response.errorcount} errors in the import. Please review the import file and correct the errors.`,
+          customClass: {
+            container: "high-z-index",
+          },
+        });
 
-    this.setState(
-      (prevState) => ({
-        sharedValue: prevState.sharedValue + 1,
-      }),
-      () => {
-        // After state update, call the parent's callback to update its state as well
-        this.props.onValueChange(this.state.sharedValue);
-      }
-    );
+        if (response.success) {
+          // Handle successful response
+        } else {
+          // Handle other scenarios
+        }
 
-    console.log("new value:", this.state.newValue);
-    this.props.onValueChange(this.state.newValue);
+        this.setState(
+          (prevState) => ({
+            sharedValue: prevState.sharedValue + 1,
+          }),
+          () => {
+            this.props.onValueChange(this.state.sharedValue);
+          }
+        );
+
+        this.props.onValueChange(this.state.newValue);
+        this.setState({ isLoading: false }); // Set loading to false after operation is complete
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        this.setState({ isLoading: false }); // Set loading to false also in case of error
+      });
   };
 
   /////////////////////////////////////////////////////////////
-  //// this is the auto receive not working
+  //// this is the auto receive not working on the spinner
   /////////////////////////////////////////////////////////////
 
   onDataReceived = (data) => {
-    console.log("Received data:", data);
+    //console.log("Received data:", data);
+    this.setState({ isLoading: true });
 
-    updateImportFile(
-      this.props.clientCode,
-      this.state.currentBankAccount,
-      data
-    );
-    this.setState(
-      (prevState) => ({
-        sharedValue: prevState.sharedValue + 1,
-      }),
-      () => {
-        // After state update, call the parent's callback to update its state as well
-        this.props.onValueChange(this.state.sharedValue);
-      }
-    );
-    console.log("new value:", this.state.newValue);
-    this.props.onValueChange(this.state.newValue);
-    // Update the state or perform any other actions as needed
+    updateImportFile(this.props.clientCode, this.state.currentBankAccount, data)
+      /////////////////////////////////////////////////
+      .then((response) => {
+        this.MySwal.fire({
+          icon: "success",
+          title: "Import Complete",
+          text: `There were ${response.count} records imported and ${response.errorcount} errors in the import. Please review the import file and correct the errors.`,
+          customClass: {
+            container: "high-z-index",
+          },
+        });
+
+        if (response.success) {
+          // Handle successful response
+        } else {
+          // Handle other scenarios
+        }
+
+        this.setState(
+          (prevState) => ({
+            sharedValue: prevState.sharedValue + 1,
+          }),
+          () => {
+            this.props.onValueChange(this.state.sharedValue);
+          }
+        );
+
+        this.props.onValueChange(this.state.newValue);
+        this.setState({ isLoading: false }); // Set loading to false after operation is complete
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        this.setState({ isLoading: false }); // Set loading to false also in case of error
+      });
   };
 
   ///////////////////////////////
@@ -111,7 +150,7 @@ class BankCSVImportx extends React.Component {
       .then((data) => {
         //console.log("bank accounts ", data);
         this.setState({ bankAccountList: data.data }, () => {
-          console.log("bank accounts ", this.state.bankAccountList);
+          //console.log("bank accounts ", this.state.bankAccountList);
         });
       })
       .catch((error) => {
@@ -158,50 +197,66 @@ class BankCSVImportx extends React.Component {
 
   render() {
     return (
-      <div className="content-block2 dx-card">
-        <p> </p>
-        <p>&nbsp;&nbsp;Bank Transactions Import </p>
-        <div style={{ display: "flex", alignItems: "left" }}>
-          <p
-            style={{
-              marginRight: "10px",
-              marginLeft: "10px",
-              marginTop: "6px",
-            }}
-          >
-            Bank Account:
-          </p>
-          <SelectBox
-            style={{ width: "200px", height: "30px" }}
-            items={this.state.bankAccountList}
-            valueExpr="BANKACCOUNTNUMBER"
-            displayExpr={(item) =>
-              item
-                ? `${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
-                : ""
-            }
-            //displayExpr="BANKACCOUNTNUMBER"
-            //displayExpr={(item) =>
-            //  `${item.BANKACCOUNTNUMBER} - ${item.DESCRIPTION}`
-            // }
-            value={this.state.currentBankAccount}
-            searchEnabled={true}
-            //value={currentEmployeeName}
-            onValueChanged={this.setAccountData}
-            //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
-          />
-          <p>&nbsp;&nbsp;&nbsp;{this.state.currentBankAccountName}</p>
-        </div>
-
-        {this.state.dateRow === 0 ? (
-          <DataImporter
-            onCompleteImport={this.handleImportedData}
-            reset={false}
-          />
-        ) : (
-          <PredefinedCSVReader onDataReceived={this.onDataReceived} />
+      <>
+        {this.state.isLoading && (
+          <div className="spinner-container">
+            {this.state.isLoading && (
+              <>
+                <p>Processing please wait &nbsp;&nbsp;</p>
+                <FontAwesomeIcon
+                  icon={faSpinner}
+                  spin
+                  className="large-spinner"
+                />
+              </>
+            )}
+          </div>
         )}
-      </div>
+        <div className="content-block2 dx-card">
+          <p> </p>
+          <p>&nbsp;&nbsp;Bank Transactions Import </p>
+          <div style={{ display: "flex", alignItems: "left" }}>
+            <p
+              style={{
+                marginRight: "10px",
+                marginLeft: "10px",
+                marginTop: "6px",
+              }}
+            >
+              Bank Account:
+            </p>
+            <SelectBox
+              style={{ width: "250px", height: "30px" }}
+              items={this.state.bankAccountList}
+              valueExpr="BANKACCOUNTNUMBER"
+              displayExpr={(item) =>
+                item
+                  ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
+                  : ""
+              }
+              //displayExpr="BANKACCOUNTNUMBER"
+              //displayExpr={(item) =>
+              //  `${item.BANKACCOUNTNUMBER} - ${item.DESCRIPTION}`
+              // }
+              value={this.state.currentBankAccount}
+              searchEnabled={true}
+              //value={currentEmployeeName}
+              onValueChanged={this.setAccountData}
+              //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
+            />
+            <p>&nbsp;&nbsp;&nbsp;{this.state.currentBankAccountName}</p>
+          </div>
+
+          {this.state.dateRow === 0 ? (
+            <DataImporter
+              onCompleteImport={this.handleImportedData}
+              reset={false}
+            />
+          ) : (
+            <PredefinedCSVReader onDataReceived={this.onDataReceived} />
+          )}
+        </div>
+      </>
     );
   }
 
@@ -222,13 +277,13 @@ class BankCSVImportx extends React.Component {
 export default BankCSVImportx;
 
 function DataImporter(props) {
-  console.log("DataImporter props", props);
+  //console.log("DataImporter props", props);
   const [importComplete, setImportComplete] = React.useState(props.reset); // Initialize importComplete as false
   const [importedData, setImportedData] = React.useState([]); // Initialize importedData as an empty array
 
   const onCompleteImport = ({ data }) => {
     // Handle the imported data here
-    console.log("Imported data in DataImporter:", importedData);
+    //console.log("Imported data in DataImporter:", importedData);
     setImportComplete(true);
     // Call the parent's onCompleteImport function with the imported data
     props.onCompleteImport(importedData);
@@ -261,7 +316,7 @@ function DataImporter(props) {
           restartable={false}
           onComplete={onCompleteImport}
           onClose={() => {
-            console.log("Importer dismissed");
+            //console.log("Importer dismissed");
           }}
         >
           <ImporterField name="date" label="date" />
@@ -274,3 +329,126 @@ function DataImporter(props) {
     </div>
   );
 }
+////////////////////////////////////////////
+
+// handleImportedData = (importedData) => {
+//   this.setState({ isLoading: true });
+//   //console.log("Received data in parent component:", importedData);
+//   const transformedData = [];
+//   importedData.forEach((item) => {
+//     const row = [
+//       item.date,
+//       item.Description,
+//       item.Payments,
+//       item.Deposits,
+//       item.Total,
+//     ];
+//     transformedData.push(row);
+//   });
+
+//   //console.log("transformed before sending to data call", transformedData);
+
+//   updateImportFileV2(
+//     this.props.clientCode,
+//     this.state.currentBankAccount,
+//     transformedData
+//   )
+//     .then((response) => {
+//       // Handle the response here
+//       // 'response' is what the promise resolved to
+//       this.MySwal.fire({
+//         icon: "success",
+//         title: "Import Complete",
+//         text:
+//           "There were " +
+//           response.count +
+//           " records imported and " +
+//           response.errorcount +
+//           " errors in the import. Please review the import file and correct the errors.",
+//         customClass: {
+//           container: "high-z-index",
+//         },
+//       });
+
+//       //console.log("Response:", response);
+
+//       // Check response or process it as needed
+//       if (response.success) {
+//         // Handle successful response
+//       } else {
+//         // Handle other scenarios
+//       }
+//     })
+//     .catch((error) => {
+//       // Handle any errors here
+//       console.error("Error:", error);
+//     });
+
+//   this.setState(
+//     (prevState) => ({
+//       sharedValue: prevState.sharedValue + 1,
+//     }),
+//     () => {
+//       // After state update, call the parent's callback to update its state as well
+//       this.props.onValueChange(this.state.sharedValue);
+//     }
+//   );
+
+//   //console.log("new value:", this.state.newValue);
+//   this.props.onValueChange(this.state.newValue);
+//   this.setState({ isLoading: false });
+// };
+
+///////////////////////////////////////////////////////////////
+
+// onDataReceived = (data) => {
+//   //console.log("Received data:", data);
+//   this.setState({ isLoading: true });
+
+//   updateImportFile(this.props.clientCode, this.state.currentBankAccount, data)
+//     /////////////////////////////////////////////////
+//     .then((response) => {
+//       // Handle the response here
+//       // 'response' is what the promise resolved to
+//       this.MySwal.fire({
+//         icon: "success",
+//         title: "Import Complete",
+//         text:
+//           "There were " +
+//           response.count +
+//           " records imported and " +
+//           response.errorcount +
+//           " errors in the import. Please review the import file and correct the errors.",
+//         customClass: {
+//           container: "high-z-index",
+//         },
+//       });
+
+//       //console.log("Response:", response);
+
+//       // Check response or process it as needed
+//       if (response.success) {
+//         // Handle successful response
+//       } else {
+//         // Handle other scenarios
+//       }
+//     })
+//     .catch((error) => {
+//       // Handle any errors here
+//       console.error("Error:", error);
+//     });
+
+//   this.setState(
+//     (prevState) => ({
+//       sharedValue: prevState.sharedValue + 1,
+//     }),
+//     () => {
+//       // After state update, call the parent's callback to update its state as well
+//       this.props.onValueChange(this.state.sharedValue);
+//     }
+//   );
+//   //console.log("new value:", this.state.newValue);
+//   this.props.onValueChange(this.state.newValue);
+//   this.setState({ isLoading: false }); // Set loading to false after operation is complete
+//   // Update the state or perform any other actions as needed
+// };

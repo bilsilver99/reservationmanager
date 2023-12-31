@@ -96,6 +96,7 @@ function ClientBankSegmentTransactions(props) {
               onEditorPreparing={onEditorPreparing}
               onInitNewRow={onInitNewRow}
               width={"100%"}
+              style={{ border: "1px solid orange" }}
             >
               <FilterRow visible={true} />
               <Sorting mode="single" />

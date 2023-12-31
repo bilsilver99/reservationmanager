@@ -151,6 +151,11 @@ export const fetchcompany = async (companynumber) => {
         enddateforreports: json.user_response.R_EndDateForReports,
         primerate: json.user_response.R_PrimeRate,
         lastpdffile: json.user_response.R_LastPDFFile,
+        CashInvestmentStockCode: json.user_response.R_CashInvestmentStockCode,
+        PurchaseTransactionType: json.user_response.R_PurchaseTransactionType,
+        SaleTransactionType: json.user_response.R_SaleTransactionType,
+        CostTransactionType: json.user_response.R_CostTransactionType,
+        NoncashTransactionType: json.user_response.R_NoncashTransactionType,
       };
     });
 };
@@ -205,6 +210,11 @@ export const updateCompany = async (companynumber, companyValues) => {
       enddateforreports: companyValues.enddateforreports,
       primerate: companyValues.primerate,
       lastpdffile: companyValues.lastpdffile,
+      CashInvestmentStockCode: companyValues.CashInvestmentStockCode,
+      PurchaseTransactionType: companyValues.PurchaseTransactionType,
+      SaleTransactionType: companyValues.SaleTransactionType,
+      CostTransactionType: companyValues.CostTransactionType,
+      NoncashTransactionType: companyValues.NoncashTransactionType,
     }),
   };
   const url = `${process.env.REACT_APP_BASE_URL}/updateCompanydata`;
@@ -702,5 +712,37 @@ export const getNetWorth = (clientcode) => {
       //bankdata = JSON.parse(chips.responseText.FPClientBankAccount);
       //console.log(bankrecords);
       return bankrecords.user_response.bankq;
+    });
+};
+
+export const getStockTypes = () => {
+  var myClient = 1;
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: myClient,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/getStockTransactionTypes`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      //console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("transaction types", json);
+      return {
+        data: json.user_response.loginq,
+      };
     });
 };

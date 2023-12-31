@@ -128,7 +128,7 @@ class Banksx extends React.Component {
             this.props.companyCode,
             this.state.includeInactiveBanks
           )}
-          keyExpr="UNIQUEID"
+          //keyExpr="UNIQUEID"
           showBorders={true}
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line

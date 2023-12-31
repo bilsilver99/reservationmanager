@@ -5,6 +5,7 @@ function isNotEmpty(value) {
 
 export const getBanks = (myClient) => {
   //var myClient = 1;
+  const activeOnly = true;
   var requestoptions = {
     method: "POST",
     headers: {
@@ -13,9 +14,10 @@ export const getBanks = (myClient) => {
     },
     body: JSON.stringify({
       sentclientcode: myClient,
+      activeOnly: activeOnly,
     }),
   };
-  console.log("client sent", myClient);
+  //console.log("client sent", myClient);
   const url = `${process.env.REACT_APP_BASE_URL}/getClientbankAccounts`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
@@ -50,7 +52,7 @@ export const getBankName = (myClient, MybankAccount) => {
     }),
   };
 
-  console.log("client sent", myClient, "bank account sent", MybankAccount);
+  //console.log("client sent", myClient, "bank account sent", MybankAccount);
 
   const url = `${process.env.REACT_APP_BASE_URL}/getClientbankAccountName`;
   return fetch(url, requestoptions) // Request fish
@@ -65,14 +67,14 @@ export const getBankName = (myClient, MybankAccount) => {
       return response.json();
     })
     .then((json) => {
-      console.log(
-        "client sent",
-        myClient,
-        "bank account",
-        MybankAccount,
-        "bank name ",
-        json
-      );
+      // console.log(
+      //   "client sent",
+      //   myClient,
+      //   "bank account",
+      //   MybankAccount,
+      //   "bank name ",
+      //   json
+      // );
       return {
         data: json.user_response.returnedName,
         daterow: json.user_response.daterow,
@@ -332,7 +334,7 @@ export const myStore5 = (myClient) => {
 /////////////////////////////////////////
 
 export const updateImportFilexx = (clientcode, bankaccount, dataArray) => {
-  console.log("array from web page", dataArray.data);
+  //console.log("array from web page", dataArray.data);
   //var myClient = 1;
   // const sentArray = dataArray.data.map(
   //   ([date, description, payments, deposits, total]) => ({
@@ -363,8 +365,8 @@ export const updateImportFilexx = (clientcode, bankaccount, dataArray) => {
   const dataToSend = {
     sentArray: sentArray,
   };
-  console.log("data to send", dataToSend);
-  console.log("sentarray", sentArray);
+  //  console.log("data to send", dataToSend);
+  //  console.log("sentarray", sentArray);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -377,14 +379,14 @@ export const updateImportFilexx = (clientcode, bankaccount, dataArray) => {
       sentArray: sentArray,
     }),
   };
-  console.log(
-    "client sent",
-    clientcode,
-    "bank account sent",
-    bankaccount,
-    "data sent",
-    dataToSend
-  );
+  // console.log(
+  //   "client sent",
+  //   clientcode,
+  //   "bank account sent",
+  //   bankaccount,
+  //   "data sent",
+  //   dataToSend
+  // );
   const url = `${process.env.REACT_APP_BASE_URL}/SendImportFileData2`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
@@ -409,14 +411,14 @@ export const updateImportFilexx = (clientcode, bankaccount, dataArray) => {
 ////////////////////////////////
 
 export const updateImportFileV2 = (clientcode, bankaccount, dataArray) => {
-  console.log(
-    "clientcode",
-    clientcode,
-    "banksaccount",
-    bankaccount,
-    "array from web page",
-    dataArray
-  );
+  // console.log(
+  //   "clientcode",
+  //   clientcode,
+  //   "banksaccount",
+  //   bankaccount,
+  //   "array from web page",
+  //   dataArray
+  // );
   //var myClient = 1;
 
   const sentArray = dataArray.map(
@@ -434,7 +436,7 @@ export const updateImportFileV2 = (clientcode, bankaccount, dataArray) => {
     sentArray: sentArray,
   };
 
-  console.log("sent array - this is sent to clarion", sentArray);
+  //console.log("sent array - this is sent to clarion", sentArray);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -447,14 +449,14 @@ export const updateImportFileV2 = (clientcode, bankaccount, dataArray) => {
       sentArray: sentArray,
     }),
   };
-  console.log(
-    "client sent",
-    clientcode,
-    "bank account sent",
-    bankaccount,
-    "data sent",
-    dataToSend
-  );
+  // console.log(
+  //   "client sent",
+  //   clientcode,
+  //   "bank account sent",
+  //   bankaccount,
+  //   "data sent",
+  //   dataToSend
+  // );
   const url = `${process.env.REACT_APP_BASE_URL}/SendImportFileData`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
@@ -470,24 +472,26 @@ export const updateImportFileV2 = (clientcode, bankaccount, dataArray) => {
     .then((json) => {
       //console.log("banks list", json);
       return {
+        count: json.user_response.count,
+        errorcount: json.user_response.errorcount,
         data: json.user_response.loginq,
       };
     });
 };
 ////////////////////////////////
 export const updateImportFile = (clientcode, bankaccount, dataArray) => {
-  console.log(
-    "clientcode",
-    clientcode,
-    "banksaccount",
-    bankaccount,
-    "array from web page",
-    dataArray
-  );
+  // console.log(
+  //   "clientcode",
+  //   clientcode,
+  //   "banksaccount",
+  //   bankaccount,
+  //   "array from web page",
+  //   dataArray
+  // );
   //alert("update import file");
   //var myClient = 1;
 
-  console.log("HERE: ", dataArray.data);
+  //console.log("HERE: ", dataArray.data);
 
   // const sentArray = dataArray.data.map(([fld1, fld2, fld3, fld4, fld5]) => ({
   //   fld1: fld1,
@@ -512,7 +516,7 @@ export const updateImportFile = (clientcode, bankaccount, dataArray) => {
     sentArray: sentArray,
   };
 
-  console.log("sent array - this is sent to clarion", sentArray);
+  //console.log("sent array - this is sent to clarion", sentArray);
   var requestoptions = {
     method: "POST",
     headers: {
@@ -525,14 +529,14 @@ export const updateImportFile = (clientcode, bankaccount, dataArray) => {
       sentArray: sentArray,
     }),
   };
-  console.log(
-    "client sent",
-    clientcode,
-    "bank account sent",
-    bankaccount,
-    "data sent",
-    dataToSend
-  );
+  // console.log(
+  //   "client sent",
+  //   clientcode,
+  //   "bank account sent",
+  //   bankaccount,
+  //   "data sent",
+  //   dataToSend
+  // );
   const url = `${process.env.REACT_APP_BASE_URL}/SendImportFileData3`;
   return fetch(url, requestoptions) // Request fish
     .then((response) => {
@@ -549,6 +553,8 @@ export const updateImportFile = (clientcode, bankaccount, dataArray) => {
       //console.log("banks list", json);
       return {
         data: json.user_response.loginq,
+        count: json.user_response.count,
+        errorcount: json.user_response.errorcount,
       };
     });
 };

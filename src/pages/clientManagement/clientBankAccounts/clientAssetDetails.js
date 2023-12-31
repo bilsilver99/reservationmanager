@@ -21,6 +21,8 @@ import "./app.scss";
 
 import "devextreme/data/data_source";
 
+import { fetchThisClientData } from "../clientManagementData";
+
 import DataSource from "devextreme/data/data_source";
 import { mystore7 } from "./clientAssetsData";
 //import ClientBankSegmentTransactions from "./clientBankSegmentTransactions";
@@ -34,6 +36,7 @@ function ClientAssetDetails(props) {
 
   const [bankID, setBankID] = useState(props.bankAccountNumberID);
   const [bankUniqueid, setBankUniqueid] = useState(props.bankAccountUniqueID);
+  const [enddate, setEndDate] = useState(null);
 
   // const validateSegment = async (params) => {
   //   //console.log("params coming in ", params, "bankid: ", bankUniqueid);
@@ -55,6 +58,7 @@ function ClientAssetDetails(props) {
     e.data.CLIENTCODE = props.clientCode;
     e.data.ASSETNAME = props.assetName;
     e.data.CURRENCY = props.currency;
+    e.data.TRANSACTIONDATE = enddate;
   };
 
   const onRowUpdated = (e) => {};
@@ -67,6 +71,16 @@ function ClientAssetDetails(props) {
 
     fetchData();
   }, [props.rowid, props.sendit]);
+
+  useEffect(() => {
+    (async () => {
+      //      console.log("current client code: ", currentClientCode);
+      const result = await fetchThisClientData(props.clientCode);
+      setEndDate(result.ENDDATE);
+    })();
+
+    return () => {};
+  }, []);
 
   return (
     <>
