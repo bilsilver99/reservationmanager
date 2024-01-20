@@ -83,8 +83,8 @@ export const navigation = [
     ],
   },
   {
-    text: "Administration",
-    icon: "folder",
+    text: "   Admin",
+    icon: "",
     auth: "Y",
     expanded: "N",
     items: [
@@ -165,19 +165,19 @@ export const navigation = [
 
   {
     text: "Client",
-    icon: "folder",
+
     path: "/clientManagement",
     auth: "Y",
   },
   {
     text: "Reporting",
-    icon: "folder",
+
     auth: "Y",
     expanded: "N",
     items: [
       {
         text: "Progress",
-        icon: "folder",
+        icon: "",
         path: "/clientProgress",
         auth: "Y",
       },

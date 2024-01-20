@@ -35,7 +35,7 @@ import {
 import ClientInvestmentsTransactions from "./clientInvestmentsTransactions";
 import ClientInvestmentsSummary from "./clientInvestmentsSummary";
 import ClientInvestmentsStocks from "./clientInvestmentsStocks";
-import DebtSummary from "./debtSummary";
+//import DebtSummary from "./debtSummary";
 
 import { GetStockQuote } from "./stockQuery";
 import { Button } from "devextreme-react/button";
@@ -187,7 +187,7 @@ function ClientInvestments(props) {
         remoteOperations={false}
         width={"100%"}
         columnAutoWidth={true}
-        height={"auto"}
+        //height={"auto"}
         onEditingStart={handleEditingStart}
         onRowUpdating={handleRowUpdating}
       >

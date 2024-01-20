@@ -13,6 +13,8 @@ import {
 import { Button } from "devextreme-react/button";
 import ClientBankAccounts from "./clientBankAccounts/clientBankAccounts";
 import DebtSummary from "./clientBankAccounts/debtSummary";
+import ProgressSummary from "./clientBankAccounts/progressSummary";
+import NetWorth from "./clientBankAccounts/netWorth";
 import ClientTransactions from "./clientBankAccounts/clientTransactions";
 import Interest from "./clientBankAccounts/interest";
 import ClientInvestments from "./clientBankAccounts/clientInvestments";
@@ -24,6 +26,8 @@ import ImportTransactions from "./clientBankAccounts/importTransactions";
 import BankCSVImport from "./clientBankAccounts/bankCSVImport";
 
 import ClientOwners from "./clientOwners";
+
+import GetStockPrice from "./clientBankAccounts/getStockprice";
 
 const clients = ["sam", "lou"];
 
@@ -59,6 +63,7 @@ const ClientManagement = () => {
   const [showInterest, setShowInterest] = React.useState(false);
 
   const [showDebtSummary, setFormDebtSummary] = React.useState(false);
+
   const [showProgress, setFormProgress] = React.useState(false);
   const [showNetWorth, setFormNetWorth] = React.useState(false);
 
@@ -194,6 +199,8 @@ const ClientManagement = () => {
     setShowBanksForm(false);
     setShowInterest(false);
     setShowTransfers(false);
+    setFormProgress(false);
+    setFormNetWorth(false);
   };
 
   const setForm1 = () => {
@@ -226,6 +233,7 @@ const ClientManagement = () => {
   const setShowProgress = () => {
     setallflags();
     setShowDashboard(true);
+    setFormProgress(true);
   };
   const setShowDebtSummary = () => {
     setallflags();
@@ -235,6 +243,7 @@ const ClientManagement = () => {
   const setShowNetWorth = () => {
     setallflags();
     setShowDashboard(true);
+    setFormNetWorth(true);
   };
 
   const setFormTransactions = () => {
@@ -353,6 +362,26 @@ const ClientManagement = () => {
         <>
           <p></p>
           <DebtSummary
+            clientCode={currentClientCode}
+            thisWidth={thisWidth}
+            showPrior={showPrior}
+          />
+        </>
+      )}
+      {showProgress && (
+        <>
+          <p></p>
+          <ProgressSummary
+            clientCode={currentClientCode}
+            thisWidth={thisWidth}
+            showPrior={showPrior}
+          />
+        </>
+      )}
+      {showNetWorth && (
+        <>
+          <p></p>
+          <NetWorth
             clientCode={currentClientCode}
             thisWidth={thisWidth}
             showPrior={showPrior}

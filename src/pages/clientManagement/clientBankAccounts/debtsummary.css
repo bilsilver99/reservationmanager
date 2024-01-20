@@ -1,3 +1,20 @@
 .dx-datagrid {
-  font: 9px roman;
+  font: 12px calibri;
 }
+/* Add this to your debtSummaryStyles.scss or debtsummary.css */
+.dx-datagridx .dx-datagrid-rowsview .dx-row > td {
+  border-bottom: none;
+  border-top: none;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/* .dx-datagrid .dx-datagrid-rowsview .dx-data-row > td {
+  border-bottom: none !important;
+} */
+
+/* #gridContainer .dx-row {
+  height: 20px;
+} */

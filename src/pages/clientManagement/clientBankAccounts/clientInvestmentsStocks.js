@@ -20,6 +20,8 @@ import {
   CustomRule,
 } from "devextreme-react/validator";
 
+//import { fetchQuote } from "./getStockData";
+
 import { mystore14, checkStocks } from "./clientInvestmentsData";
 import "devextreme-react/text-area";
 import "devextreme/data/data_source";
@@ -37,6 +39,9 @@ function ClientInvestmentsStocks(props) {
     if (e.parentType === "dataRow" && !e.row.isNewRow) {
       // Disable editing for a specific field
       if (e.dataField === "STOCKCODE") {
+        //console.log("e.value", e.value);
+        //        fetchQuote(e.value);
+
         e.editorOptions.disabled = true;
       }
     }
@@ -49,12 +54,26 @@ function ClientInvestmentsStocks(props) {
       "stockid",
       props.StockID
     );
-    return await checkStocks(params.value, props.StockID);
+
+    //return await fetchLastClosePrice(params.value, props.StockID);
   };
 
-  const refreshData = () => {
-    setRefreshKey((oldKey) => oldKey + 1);
-  };
+  // const [stock, setStock] = useState("");
+  // const [lastClose, setLastClose] = useState(null);
+
+  // const fetchLastClosePrice = () => {
+  //   const API_KEY = process.env.REACT_APP_API_KEY; // Replace with your Finnhub API key
+  //   const url = `https://finnhub.io/api/v1/quote?symbol=${stock}&token=${API_KEY}`;
+
+  //   fetch(url)
+  //     .then((response) => response.json())
+  //     .then((data) => setLastClose(data.c))
+  //     .catch((error) => console.error("Error fetching data: ", error));
+  // };
+
+  // // const refreshData = () => {
+  // //   setRefreshKey((oldKey) => oldKey + 1);
+  // // };
 
   return (
     <div className="red-color">
@@ -170,7 +189,7 @@ function ClientInvestmentsStocks(props) {
           visible={true}
           format={"$###,###,###.00"}
         />
-        <Column
+        {/* <Column
           dataField={"TOTALCOMMISSIONCOSTS"}
           width={140}
           caption={"Commission Costs"}
@@ -185,7 +204,7 @@ function ClientInvestmentsStocks(props) {
           hidingPriority={8}
           visible={true}
           format={"$###,###,###.00"}
-        />
+        /> */}
         <Column
           dataField={"CURRENTACBVALUE"}
           width={140}
@@ -205,11 +224,28 @@ function ClientInvestmentsStocks(props) {
         <Column
           dataField={"TOTALSTOCKCURRENTPRICE"}
           width={140}
-          caption={"Current Value"}
+          caption={"Current Market Value"}
           hidingPriority={8}
           visible={true}
           format={"$###,###,###.00"}
         />
+        <Column
+          dataField={"NETPROFIT"}
+          width={140}
+          caption={"Gain/Loss"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        />
+
+        {/* <Column
+          dataField={"TOTALSTOCKCURRENTPRICE"}
+          width={140}
+          caption={"Total Market Value"}
+          hidingPriority={8}
+          visible={true}
+          format={"$###,###,###.00"}
+        /> */}
       </DataGrid>
     </div>
   );

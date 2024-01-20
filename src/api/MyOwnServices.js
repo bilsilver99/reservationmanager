@@ -156,6 +156,7 @@ export const fetchcompany = async (companynumber) => {
         SaleTransactionType: json.user_response.R_SaleTransactionType,
         CostTransactionType: json.user_response.R_CostTransactionType,
         NoncashTransactionType: json.user_response.R_NoncashTransactionType,
+        FinnHubAPIKey: json.user_response.R_FinnHubAPIKey,
       };
     });
 };
@@ -215,6 +216,7 @@ export const updateCompany = async (companynumber, companyValues) => {
       SaleTransactionType: companyValues.SaleTransactionType,
       CostTransactionType: companyValues.CostTransactionType,
       NoncashTransactionType: companyValues.NoncashTransactionType,
+      FinnHubAPIKey: companyValues.FinnHubAPIKey,
     }),
   };
   const url = `${process.env.REACT_APP_BASE_URL}/updateCompanydata`;

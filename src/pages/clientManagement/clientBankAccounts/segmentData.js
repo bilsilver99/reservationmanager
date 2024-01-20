@@ -538,6 +538,10 @@ export const mystore4 = (ClientCode, rangeValue) =>
           })
           .then((json) => {
             resolve(json.user_response.FPTransq);
+            console.log(
+              "json.user_response.FPTransq",
+              json.user_response.FPTransq
+            );
           })
           .catch((error) => {
             reject(error);
@@ -1183,3 +1187,322 @@ export const getInvestmentRecords = (myClient) => {
       };
     });
 };
+
+////////////////////////////////////////////
+export const mystore5 = (ClientCode, rangeValue) =>
+  new CustomStore({
+    key: "UNIQUEID",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: ClientCode,
+          Parameters: params,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/returnProgress`;
+      return new Promise((resolve, reject) => {
+        fetch(url, requestoptions)
+          .then((response) => {
+            if (!response.ok) {
+              reject(new Error("System did not respond"));
+            }
+            return response.json();
+          })
+          .then((json) => {
+            resolve(json.user_response.LineQ);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    totalCount: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      return new Promise((resolve, reject) => {
+        fetchData(ClientCode, params, rangeValue)
+          .then((json) => {
+            resolve(json.user_response.LineQ);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+  });
+///////////////////////////////////////////////////////////////
+export const mystore7 = (ClientCode, rangeValue) =>
+  new CustomStore({
+    key: "UNIQUEID",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: ClientCode,
+          Parameters: params,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/returnNetWorth`;
+      return new Promise((resolve, reject) => {
+        fetch(url, requestoptions)
+          .then((response) => {
+            if (!response.ok) {
+              reject(new Error("System did not respond"));
+            }
+            return response.json();
+          })
+          .then((json) => {
+            resolve(json.user_response.LineQ);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    totalCount: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      return new Promise((resolve, reject) => {
+        fetchData(ClientCode, params, rangeValue)
+          .then((json) => {
+            resolve(json.user_response.LineQ);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+  });
+
+export const relatedData = (ClientCode, UniqueID2) =>
+  new CustomStore({
+    key: "UNIQUEID2",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: ClientCode,
+          Parameters: params,
+          UniqueID: UniqueID2,
+        }),
+      };
+      console.log("uniqueid is ", UniqueID2);
+      const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
+      return new Promise((resolve, reject) => {
+        fetch(url, requestoptions)
+          .then((response) => {
+            if (!response.ok) {
+              reject(new Error("System did not respond"));
+            }
+            return response.json();
+          })
+          .then((json) => {
+            resolve(json.user_response.bankq);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    totalCount: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      return new Promise((resolve, reject) => {
+        fetchData(ClientCode, params, UniqueID2)
+          .then((json) => {
+            resolve(json.user_response.bankq);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+  });
+////////////////////////////////////////////////////////
+export const relatedData2 = (ClientCode, UniqueID2) =>
+  new CustomStore({
+    key: "UNIQUEID2",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: ClientCode,
+          Parameters: params,
+          UniqueID: UniqueID2,
+        }),
+      };
+      console.log("uniqueid is ", UniqueID2);
+      const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
+      return new Promise((resolve, reject) => {
+        fetch(url, requestoptions)
+          .then((response) => {
+            if (!response.ok) {
+              reject(new Error("System did not respond"));
+            }
+            return response.json();
+          })
+          .then((json) => {
+            resolve(json.user_response.bankq);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    totalCount: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      return new Promise((resolve, reject) => {
+        fetchData(ClientCode, params, UniqueID2)
+          .then((json) => {
+            resolve(json.user_response.bankq);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+  });
+
+////////////////////////////////////////////////////////

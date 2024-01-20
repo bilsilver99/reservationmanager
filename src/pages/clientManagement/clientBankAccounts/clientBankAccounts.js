@@ -359,13 +359,13 @@ class ClientBankAccountsx extends React.Component {
             <HeaderFilter visible={this.state.showHeaderFilter} />
             <SearchPanel visible={false} width={240} placeholder="Search..." />
             <Paging enabled={true} />
-            <Editing
+            {/* <Editing
               mode="row"
               allowUpdating={true}
               allowAdding={true}
               allowDeleting={true}
               confirmDelete={false}
-            />
+            /> */}
 
             <Editing
               mode="popup"

@@ -17,17 +17,30 @@ import "./debtsummary.css";
 //const allowedPageSizes = [8, 12, 20];
 
 //let pageoption = 90;
-const renderGroupDescriptionCell = (data) => {
+
+let lastBankAccountNumber = "xxxxxx";
+
+const renderBankAccountNumber = (data) => {
   const { data: rowData } = data;
 
   let style = {};
-  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
-    style = { color: "blue" }; // Apply blue color
-  } else if (rowData.ACTUALSEGMENT === 99) {
-    style = { color: "red" }; // Apply yellow color
+  let content = "";
+
+  if (rowData.BANKACCOUNTNUMBER !== lastBankAccountNumber) {
+    content = <div>{rowData.BANKACCOUNTNUMBER}</div>;
   }
 
-  return <div style={style}>{rowData.GROUPCODEDESCRIPTION}</div>;
+  lastBankAccountNumber = rowData.BANKACCOUNTNUMBER;
+
+  if (rowData.GROUPCODEDESCRIPTION !== "") {
+    if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
+      style = { color: "white" }; // Apply blue color
+    } else if (rowData.ACTUALSEGMENT === 99) {
+      style = { color: "white" }; // Apply yellow color
+    }
+
+    return <div style={style}>{content}</div>;
+  }
 };
 const renderDescriptionCell = (data) => {
   const { data: rowData } = data;
@@ -40,6 +53,101 @@ const renderDescriptionCell = (data) => {
   }
 
   return <div style={style}>{rowData.DESCRIPTION}</div>;
+};
+
+const renderGroupDescriptionCell = (data) => {
+  const { data: rowData } = data;
+
+  let style = {};
+  if (rowData.GROUPCODEDESCRIPTION !== "") {
+    if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
+      style = { color: "blue" }; // Apply blue color
+    } else if (rowData.ACTUALSEGMENT === 99) {
+      style = { color: "red" }; // Apply yellow color
+    }
+
+    return <div style={style}>{rowData.GROUPCODEDESCRIPTION}</div>;
+  }
+};
+
+const renderCurrentValueCell = (data) => {
+  const { data: rowData } = data;
+
+  let style = {};
+  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
+    style = { color: "blue", borderTop: "1px solid black" }; // Apply blue color
+  } else if (rowData.ACTUALSEGMENT === 99) {
+    style = { color: "red", borderTop: "1px solid black" }; // Apply yellow color
+  }
+  // Check if the value is negative
+  const isNegative = rowData.CHANGEVALUE < 0;
+  const absoluteValue = Math.abs(rowData.CURRENTVALUE);
+
+  // Format the number
+  const formattedValue = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(absoluteValue);
+
+  // If negative, enclose in brackets
+  const displayValue = isNegative ? `(${formattedValue})` : formattedValue;
+
+  return <div style={style}>{displayValue}</div>;
+};
+const renderPriorValueCell = (data) => {
+  const { data: rowData } = data;
+
+  let style = {};
+  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
+    style = { color: "blue", borderTop: "1px solid black" }; // Apply blue color
+  } else if (rowData.ACTUALSEGMENT === 99) {
+    style = { color: "red", borderTop: "1px solid black" }; // Apply yellow color
+  }
+  // Check if the value is negative
+  const isNegative = rowData.CHANGEVALUE < 0;
+  const absoluteValue = Math.abs(rowData.PRIORVALUE);
+
+  // Format the number
+  const formattedValue = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(absoluteValue);
+
+  // If negative, enclose in brackets
+  const displayValue = isNegative ? `(${formattedValue})` : formattedValue;
+
+  return <div style={style}>{displayValue}</div>;
+};
+const renderChangeValueCell = (data) => {
+  const { data: rowData } = data;
+
+  let style = {};
+  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
+    style = { color: "blue", borderTop: "1px solid black" }; // Apply blue color
+  } else if (rowData.ACTUALSEGMENT === 99) {
+    style = { color: "red", borderTop: "1px solid black" }; // Apply yellow color
+  }
+
+  // Check if the value is negative
+  const isNegative = rowData.CHANGEVALUE < 0;
+  const absoluteValue = Math.abs(rowData.CHANGEVALUE);
+
+  // Format the number
+  const formattedValue = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(absoluteValue);
+
+  // If negative, enclose in brackets
+  const displayValue = isNegative ? `(${formattedValue})` : formattedValue;
+
+  return <div style={style}>{displayValue}</div>;
 };
 
 class DebtSummaryx extends React.Component {
@@ -72,27 +180,6 @@ class DebtSummaryx extends React.Component {
     console.log("what is props in debtsummary :", { props });
   }
 
-  //   componentDidMount() {
-  //     Assetgroups() // call the function to fetch data
-  //       .then((data) => {
-  //         console.log("group codes returned", data);
-  //         this.setState({ assetGroupsCodes: data.data }); // store the data in state
-  //       })
-  //       .catch((error) => {
-  //         console.error(
-  //           "There was an error fetching the transaction group data:",
-  //           error
-  //         );
-  //       });
-  //   }
-
-  // handleFilterChange = (e) => {
-  //   this.setState({ filterValue: e.value }, () => {
-  //     //console.log("New filter value:", this.state.filterValue);
-  //     pageoption = this.state.filterValue;
-  //   });
-  // };
-
   handleSelectionChanged(e) {
     this.setState({ selectedRowKeys: e.selectedRowKeys });
     if (e.selectedRowKeys.length > 0) {
@@ -114,10 +201,15 @@ class DebtSummaryx extends React.Component {
   }
 
   onRowPrepared(e) {
-    if (e.rowIndex % 2 === 0) e.rowElement.style.height = "5px";
+    //if (e.rowIndex % 2 === 0) e.rowElement.style.height = "5px";
     //console.log("row prepared", e);
   }
   //      <div className="custom-container" style={{ height: "400px" }}>
+
+  onCellPrepared = (e) => {
+    e.cellElement.style.padding = "0px";
+    e.cellElement.style.borderTop = "1px solid purple";
+  };
 
   render() {
     return (
@@ -127,6 +219,7 @@ class DebtSummaryx extends React.Component {
           <DataGrid
             dataSource={mystore4(this.props.clientCode)}
             onRowPrepared={this.onRowPrepared}
+            onCellPrepared={this.onCellPrepared}
             scrolling={{ mode: "virtual" }} // or 'standard', based on your preference
             //keyExpr="UNIQUEID"
             showBorders={true}
@@ -153,11 +246,13 @@ class DebtSummaryx extends React.Component {
               caption="Account"
               style={{ color: "blue" }}
               width={150}
+              cellRender={renderBankAccountNumber}
+              visible={false}
             />
             <Column
               dataField="DESCRIPTION"
               caption="Description"
-              width={150}
+              width={350}
               cellRender={renderDescriptionCell}
             />
             <Column
@@ -166,6 +261,7 @@ class DebtSummaryx extends React.Component {
               format={"###"}
               alignment="right"
               width={120}
+              visible={false}
             />
             <Column dataField="GROUPCODE" caption="Group" visible={false} />
             <Column
@@ -177,22 +273,25 @@ class DebtSummaryx extends React.Component {
             <Column
               dataField="CURRENTVALUE"
               caption="Current"
-              format={"$###,###,###.00"}
+              format={"$###,###,###"}
               alignment="right"
+              cellRender={renderCurrentValueCell}
             />
             <Column
               dataField="PRIORVALUE"
               caption="Prior"
-              format={"$###,###,###.00"}
+              format={"$###,###,###"}
               alignment="right"
               visible={this.state.showCurrentOnly}
+              cellRender={renderPriorValueCell}
             />
             <Column
               dataField="CHANGEVALUE"
               caption="Change"
-              format={"$###,###,###.00"}
+              format={"$###,###,###"}
               alignment="right"
               visible={this.state.showCurrentOnly}
+              cellRender={renderChangeValueCell}
             />
             <Column
               dataField="GROUPSEQUENCE"

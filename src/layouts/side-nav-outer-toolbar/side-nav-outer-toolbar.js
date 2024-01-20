@@ -70,7 +70,7 @@ export default function SideNavOuterToolbar({ title, children }) {
         closeOnOutsideClick={onOutsideClick}
         openedStateMode={isLarge ? "shrink" : "overlap"}
         revealMode={isXSmall ? "slide" : "expand"}
-        minSize={isXSmall ? 0 : 250}
+        minSize={isXSmall ? 0 : 100}
         maxSize={250}
         shading={isLarge ? false : true}
         opened={menuStatus === MenuStatus.Closed ? false : true}

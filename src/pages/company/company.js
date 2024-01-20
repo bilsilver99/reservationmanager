@@ -51,6 +51,7 @@ function Companyx(props) {
     SaleTransactionType: "",
     CostTransactionType: "",
     NoncashTransactionType: "",
+    FinnHubAPIKey: "",
   });
 
   const companynumbersent = props.companynumber; //CompanyContext; //{companyvalue};
@@ -65,7 +66,7 @@ function Companyx(props) {
         console.error("Error fetching investment types:", error);
       });
     (async () => {
-      console.log("companynumbersent", companynumbersent);
+      console.log("companynumbersent now ", companynumbersent);
       const result = await fetchcompany(companynumbersent);
       setCompanyValues({
         CompanyNumber: result.CompanyNumber,
@@ -112,6 +113,7 @@ function Companyx(props) {
         SaleTransactionType: result.SaleTransactionType,
         CostTransactionType: result.CostTransactionType,
         NoncashTransactionType: result.NoncashTransactionType,
+        FinnHubAPIKey: result.FinnHubAPIKey,
       });
     })();
     //getemployee(service.getEmployee());
@@ -122,6 +124,7 @@ function Companyx(props) {
   }, [companynumbersent]);
 
   const companyUpdate = (event) => {
+    console.log("finnhub api key", companyValues.FinnHubAPIKey);
     updateCompany(props.companynumber, companyValues);
     notify(
       {
@@ -227,6 +230,7 @@ function Companyx(props) {
                 <Item dataField="developmentURL" />
                 <Item dataField="productionURL" />
                 <Item dataField="sandboxURL" />
+                <Item dataField="FinnHubAPIKey" />
               </GroupItem>
               <GroupItem
                 caption="Data Setup"
