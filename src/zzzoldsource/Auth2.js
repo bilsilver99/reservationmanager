@@ -1,48 +1,162 @@
-import React, {
-  useState,
-  useEffect,
-  createContext,
-  useContext,
-  useCallback,
-} from "react";
-import { getUser, signIn as sendSignInRequest } from "../api/auth";
+import defaultUser from "../utils/default-user";
+import { login2 } from "./MyOwnServices";
+//import { useAuth0 } from "@auth0/auth0-react";
 
-function AuthProvider2(props) {
-  const [user, setUser] = useState();
-  const [loading, setLoading] = useState(true);
+const currentUser = {};
+var thisOK = "0";
 
-  useEffect(() => {
-    (async function () {
-      const result = await getUser();
-      if (result.isOk) {
-        setUser(result.data);
-      }
-      setLoading(false);
-    })();
-  }, []);
+export async function signIn2(user, password) {
+  try {
+    // Send request
+    //console.log(email, password);
+    await login2(user, password).then((response) => {
+      thisOK = response.returnOK;
+      //console.log("response", response);
+      currentUser.name = response.clientname;
+      currentUser.clientCode = response.clientcode;
+      currentUser.administrator = response.administrator;
+      currentUser.avatarUrl =
+        "https://js.devexpress.com/Demos/WidgetsGallery/JSDemos/images/employees/07.png";
+      currentUser.guid = response.guid;
+      currentUser.widget = response.widget;
+      currentUser.UserCode = response.UserCode;
+      currentUser.UserPassword = response.UserPassword;
+      //currentUser.FlinksEnvironmentRetail=response.FlinksEnvironmentRetail
+      currentUser.FlinkCustomerRetail = response.FlinkCustomerRetail;
+      currentUser.FlinksAPIDomainRetail = response.FlinksAPIDomainRetail;
+      currentUser.FlinksConnectDomainRetail =
+        response.FlinksConnectDomainRetail;
+      currentUser.FlinksProjectIDRetail = response.FlinksProjectIDRetail;
+      currentUser.FlinkCustomerWealth = response.FlinkCustomerWealth;
+      currentUser.FlinksAPIDomainWealth = response.FlinksAPIDomainWealth;
+      currentUser.FlinksConnectDomainWealth =
+        response.FlinksConnectDomainWealth;
+      currentUser.FlinksProjectIDWealth = response.FlinksProjectIDWealth;
+      currentUser.thisClientcode = response.thisClientcode;
+      currentUser.lastClientUpdated = response.lastClientUpdated;
+      currentUser.DateFormat = response.DateFormat;
 
-  const signIn = useCallback(async (email, password) => {
-    const result = await sendSignInRequest(email, password);
-    if (result.isOk) {
-      setUser(result.data);
+      console.log(
+        "this:",
+        currentUser.thisClientcode,
+        "sent",
+        currentUser.clientCode,
+        "client",
+        currentUser.lastClientUpdated
+      );
+    });
+    if (thisOK === "1") {
+      return {
+        isOk: true,
+        data: currentUser,
+      };
+    } else {
+      return { isOk: false };
     }
-
-    return result;
-  }, []);
-
-  const signOut = useCallback(() => {
-    setUser(undefined);
-  }, []);
-
-  return (
-    <AuthContext.Provider
-      value={{ user, signIn, signOut, loading }}
-      {...props}
-    />
-  );
+  } catch {
+    return {
+      isOk: false,
+      message: "Authentication failed",
+    };
+  }
 }
 
-const AuthContext = createContext({ loading: false });
-const useAuth = () => useContext(AuthContext);
+export async function signInOriginal(email, password) {
+  try {
+    // Send request
+    //console.log(email, password);
 
-export { AuthProvider2, useAuth };
+    return {
+      isOk: true,
+      data: defaultUser,
+    };
+  } catch {
+    return {
+      isOk: false,
+      message: "Authentication failed",
+    };
+  }
+}
+
+export async function getUser() {
+  try {
+    return {
+      isOk: true,
+      //data: defaultUser,
+    };
+  } catch {
+    return {
+      isOk: false,
+    };
+  }
+}
+
+export async function createAccount(email, password) {
+  try {
+    // Send request
+    //console.log(email, password);
+
+    return {
+      isOk: true,
+    };
+  } catch {
+    return {
+      isOk: false,
+      message: "Failed to create account",
+    };
+  }
+}
+
+export async function changePassword(email, recoveryCode) {
+  try {
+    // Send request
+    //console.log(email, recoveryCode);
+
+    return {
+      isOk: true,
+    };
+  } catch {
+    return {
+      isOk: false,
+      message: "Failed to change password",
+    };
+  }
+}
+
+export async function resetPassword(email) {
+  try {
+    // Send request
+    //console.log(email);
+
+    return {
+      isOk: true,
+    };
+  } catch {
+    return {
+      isOk: false,
+      message: "Failed to reset password",
+    };
+  }
+}
+
+// export async function signIn(email, password) {
+//   try {
+//     // Send request
+//     console.log(email, password);
+//     login(email, password).then((response) => {
+//       currentUser.email = response.clientname;
+//       currentUser.companynumber = response.companynumber;
+//       currentUser.avatarUrlavatarUrl =
+//         "https://js.devexpress.com/Demos/WidgetsGallery/JSDemos/images/employees/06.png";
+//     });
+//     return {
+//       isOk: true,
+//       data: currentUser,
+//     };
+//   } catch {
+//     return {
+//       isOk: false,
+//       message: "Authentication failed",
+//     };
+//   }
+// }

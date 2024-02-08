@@ -3,7 +3,7 @@ function isNotEmpty(value) {
   return value !== undefined && value !== null && value !== "";
 }
 
-export const mystore2 = (myClient) =>
+export const mystore = () =>
   new CustomStore({
     key: "UNIQUEID",
     load: (loadOptions) => {
@@ -32,11 +32,10 @@ export const mystore2 = (myClient) =>
           Accept: "application/json;",
         },
         body: JSON.stringify({
-          sentclientcode: myClient,
           Parameters: params,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/getStockTransactionTypes`;
+      const url = `${process.env.REACT_APP_BASE_URL}/getNewClientList`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           //console.log("client " + myClient);
@@ -49,9 +48,9 @@ export const mystore2 = (myClient) =>
           return response.json();
         })
         .then((json) => {
-          //console.log("types: ", json);
+          console.log("types: ", json);
           return {
-            data: json.user_response.loginq,
+            data: json.user_response.bankq,
             totalCount: json.user_response.totalCount,
             key: json.user_response.keyname,
           };
@@ -67,10 +66,9 @@ export const mystore2 = (myClient) =>
         body: JSON.stringify({
           ThisFunction: "insert",
           keyvaluepair: values,
-          sentcompany: myClient,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateStockTransactionTypes`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateNewClients`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -99,7 +97,7 @@ export const mystore2 = (myClient) =>
           ThisFunction: "delete",
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateStockTransactionTypes`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateNewClients`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -115,8 +113,8 @@ export const mystore2 = (myClient) =>
         });
     },
     update: (key, values) => {
-      //console.log("key: ", key);
-      //console.log("values: ", values);
+      console.log("key: ", key);
+      console.log("values: ", values);
       var requestoptions = {
         method: "POST",
         headers: {
@@ -125,11 +123,11 @@ export const mystore2 = (myClient) =>
         },
         body: JSON.stringify({
           ThisFunction: "change",
-          SentCompany: key,
+          sentcompany: key,
           keyvaluepair: values,
         }),
       };
-      const url = `${process.env.REACT_APP_BASE_URL}/updateStockTransactionTypes`;
+      const url = `${process.env.REACT_APP_BASE_URL}/updateNewClients`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
           if (!response.ok) {
@@ -147,4 +145,36 @@ export const mystore2 = (myClient) =>
   });
 //
 //////////////////////////////////////////////////////////////////////////////
+//
+export const ClientList = () => {
+  var myClient = 1;
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: myClient,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/getClientData`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      //console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("cients", json);
+      return {
+        data: json.user_response.loginq,
+      };
+    });
+};
 //

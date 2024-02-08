@@ -748,3 +748,90 @@ export const getStockTypes = () => {
       };
     });
 };
+/////////////////////////////////////////////////////
+//////////// using auth0
+/////////////////////////////////////////////////////
+export const login2 = async (username, password) => {
+  // username here i sthe user passed from auth0
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      clientname: username,
+      clientpassword: password,
+    }),
+  };
+
+  const url = `${process.env.REACT_APP_BASE_URL}/validateuser2`;
+
+  return await fetch(url, requestoptions)
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          clientname: "System did not respond",
+          clientcode: "",
+          authorized: "N",
+          administrator: "",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log(json);
+      if (json.user_response.returnOK !== false) {
+        return {
+          clientname: json.user_response.ReturnClientName,
+          clientcode: json.user_response.ReturnClientCode,
+          thisClientcode: "",
+          authorized: "Y",
+          administrator: json.user_response.Returnadministrator,
+          clientcompany: json.user_response.Returnedcompanynumber,
+          returnOK: json.user_response.returnOK,
+          guid: json.user_response.returnguid,
+          widget: json.user_response.ReturnWidget,
+          UserCode: json.user_response.ReturnUserCode,
+          UserPassword: json.user_response.ReturnPassword,
+
+          FlinkCustomerRetail: json.user_response.FlinkCustomerRetail,
+          FlinksAPIDomainRetail: json.user_response.FlinksAPIDomainRetail,
+          FlinksConnectDomainRetail:
+            json.user_response.FlinksConnectDomainRetail,
+          FlinksProjectIDRetail: json.user_response.FlinksProjectIDRetail,
+          FlinkCustomerWealth: json.user_response.FlinkCustomerWealth,
+          FlinksAPIDomainWealth: json.user_response.FlinksAPIDomainWealth,
+          FlinksConnectDomainWealth:
+            json.user_response.FlinksConnectDomainWealth,
+          FlinksProjectIDWealth: json.user_response.FlinksProjectIDWealth,
+          lastClientUpdated: json.user_response.LastClientUpdated,
+          DateFormat: json.user_response.DateFormat,
+        };
+      } else {
+        //throw new Error("invalid username/password");
+        return {
+          returnOK: json.user_response.ReturnOK,
+          clientname: "",
+          error: "Invalid username/password",
+          loginmessage: " ",
+          clientcode: "",
+          authorized: "X",
+          administrator: "",
+          unavailable: "N",
+        };
+      }
+    })
+    .catch((err) => {
+      //console.log(err.message);
+      return {
+        clientname: "",
+        error: "System Not Available",
+        loginmessage: " ",
+        clientcode: "",
+        authorized: "X",
+        administrator: "",
+        unavailable: "Y",
+      };
+    });
+};

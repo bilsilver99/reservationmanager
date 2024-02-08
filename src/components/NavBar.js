@@ -22,19 +22,14 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    user,
-    isAuthenticated,
-    loginWithRedirect,
-    logout,
-  } = useAuth0();
+  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const toggle = () => setIsOpen(!isOpen);
 
   const logoutWithRedirect = () =>
     logout({
-        logoutParams: {
-          returnTo: window.location.origin,
-        }
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
     });
 
   return (
@@ -77,7 +72,7 @@ const NavBar = () => {
                     className="btn-margin"
                     onClick={() => loginWithRedirect()}
                   >
-                    Log in
+                    Log in Here
                   </Button>
                 </NavItem>
               )}
@@ -121,7 +116,7 @@ const NavBar = () => {
                     block
                     onClick={() => loginWithRedirect({})}
                   >
-                    Log in
+                    Log in Here
                   </Button>
                 </NavItem>
               </Nav>

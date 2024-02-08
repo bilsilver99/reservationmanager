@@ -28,3 +28,5 @@ export { default as BanksPage } from "./banks/banks";
 export { default as InvestmentGroupsPage } from "./investmentGroups/investmentGroups";
 export { default as InvestmentSubGroupsPage } from "./investmentSubGroups/investmentSubGroups";
 export { default as StockTransactionTypesPage } from "./stockTransactionTypes/stockTransactionTypes";
+export { default as NotRegisteredPage } from "./notRegistered/notRegistered";
+export { default as NewClientsPage } from "./newClients/newClients";

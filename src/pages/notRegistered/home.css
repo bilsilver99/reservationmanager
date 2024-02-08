@@ -1,0 +1,16 @@
+.card {
+  height: 600px;
+  margin-top: 10px;
+  width: 450px;
+  float: left;
+  margin-left: 32px;
+  border-radius: 10px;
+}
+.card-top {
+  padding-top: 5px;
+  color: blue;
+  padding-left: 15px;
+}
+.systempic {
+  padding-left: 30px;
+}

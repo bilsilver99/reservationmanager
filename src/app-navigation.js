@@ -1,5 +1,11 @@
 export const navigation = [
   {
+    text: "Registration",
+    path: "/notRegistered",
+    icon: "home",
+    auth: "X",
+  },
+  {
     text: "Home",
     path: "/home",
     icon: "home",
@@ -153,6 +159,12 @@ export const navigation = [
         icon: "folder",
         auth: "Y",
         path: "/stockTransactionTypes",
+      },
+      {
+        text: "New Clients",
+        icon: "folder",
+        auth: "Y",
+        path: "/newClients",
       },
       {
         text: "List Clients",

@@ -6,10 +6,7 @@ import scheduling from "../images/scheduling.jpg";
 import globe from "../images/globe.png";
 //import logo from "../images/iron.webp";
 
-import { useAuth } from "../../contexts/auth";
-
 function Card() {
-  const { user } = useAuth();
   return (
     <div className="card">
       <div className="card-top">
@@ -22,16 +19,10 @@ function Card() {
         height="200"
         width="250"
       />
-      {user.administrator === "X" && (
-        <>
-          <h5>
-            Please Contact Beach Street Wealth Management to complete your
-            registration process. When the registration process is complete, you
-            can return to this page.
-          </h5>
-          <h5> Thank You - The Beachstreet Wealth Support Group</h5>
-        </>
-      )}
+      <h5>
+        Please Contact Beach Street Wealth Management to complete your
+        registration process
+      </h5>
     </div>
   );
 }
@@ -73,7 +64,7 @@ function Card3() {
     </div>
   );
 }
-const home = () => {
+const NotRegistered = () => {
   return (
     <div className="App">
       <div className="right-container">
@@ -83,6 +74,6 @@ const home = () => {
   );
 };
 
-export default home;
+export default NotRegistered;
 //<Card2 />
 //<Card3 />

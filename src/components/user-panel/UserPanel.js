@@ -3,10 +3,14 @@ import { useNavigate } from "react-router-dom";
 import ContextMenu, { Position } from "devextreme-react/context-menu";
 import List from "devextreme-react/list";
 import { useAuth } from "../../contexts/auth";
+import { useAuth0 } from "@auth0/auth0-react";
 import "./UserPanel.scss";
 
 export default function UserPanel({ menuMode }) {
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+
   const { user, signOut } = useAuth();
+  //console.log("user", user);
   const navigate = useNavigate();
 
   function navigateToProfile() {
@@ -22,10 +26,10 @@ export default function UserPanel({ menuMode }) {
       {
         text: "Logout",
         icon: "runner",
-        onClick: signOut,
+        onClick: logout,
       },
     ],
-    [signOut]
+    [logout]
   );
   return (
     <div className={"user-panel"}>

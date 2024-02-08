@@ -28,6 +28,8 @@ import {
   InvestmentGroupsPage,
   InvestmentSubGroupsPage,
   StockTransactionTypesPage,
+  NotRegisteredPage,
+  NewClientsPage,
 } from "./pages";
 
 import { withNavigationWatcher } from "./contexts/navigation";
@@ -153,6 +155,14 @@ const routes = [
   {
     path: "/stockTransactionTypes",
     element: StockTransactionTypesPage,
+  },
+  {
+    path: "/notRegistered",
+    element: NotRegisteredPage,
+  },
+  {
+    path: "/newClients",
+    element: NewClientsPage,
   },
 ];
 

@@ -1,40 +1,43 @@
-import React from "react";
-
-//import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 //import { Popup, Position, ToolbarItem } from "devextreme-react/popup";
 //import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //import { faCheckSquare, faSquare } from "@fortawesome/free-solid-svg-icons";
 //import { getTransactionGroups } from "../../api/MyOwnServices";
-//
 import DataGrid, {
   Column,
-  Editing,
-  Popup,
   Paging,
-  Lookup,
-  Form,
   Pager,
+  Sorting,
+  Editing,
   FilterRow,
+  Item,
+  Lookup,
+  Popup,
+  Form,
+  MasterDetail,
   HeaderFilter,
   Search,
   SearchPanel,
-  MasterDetail,
 } from "devextreme-react/data-grid";
-import { Item } from "devextreme-react/form";
-import "devextreme-react/text-area";
-import "devextreme/data/data_source";
-import "./app.scss";
-import { mystore } from "./clientOwnersData";
-import "whatwg-fetch";
-import { useAuth } from "../../contexts/auth";
-//import CustomStore from "devextreme/data/custom_store";
-//import SelectBox from "devextreme-react/select-box";
 
-const allowedPageSizes = [8, 12, 24];
+import { TextBox } from "devextreme-react/text-box";
+
+//import SelectBox from "devextreme-react/select-box";
+import "devextreme-react/text-area";
+//import BankTransactions from "./bankTransactions";
+import "devextreme/data/data_source";
+import { useAuth } from "../../contexts/auth";
+import "./app.scss";
+import { mystore, ClientList } from "./newClientData";
+//import { Button } from "devextreme-react";
+//import { SelectBox } from "devextreme-react";
+//import { Template } from "devextreme-react/core/template";
+
+const allowedPageSizes = [8, 12, 20];
 
 let pageoption = 90;
 
-class ClientOwnersx extends React.Component {
+class NewClientsx extends React.Component {
   constructor(props) {
     super(props);
     this.applyFilterTypes = [
@@ -52,29 +55,35 @@ class ClientOwnersx extends React.Component {
       currentRow: 0,
       filterValue: "90",
       selectedRowKeys: [],
-      transactionGroupData: [], // add new state variable
-      companyCode: 1,
       showFilterRow: true,
       showHeaderFilter: true,
+      companyCode: 1,
+      assetGroupsCodes: [],
       currentFilter: this.applyFilterTypes[0].key,
-      thisClient: this.props.clientCode,
-      //bankNameToAuthorize: "", // add new state variable
+      isLoading: true, // Add a loading state
     };
   }
 
-  // componentDidMount() {
-  //   mystore2() // call the function to fetch data
-  //     .then((data) => {
-  //       //console.log("data", data);
-  //       this.setState({ transactionGroupData: data.data }); // store the data in state
-  //     })
-  //     .catch((error) => {
-  //       console.error(
-  //         "There was an error fetching the transaction group data:",
-  //         error
-  //       );
-  //     });
-  // }
+  componentDidMount() {
+    ClientList() // call the function to fetch data
+      .then((data) => {
+        console.log("client codes returned", data);
+        this.setState({ ClientCodes: data.data }); // store the data in state
+      })
+      .catch((error) => {
+        console.error(
+          "There was an error fetching the clients group data:",
+          error
+        );
+      });
+  }
+
+  // handleFilterChange = (e) => {
+  //   this.setState({ filterValue: e.value }, () => {
+  //     //console.log("New filter value:", this.state.filterValue);
+  //     pageoption = this.state.filterValue;
+  //   });
+  // };
 
   handleSelectionChanged(e) {
     this.setState({ selectedRowKeys: e.selectedRowKeys });
@@ -84,7 +93,7 @@ class ClientOwnersx extends React.Component {
   }
 
   handleEditingStart(e) {
-    //console.log("Editing is starting for row", e.data);
+    console.log("Editing is starting for row", e.data);
 
     // You can access the data of the row that is being edited
     const rowToBeEdited = e.data;
@@ -98,50 +107,43 @@ class ClientOwnersx extends React.Component {
 
   render() {
     return (
-      <div className="content-block2 dx-card responsive-paddings">
-        <p>Distribution/Ownership</p>
+      <div className="content-block dx-card responsive-paddings">
+        {/* <h3>Asset Types</h3> */}
         <DataGrid
-          dataSource={mystore(this.props.clientCode)}
+          dataSource={mystore(this.state.companyCode)}
           //keyExpr="UNIQUEID"
           showBorders={true}
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
           onEditingStart={this.handleEditingStart}
-          width={"100%"}
-          columnAutoWidth={true}
+          width={"60%"}
         >
+          <FilterRow
+            visible={this.state.showFilterRow}
+            applyFilter={this.state.currentFilter}
+          />
+          <HeaderFilter visible={this.state.showHeaderFilter} />
+          <SearchPanel visible={true} width={240} placeholder="Search..." />
           <Paging enabled={true} />
           <Editing
-            mode="cell"
+            mode="row"
             allowUpdating={true}
             allowAdding={true}
             allowDeleting={true}
           ></Editing>
-          <Column
-            dataField={"UNIQUEID"}
-            width={190}
-            caption={"ID"}
-            hidingPriority={8}
-            visible={false}
-          />
-          <Column
-            dataField={"CLIENTCODE"}
-            width={190}
-            caption={"Client"}
-            hidingPriority={8}
-            visible={false}
-          />
+          <Column dataField="EMAIL" caption="Email" />
+
+          <Column dataField="CLIENTCODE" caption="Client">
+            <Lookup
+              dataSource={this.state.ClientCodes}
+              valueExpr="CLIENTCODE"
+              displayExpr="CLIENTCODE"
+            />
+          </Column>
           <Column
             dataField={"NAME"}
-            width={200}
+            width={180}
             caption={"Name"}
-            hidingPriority={8}
-            visible={true}
-          />
-          <Column
-            dataField={"SEQUENCE"}
-            width={80}
-            caption={"Sequence"}
             hidingPriority={8}
             visible={true}
           />
@@ -153,33 +155,12 @@ class ClientOwnersx extends React.Component {
             visible={true}
           />
           <Column
-            dataField={"EMAIL"}
-            width={250}
-            caption={"Email"}
+            dataField={"UNIQUEID"}
+            width={90}
             hidingPriority={8}
-            visible={true}
-          />
-
-          <Column
-            dataField={"USERNAME"}
-            width={200}
-            caption={"Username"}
-            hidingPriority={8}
+            dataType="Number"
             visible={false}
-          />
-          <Column
-            dataField={"PASSWORD"}
-            width={200}
-            caption={"Password"}
-            hidingPriority={8}
-            visible={false}
-          />
-          <Column
-            dataType="boolean"
-            dataField={"ADMIN"}
-            caption={"Administrator"}
-            hidingPriority={8}
-            visible={true}
+            allowEditing={false}
           />
           <Paging defaultPageSize={8} />
           <Pager
@@ -191,9 +172,8 @@ class ClientOwnersx extends React.Component {
     );
   }
 }
-
-export default function ClientOwners() {
+export default function NewClients() {
   const { user } = useAuth();
-  //console.log("my user stuff", { user });
-  return <ClientOwnersx clientCode={user.thisClientcode} />;
+  //console.log({ user });
+  return <NewClientsx companyCode={user.companyCode} />;
 }

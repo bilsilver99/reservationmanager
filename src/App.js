@@ -1,42 +1,37 @@
 import React from "react";
-import "devextreme/dist/css/dx.common.css";
-import "./themes/generated/theme.base.css";
-import "./themes/generated/theme.additional.css";
-import { HashRouter as Router } from "react-router-dom";
-import "./dx-styles.scss";
+import { Router, Route, Switch } from "react-router-dom";
+//import { Container } from "reactstrap";
+
+//import Loading from "./components/Loading";
+//import NavBar from "./components/NavBar";
+// import Footer from "./components/Footer";
+// import Home from "./views/Home";
+// import Profile from "./views/Profile";
+// import ExternalApi from "./views/ExternalApi";
+import { useAuth0 } from "@auth0/auth0-react";
+//import history from "./utils/history";
 import LoadPanel from "devextreme-react/load-panel";
-import { NavigationProvider } from "./contexts/navigation";
-import { AuthProvider, useAuth } from "./contexts/auth";
-import { useScreenSizeClass } from "./utils/media-query";
-import Content from "./Content";
-import UnauthenticatedContent from "./UnauthenticatedContent";
+import AppLogged from "./AppLogged";
+// styles
+import "./App.css";
 
-function App() {
-  const { user, loading } = useAuth();
+// fontawesome
+import initFontAwesome from "./utils/initFontAwesome";
+initFontAwesome();
 
-  if (loading) {
-    return <LoadPanel visible={true} />;
+const App = () => {
+  const { isLoading, error } = useAuth0();
+  //console.log("App.js: isLoading: ", isLoading);
+
+  if (error) {
+    return <div>Oops... {error.message}</div>;
   }
 
-  if (user) {
-    return <Content />;
+  if (isLoading) {
+    return <LoadPanel />;
   }
 
-  return <UnauthenticatedContent />;
-}
+  return <AppLogged />;
+};
 
-export default function Root() {
-  const screenSizeClass = useScreenSizeClass();
-
-  return (
-    <Router>
-      <AuthProvider>
-        <NavigationProvider>
-          <div className={`app ${screenSizeClass}`}>
-            <App />
-          </div>
-        </NavigationProvider>
-      </AuthProvider>
-    </Router>
-  );
-}
+export default App;

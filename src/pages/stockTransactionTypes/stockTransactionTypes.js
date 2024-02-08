@@ -69,7 +69,7 @@ class StockTransactionTypesx extends React.Component {
   }
 
   handleEditingStart(e) {
-    console.log("Editing is starting for row", e.data);
+    //console.log("Editing is starting for row", e.data);
 
     // You can access the data of the row that is being edited
     const rowToBeEdited = e.data;
