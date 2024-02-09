@@ -1,0 +1,7 @@
+#pie {
+  height: 800px;
+}
+
+#pie * {
+  margin: 0 auto;
+}
