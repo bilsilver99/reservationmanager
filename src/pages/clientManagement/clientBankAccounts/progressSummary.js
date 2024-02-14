@@ -2,14 +2,6 @@ import React from "react";
 
 /////////////////////////////////////////
 
-import PieChart, {
-  //Series,
-  Label,
-  Connector,
-  Size,
-  Export,
-} from "devextreme-react/pie-chart";
-
 import { Chart, Series } from "devextreme-react/chart";
 //import { areas } from "./progressGraphData.js";
 
@@ -21,8 +13,6 @@ import DataGrid, {
   Paging,
   FilterRow,
   HeaderFilter,
-  Editing,
-  Popup,
 } from "devextreme-react/data-grid";
 
 import {
@@ -39,23 +29,21 @@ import "devextreme/data/data_source";
 import "./debtSummaryStyles.scss";
 import "./debtsummary.css";
 
-function pointClickHandler(e) {
-  toggleVisibility(e.target);
-}
-function legendClickHandler(e) {
-  const arg = e.target;
-  const item = e.component.getAllSeries()[0].getPointsByArg(arg)[0];
-  toggleVisibility(item);
-}
-function toggleVisibility(item) {
-  item.isVisible() ? item.hide() : item.show();
-}
+// function pointClickHandler(e) {
+//   toggleVisibility(e.target);
+// }
+// function legendClickHandler(e) {
+//   const arg = e.target;
+//   const item = e.component.getAllSeries()[0].getPointsByArg(arg)[0];
+//   toggleVisibility(item);
+// }
+// function toggleVisibility(item) {
+//   item.isVisible() ? item.hide() : item.show();
+// }
 
 //const allowedPageSizes = [8, 12, 20];
 
 //let pageoption = 90;
-
-let lastBankAccountNumber = "xxxxxx";
 
 const renderDescriptionCell = (data) => {
   const { data: rowData } = data;
@@ -527,7 +515,7 @@ class ProgressSummaryx extends React.Component {
   render() {
     return (
       <>
-        <Button
+        {/* <Button
           text="Pie Chart"
           onClick={this.ClearPieClick}
           style={{
@@ -537,7 +525,7 @@ class ProgressSummaryx extends React.Component {
             marginBottom: "10px",
             marginLeft: "15px",
           }}
-        ></Button>
+        ></Button> */}
         <Button
           text="Clear Selections"
           onClick={this.ClearClick}

@@ -28,6 +28,7 @@ import BankCSVImport from "./clientBankAccounts/bankCSVImport";
 import ClientOwners from "./clientOwners";
 
 import GetStockPrice from "./clientBankAccounts/getStockprice";
+import ImportExcel from "./clientBankAccounts/importExcel";
 
 const clients = ["sam", "lou"];
 
@@ -69,6 +70,7 @@ const ClientManagement = () => {
 
   const [ShowTransactions, setShowTransactions] = React.useState(false);
   const [ShowImport, setShowImport] = React.useState(false);
+  const [ShowImportExcel, setShowImportExcel] = React.useState(false);
   const [ShowProcessImport, setShowProcessImport] = React.useState(false);
 
   const [showPrior, setPrior] = React.useState(true);
@@ -195,6 +197,7 @@ const ClientManagement = () => {
     setFormDebtSummary(false);
     setShowTransactions(false);
     setShowImport(false);
+    setShowImportExcel(false);
     setShowProcessImport(false);
     setShowBanksForm(false);
     setShowInterest(false);
@@ -259,6 +262,14 @@ const ClientManagement = () => {
     setShowImport(true);
     setShowProcessImport(false);
   };
+  const setFormImportExcel = () => {
+    setallflags();
+    setShowBanks(true);
+    setShowBanksForm(false);
+    setShowImport(false);
+    setShowImportExcel(true);
+    setShowProcessImport(false);
+  };
   const setFormProcessImports = () => {
     setallflags();
     setShowBanks(true);
@@ -319,6 +330,7 @@ const ClientManagement = () => {
                 <>
                   <div></div>
                   <Button text="Import" onClick={setFormImport} />
+                  <Button text="Import Excel" onClick={setFormImportExcel} />
                   <Button text="Transfers" onClick={setFormTransfers} />
                   <Button text="Interest" onClick={setFormInterest} />
                   <Button text="Transactions" onClick={setFormTransactions} />
@@ -406,6 +418,9 @@ const ClientManagement = () => {
             sharedValue={sharedValue}
           />
         </>
+      )}
+      {ShowImportExcel && (
+        <ImportExcel clientCode={currentClientCode} sharedValue={sharedValue} />
       )}
       {showInterest && (
         <Interest clientCode={currentClientCode} sharedValue={sharedValue} />
