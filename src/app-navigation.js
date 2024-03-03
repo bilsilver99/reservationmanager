@@ -90,7 +90,7 @@ export const navigation = [
   },
   {
     text: "   Admin",
-    icon: "",
+    icon: "image",
     auth: "Y",
     expanded: "N",
     items: [
@@ -177,13 +177,13 @@ export const navigation = [
 
   {
     text: "Client",
-
+    icon: "image",
     path: "/clientManagement",
     auth: "Y",
   },
   {
     text: "Reporting",
-
+    icon: "image",
     auth: "Y",
     expanded: "N",
     items: [

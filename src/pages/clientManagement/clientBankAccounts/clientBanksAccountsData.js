@@ -558,3 +558,42 @@ export const updateImportFile = (clientcode, bankaccount, dataArray) => {
       };
     });
 };
+
+export const updateExcelTransactions = (clientcode, bankaccount, dataArray) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+      sentBankAccount: bankaccount,
+      sentArray: dataArray,
+    }),
+  };
+  console.log(
+    "client sent",
+    clientcode,
+    "bank account sent",
+    bankaccount,
+    "data sent",
+    dataArray
+  );
+  const url = `${process.env.REACT_APP_BASE_URL}/SendExcelFileData`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {};
+    });
+};
