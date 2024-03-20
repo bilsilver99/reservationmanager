@@ -100,7 +100,7 @@ function ClientInvestmentsStocks(props) {
         <Column
           dataField={"INVESTMENTNAME"}
           width={150}
-          caption={"Investment"}
+          caption={"Account #"}
           hidingPriority={8}
           visible={false}
           allowEditing={false}

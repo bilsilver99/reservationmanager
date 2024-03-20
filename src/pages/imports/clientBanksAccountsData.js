@@ -67,7 +67,7 @@ export const getBankName = (myClient, MybankAccount) => {
       return response.json();
     })
     .then((json) => {
-      console.log("date returned: ", json.user_response.returneddate);
+      // console.log(
       //   "client sent",
       //   myClient,
       //   "bank account",
@@ -77,7 +77,6 @@ export const getBankName = (myClient, MybankAccount) => {
       // );
       return {
         data: json.user_response.returnedName,
-        date: json.user_response.returneddate,
         daterow: json.user_response.daterow,
         descriptionrow: json.user_response.descriptionrow,
         paymentsrow: json.user_response.paymentsrow,
@@ -411,12 +410,7 @@ export const updateImportFilexx = (clientcode, bankaccount, dataArray) => {
 /////  this one works
 ////////////////////////////////
 
-export const updateImportFileV2 = (
-  clientcode,
-  bankaccount,
-  dataArray,
-  processmap
-) => {
+export const updateImportFileV2 = (clientcode, bankaccount, dataArray) => {
   // console.log(
   //   "clientcode",
   //   clientcode,
@@ -453,7 +447,6 @@ export const updateImportFileV2 = (
       sentclientcode: clientcode,
       sentBankAccount: bankaccount,
       sentArray: sentArray,
-      processmap: processmap,
     }),
   };
   console.log(
@@ -487,6 +480,27 @@ export const updateImportFileV2 = (
 };
 ////////////////////////////////
 export const updateImportFile = (clientcode, bankaccount, dataArray) => {
+  // console.log(
+  //   "clientcode",
+  //   clientcode,
+  //   "banksaccount",
+  //   bankaccount,
+  //   "array from web page",
+  //   dataArray
+  // );
+  //alert("update import file");
+  //var myClient = 1;
+
+  //console.log("HERE: ", dataArray.data);
+
+  // const sentArray = dataArray.data.map(([fld1, fld2, fld3, fld4, fld5]) => ({
+  //   fld1: fld1,
+  //   fld2: fld2,
+  //   fld3: fld3,
+  //   fdl4: fld4,
+  //   fdl5: fld5,
+  // }));
+
   const sentArray = dataArray.data.map(
     ([date, description, payments, deposits, total]) => ({
       DATEFIELD: date,
@@ -575,6 +589,90 @@ export const updateExcelTransactions = (clientcode, bankaccount, dataArray) => {
   );
   //  const url = `${process.env.REACT_APP_BASE_URL}/SendExcelFileData`;
   const url = `${process.env.REACT_APP_BASE_URL}/SendImportFileData4`;
+
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {};
+    });
+};
+
+export const createAssetsandInvestments = (
+  clientcode,
+  assetsarray,
+  investmentsarray,
+  headerDates,
+  importInvestments,
+  importAssets
+) => {
+  const newAssetsArray = assetsarray.map((item) => {
+    const newItem = { ...item }; // Create a shallow copy of the item
+    newItem.additionalValues.forEach((value, index) => {
+      const uniqueName = `additionalValue_${index + 1}`; // Generate a unique name
+      newItem[uniqueName] = value; // Assign the value to the new property
+    });
+    delete newItem.additionalValues; // Remove the original additionalValues array if not needed
+    return newItem;
+  });
+
+  const newInvestmentsArray = investmentsarray.map((item) => {
+    const newItem = { ...item }; // Create a shallow copy of the item
+    newItem.additionalValues.forEach((value, index) => {
+      const uniqueName = `additionalValue_${index + 1}`; // Generate a unique name
+      newItem[uniqueName] = value; // Assign the value to the new property
+    });
+    delete newItem.additionalValues; // Remove the original additionalValues array if not needed
+    return newItem;
+  });
+
+  console.log("dates:", headerDates);
+
+  const headerDatesSent = headerDates.map((date) => ({ date1: date }));
+
+  // const headerDatesSent = headerDates.map((date, index) => {
+  //   return { [`date${index + 1}`]: date };
+  // });
+
+  console.log("new stuff", newInvestmentsArray);
+
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+      assetarray: newAssetsArray,
+      investmentsarray: newInvestmentsArray,
+      headerDates: headerDatesSent,
+      importInvestments: importInvestments,
+      importAssets: importAssets,
+    }),
+  };
+  console.log(
+    "client sent",
+    clientcode,
+
+    "resolved array",
+    newAssetsArray,
+    "investments array sent",
+    newInvestmentsArray,
+    "dates sent",
+    headerDatesSent
+  );
+  //  const url = `${process.env.REACT_APP_BASE_URL}/SendExcelFileData`;
+  const url = `${process.env.REACT_APP_BASE_URL}/createAssetsandInvestments`;
 
   return fetch(url, requestoptions) // Request fish
     .then((response) => {

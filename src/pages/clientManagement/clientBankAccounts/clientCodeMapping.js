@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 //import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 //import { faCheckSquare, faSquare } from "@fortawesome/free-solid-svg-icons";
 //import { getTransactionGroups } from "../../api/MyOwnServices";
+import { Button } from "devextreme-react/button";
 import DataGrid, {
   Column,
   Paging,
@@ -20,11 +21,8 @@ import DataGrid, {
   SearchPanel,
 } from "devextreme-react/data-grid";
 
-//import SelectBox from "devextreme-react/select-box";
 import "devextreme-react/text-area";
-//import BankTransactions from "./bankTransactions";
 import "devextreme/data/data_source";
-import { useAuth } from "../../contexts/auth";
 import "./app.scss";
 import {
   mystore,
@@ -32,7 +30,7 @@ import {
   customerStore,
   transactionTypesStore,
   getBanks,
-} from "./codeMappingData.js";
+} from "./clientCodeMappingData.js";
 //import { Button } from "devextreme-react";
 //import { SelectBox } from "devextreme-react";
 //import { Template } from "devextreme-react/core/template";
@@ -41,7 +39,7 @@ const allowedPageSizes = [8, 12, 20];
 
 let pageoption = 90;
 
-class CodeMappingx extends React.Component {
+export class ClientCodeMapping extends React.Component {
   constructor(props) {
     super(props);
     this.applyFilterTypes = [
@@ -56,7 +54,7 @@ class CodeMappingx extends React.Component {
     ];
     this.state = {
       //myClient: this.props.clientCode,
-      clientCode: "",
+      clientCode: this.props.clientCode,
       currentRow: 0,
       filterValue: "90",
       selectedRowKeys: [],
@@ -69,6 +67,8 @@ class CodeMappingx extends React.Component {
       transactionTypes: [],
       isLoading: true, // Add a loading state
       clientBankAccounts: [],
+      mappingoff: false,
+      showAllClients: false,
     };
   }
 
@@ -100,6 +100,7 @@ class CodeMappingx extends React.Component {
   }
 
   async componentDidMount() {
+    //console.log("clientCode: ", this.state.clientCode);
     try {
       const [customersData, transactionTypesData, bankAccountsData] =
         await Promise.all([
@@ -123,15 +124,14 @@ class CodeMappingx extends React.Component {
   }
 
   fetchClientBankAccounts = async () => {
-    if (this.state.clientCode) {
-      try {
-        const bankData = await getBanks(this.state.clientCode); // Assuming getBanks is an async function
-        this.setState({ clientBankAccounts: bankData.data });
-      } catch (error) {
-        console.error("Error fetching client bank accounts:", error);
-        // Handle the error appropriately - maybe update the state with the error info
-      }
-    }
+    // if (this.state.clientCode) {
+    //   try {
+    //     const bankData = await getBanks(this.state.clientCode);
+    //     this.setState({ clientBankAccounts: bankData.data });
+    //   } catch (error) {
+    //     console.error("Error fetching client bank accounts:", error);
+    //   }
+    // }
   };
 
   fetchCustomers = async () => {
@@ -189,16 +189,22 @@ class CodeMappingx extends React.Component {
   };
 
   handleClientCodeChange = async (newClientCode) => {
-    this.setState({ clientCode: newClientCode }, async () => {
-      console.log("client: ", this.state.clientCode);
-      this.fetchClientBankAccounts();
-    });
+    await this.setState({ clientCode: newClientCode });
+    console.log("client: ", this.state.clientCode);
+    await this.fetchClientBankAccounts();
   };
 
-  //   await this.setState({ clientCode: newClientCode });
-  //   console.log("client: ", this.state.clientCode);
-  //   await this.fetchClientBankAccounts();
-  // };
+  ProcessComplete = () => {
+    this.setState({ mappingoff: false });
+    this.props.onMappingUpdated(true);
+  };
+
+  handleShowAll = (value) => {
+    this.setState((prevState) => ({
+      showAllClients: !prevState.showAllClients,
+    }));
+    // Do something with the value, like updating the state
+  };
 
   render() {
     if (this.state.isLoading) {
@@ -206,17 +212,30 @@ class CodeMappingx extends React.Component {
     }
     return (
       <div className="content-block dx-card responsive-paddings">
+        <Button
+          text="Complete"
+          onClick={this.ProcessComplete}
+          style={{ marginRight: "30px" }} // Add right margin to the button
+        />
+        <>
+          <Button onClick={this.handleShowAll} style={{ padding: "8px 16px" }}>
+            {this.state.showAllClients
+              ? "Show This Client"
+              : "Show All Clients"}
+          </Button>
+        </>
         <h3>Mapping</h3>
         <DataGrid
-          dataSource={mystore(this.state.companyCode)}
+          key={this.state.showAllClients}
+          dataSource={mystore(this.state.clientCode, this.state.showAllClients)}
           keyExpr="UNIQUEID"
           showBorders={true}
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
-          //onEditingStart={this.handleEditingStart}
-          //onRowUpdating={this.onRowUpdating}
-          //onRowUpdated={this.onRowUpdated}
-          onEditorPreparing={this.onEditorPreparing}
+          onEditingStart={this.handleEditingStart}
+          onRowUpdating={this.onRowUpdating}
+          onRowUpdated={this.onRowUpdated}
+          //onEditorPreparing={this.onEditorPreparing}
         >
           <FilterRow
             visible={this.state.showFilterRow}
@@ -314,8 +333,14 @@ class CodeMappingx extends React.Component {
     );
   }
 }
-export default function CodeMapping() {
-  const { user } = useAuth();
-  //console.log({ user });
-  return <CodeMappingx companyCode={user.companyCode} />;
-}
+// export function ClientCodeMapping(props) {
+//   const clientCode = props.clientCode;
+//   const handleMappingUpdated = props.handleMappingUpdated;
+//   //console.log({ user });
+//   return (
+//     <ClientCodeMappingx
+//       clientCode={clientCode}
+//       onMappingUpdated={handleMappingUpdated}
+//     />
+//   );
+// }

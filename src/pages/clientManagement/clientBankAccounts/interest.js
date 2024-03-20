@@ -20,6 +20,7 @@ import { Button } from "devextreme-react/button";
 import { fetchThisClientData } from "../clientManagementData";
 import { updateInterest, resetInterest } from "./interestData";
 import ClientUnpostedInterestTransactions from "./clientUnpostedInterestTransactions";
+import ClientPostedInterestTransactions from "./clientPostedInterestTransactions";
 
 import { getBanks } from "./clientBanksAccountsData";
 import ClientInterestTransactions from "./clientInterestTransactions";
@@ -45,6 +46,7 @@ const Interestx = (props) => {
   const [monthYearList, setMonthYearList] = useState([]);
   const [startPeriod, setStartPeriod] = useState("");
   const [endPeriod, setEndPeriod] = useState("");
+  const [showInterest, setShowInterest] = useState(false);
 
   const handleBankAccountChange = (e) => {
     setCurrentBankAccount(e.value);
@@ -84,6 +86,7 @@ const Interestx = (props) => {
     } finally {
       // Set loading to false regardless of outcome
       setIsLoading(false);
+      ShowInterestTransactions();
     }
   };
 
@@ -149,16 +152,27 @@ const Interestx = (props) => {
 
   const generateMonthYearList = () => {
     const monthYears = [];
-    for (let year = 2020; year <= 2030; year++) {
-      for (let month = 1; month <= 12; month++) {
+    for (let year = 2030; year >= 2020; year--) {
+      for (let month = 12; month >= 1; month--) {
         monthYears.push(`${year}-${month.toString().padStart(2, "0")}`);
       }
     }
-    //console.log("monthYears inside", monthYears);
     setMonthYearList(monthYears);
     return monthYears;
   };
 
+  const handleSegmentChange = (e) => {
+    setSegment(e.value);
+  };
+
+  const ShowInterestTransactions = () => {
+    setShowInterest((currentShowInterest) => !currentShowInterest);
+  };
+
+  const handleMappingUpdated = () => {
+    setShowInterest(false);
+    // Do something with the value, like updating the state
+  };
   return (
     <>
       {isLoading && (
@@ -198,16 +212,15 @@ const Interestx = (props) => {
                   : ""
               }
               value={currentBankAccount}
-              //searchEnabled={true}
-              //value={currentEmployeeName}
+              showClearButton={true}
               onValueChanged={handleBankAccountChange}
-              //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
             />
           </label>
           <label>
             Segment:
             <TextBox
               value={Segment}
+              onValueChanged={handleSegmentChange}
               className="white-text-selectbox"
               style={{ width: "50px", height: "30px", marginTop: "5px" }}
             />
@@ -219,6 +232,7 @@ const Interestx = (props) => {
               style={{ width: "100px", height: "30px", marginTop: "5px" }}
               items={monthYearList}
               value={startPeriod}
+              acceptCustomValue={true}
               onValueChanged={(e) => setStartPeriod(e.value)}
             />
           </label>
@@ -229,6 +243,7 @@ const Interestx = (props) => {
               style={{ width: "100px", height: "30px", marginTop: "5px" }}
               items={monthYearList}
               value={endPeriod}
+              acceptCustomValue={true}
               onValueChanged={(e) => setEndPeriod(e.value)}
             />
           </label>
@@ -274,6 +289,17 @@ const Interestx = (props) => {
         Key={refreshKey}
         bankaccount={currentBankAccount}
       />
+
+      <div>
+        {showInterest && (
+          <div className="overlay">
+            <ClientPostedInterestTransactions
+              clientCode={myClientCode}
+              onMappingUpdated={handleMappingUpdated}
+            />
+          </div>
+        )}
+      </div>
     </>
   );
 };

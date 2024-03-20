@@ -3,9 +3,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import DateBox from "devextreme-react/date-box";
+import TextBox from "devextreme-react/text-box";
 
 import withReactContent from "sweetalert2-react-content";
 import DropDownBox from "devextreme-react/drop-down-box";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+
 import DataGrid, {
   Column,
   Editing,
@@ -27,7 +31,7 @@ import "devextreme-react/text-area";
 import "./app.scss";
 import { useAuth } from "../../../contexts/auth";
 import "devextreme/data/data_source";
-
+import { ClientCodeMapping } from "./clientCodeMapping";
 //import DataSource from "devextreme/data/data_source";
 import {
   mystore6,
@@ -36,9 +40,12 @@ import {
   validateImports,
   processImports,
   deleteImports,
+  remapImports,
   fetchThisClientData,
   getInvestmentRecords,
+  updateMapping,
 } from "./segmentData";
+import { set } from "date-fns";
 
 const dropDownOptions = { width: 500 };
 const ownerLabel = { "aria-label": "Owner" };
@@ -54,34 +61,41 @@ function ImportTransactionsx(props) {
   const [enddate, setEnddate] = useState(null);
   const [investmentlist, setInvestmentList] = useState(null);
   const dataGridRef = useRef(null);
+  const [ShowMappings, setShowMappings] = useState(false);
+  const [allClients, setAllClients] = useState(false);
 
   const [totalEntries, setTotalEntries] = useState(0);
   const [errorEntries, setErrorEntries] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const MySwal = withReactContent(Swal);
 
-  const ProcessImports = () => {
-    validateImports(clientCode).then((data) => {
+  const ProcessImports = async () => {
+    try {
+      const data = await validateImports(clientCode);
       if (data.valid === 1) {
         setTransactionsReady(true);
-        processImports(props.clientCode, startdate, enddate).then(() => {
-          // Show a success message using SweetAlert2
-          MySwal.fire({
-            icon: "success",
-            title: "Import Processed",
-            text: "The import has been processed successfully.",
-          });
-          setRefreshKey((prevKey) => prevKey + 1);
+        await processImports(props.clientCode, startdate, enddate); // Wait for processing to complete
+        // Show a success message using SweetAlert2
+        await MySwal.fire({
+          icon: "success",
+          title: "Import Processed",
+          text: "The import has been processed successfully.",
         });
+
+        setRefreshKey((prevKey) => prevKey + 1); // Update key after processing
       } else {
         // Show an error message using SweetAlert2
-        MySwal.fire({
+        await MySwal.fire({
           icon: "error",
           title: "Import Error",
           text: "There are errors in the import file. Please correct them.",
         });
       }
-    });
+    } catch (error) {
+      console.error("An error occurred during the import process:", error);
+      // Optionally, handle any errors that might occur during the import process
+    }
   };
 
   const renderFPTransactionCell = (data) => {
@@ -98,6 +112,16 @@ function ImportTransactionsx(props) {
       }).format(rowData.TRANSACTIONAMOUNT);
       return <div style={style}>{formattedTransactionAmount}</div>;
     } else return <div style={style}>{rowData.TRANSACTIONAMOUNT}</div>;
+  };
+
+  const renderFPTransactionCellDate = (data) => {
+    const { data: rowData } = data;
+
+    let style = {};
+    if (rowData.DATEERROR === true) {
+      style = { backgroundColor: "red" }; // Apply blue color
+    }
+    return <div style={style}>{rowData.TRANSACTIONDATE}</div>;
   };
 
   const DeleteImportsButton = () => {
@@ -207,6 +231,56 @@ function ImportTransactionsx(props) {
     setEnddate(e.value);
     setRefreshKey((prevKey) => prevKey + 1);
   };
+  const UpdateMappings = () => {
+    setShowMappings(true);
+  };
+
+  const RefreshMappings = async () => {
+    try {
+      setIsLoading(true); // Start loading
+
+      console.log("Refreshing mappings for client code:", clientCode);
+
+      await remapImports(clientCode);
+
+      MySwal.fire({
+        icon: "success",
+        title: "Remapping Complete",
+        text: "The remapping process has been successfully completed.",
+      });
+
+      setRefreshKey((prevKey) => prevKey + 1);
+    } catch (error) {
+      // Handle any errors that occur during the update or remap process
+      console.error("An error occurred during the remapping process:", error);
+      MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred during the remapping process.",
+      });
+    }
+    setIsLoading(false); // Stop loading
+  };
+
+  const handleMappingUpdated = (value) => {
+    setShowMappings(false);
+    // Do something with the value, like updating the state
+  };
+
+  const ClearableEditCell = (props) => {
+    const { data, setValue } = props;
+    const handleClear = () => setValue(undefined); // Or '' if your data structure expects a string
+
+    return (
+      <div>
+        <TextBox value={data.value} onValueChanged={(e) => setValue(e.value)} />
+        <Button
+          icon="clear" // Use an appropriate icon
+          onClick={handleClear}
+        />
+      </div>
+    );
+  };
 
   // const countRows = () => {
   //   const gridData = dataGridRef.current.instance.getDataSource().items();
@@ -227,184 +301,227 @@ function ImportTransactionsx(props) {
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <Button
-          text="Process Imports"
-          onClick={ProcessImports}
-          style={{ marginRight: "30px" }} // Add right margin to the button
-        />
-        <Button
-          text="Delete All Imports"
-          onClick={DeleteImportsButton}
-          style={{ marginRight: "30px" }} // Add right margin to the button
-        />
-
-        <div style={{ marginRight: "40px" }}>
-          <label>
-            Start Date (MM/DD/YYYY):
-            <DateBox
-              type="date"
-              value={startdate}
-              onValueChanged={handleStartDateChange}
-            />
-          </label>
+      {isLoading && (
+        <div className="spinner-container">
+          <>
+            <p>Processing please wait &nbsp;&nbsp;</p>
+            <FontAwesomeIcon icon={faSpinner} spin className="large-spinner" />
+          </>
         </div>
-        <div>
-          <label>
-            End Date (MM/DD/YYYY):
-            <DateBox
-              type="date"
-              value={enddate}
-              onValueChanged={handleEndDateChange}
+      )}
+      {ShowMappings !== true && (
+        <>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Button
+              text="Process Imports"
+              onClick={ProcessImports}
+              style={{ marginRight: "30px" }} // Add right margin to the button
             />
-          </label>
-        </div>
-        <div
-          style={{
-            backgroundColor: "lightblue",
-            marginTop: "10px",
-            marginLeft: "10px",
-          }}
-        >
-          <p>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Amounts in blue indicate an
-            invalid transaction type&nbsp;&nbsp;
-          </p>
-        </div>
-      </div>
-      <div className="red-color">
-        <div className="custom-container" style={{ height: "800px" }}>
-          <DataGrid
-            ref={dataGridRef}
-            key={refreshKey} // This key will force a refresh when it changes
-            dataSource={mystore6(props.clientCode)}
-            columnAutoWidth={true}
-            //onEditorPreparing={onEditorPreparing}
-            //onRowValidating={onRowValidating}
-            onInitNewRow={onInitNewRow}
-            //onRowInserted={onRowInserted}
-            width={"100%"}
-            scrolling={{ mode: "virtual" }} // or 'standard', based on your preference
-            //keyExpr="UNIQUEID"
-            showBorders={true}
-            height={"100%"}
-            rowHeight={"70px"} // Set the row height to 70px
-            //paging={{ pageSize: 10 }}
-            //pagingEnabled={true}
-            remoteOperations={false}
-          >
-            <Sorting mode="single" />
+            <Button
+              text="Delete All Imports"
+              onClick={DeleteImportsButton}
+              style={{ marginRight: "30px" }} // Add right margin to the button
+            />
 
-            <FilterRow visible />
-            <HeaderFilter visible />
-            <Editing
-              mode="row"
-              allowUpdating={true}
-              allowAdding={true}
-              allowDeleting={true}
-              //selectionMode="single"
-            ></Editing>
-            <Column
-              dataType="boolean"
-              dataField={"ERROR"}
-              caption={"Error"}
-              hidingPriority={7}
-              allowEditing={true}
-              width={100}
-            ></Column>
-            <Column
-              dataField={"BANKACCOUNTNUMBER"}
-              caption="Bank Account"
-              allowEditing={true}
-              //width={180}
+            <div style={{ marginRight: "40px" }}>
+              <label>
+                Start Date (MM/DD/YYYY):
+                <DateBox
+                  type="date"
+                  value={startdate}
+                  onValueChanged={handleStartDateChange}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                End Date (MM/DD/YYYY):
+                <DateBox
+                  type="date"
+                  value={enddate}
+                  onValueChanged={handleEndDateChange}
+                />
+              </label>
+            </div>
+            <div
+              style={{
+                backgroundColor: "lightblue",
+                marginTop: "10px",
+                marginLeft: "10px",
+              }}
             >
-              <Lookup
-                dataSource={bankAccounts}
-                valueExpr="BANKACCOUNTNUMBER"
-                //displayExpr="BANKACCOUNTNUMBER"
-                displayExpr={(item) =>
-                  item
-                    ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
-                    : ""
-                }
-              />
-            </Column>
+              <p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Amounts in blue indicate an
+                invalid transaction type&nbsp;&nbsp;
+              </p>
+            </div>
+            <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+            <Button
+              text="Update Mappings"
+              onClick={UpdateMappings}
+              style={{ marginRight: "30px" }} // Add right margin to the button
+            />
+            <Button
+              text="Refresh Mappings"
+              onClick={RefreshMappings}
+              style={{ marginRight: "30px" }} // Add right margin to the button
+            />
+          </div>
+          <div className="red-color">
+            <div className="custom-container" style={{ height: "800px" }}>
+              <DataGrid
+                ref={dataGridRef}
+                key={refreshKey} // This key will force a refresh when it changes
+                dataSource={mystore6(props.clientCode)}
+                columnAutoWidth={true}
+                //onEditorPreparing={onEditorPreparing}
+                //onRowValidating={onRowValidating}
+                onInitNewRow={onInitNewRow}
+                //onRowInserted={onRowInserted}
+                width={"100%"}
+                scrolling={{ mode: "virtual" }} // or 'standard', based on your preference
+                //keyExpr="UNIQUEID"
+                showBorders={true}
+                height={"100%"}
+                rowHeight={"70px"} // Set the row height to 70px
+                //paging={{ pageSize: 10 }}
+                //pagingEnabled={true}
+                remoteOperations={false}
+              >
+                <Sorting mode="single" />
 
-            <Column
-              width={70}
-              dataField={"SEGMENTNUMBER"}
-              caption={"Seg"}
-              hidingPriority={7}
-              allowEditing={true}
-            >
-              <AsyncRule
-                message="Segment Does Not Exists"
-                validationCallback={validateSegment}
-              />
-            </Column>
-            <Column
-              dataType="date"
-              dataField={"TRANSACTIONDATE"}
-              caption={"Date"}
-              hidingPriority={7}
-              allowEditing={true}
-            >
-              {/* <RequiredRule message="A Date is required" /> */}
-            </Column>
-            <Column
-              dataField={"DESCRIPTION"}
-              caption="Bank Description"
-              allowEditing={true}
-            />
-            <Column
-              dataField={"SECONDDESCRIPTION"}
-              caption="Details"
-              allowEditing={true}
-            />
-            <Column
-              dataField={"FPTRANSACTIONCODE"}
-              caption={"Type"}
-              hidingPriority={7}
-              allowEditing={true}
-            >
-              <RequiredRule message="A Transaction Code is required" />
-              <Lookup
-                dataSource={transTypes}
-                valueExpr="FPTRANSACTIONCODE"
-                displayExpr="LONGDESCRIPTION"
-              />
-            </Column>
-            <Column
-              dataField={"INVESTMENTID"}
-              caption="id"
-              allowEditing={true}
-              //editCellComponent={PrepareInvestmentID}
-            >
-              <Lookup
-                dataSource={investmentlist}
-                valueExpr="UNIQUEID"
-                displayExpr="INVESTMENTNAME"
-              />
-            </Column>
+                <FilterRow visible />
+                <HeaderFilter visible />
+                <Editing
+                  mode="cell"
+                  allowUpdating={true}
+                  allowAdding={true}
+                  allowDeleting={true}
+                  //selectionMode="single"
+                ></Editing>
+                <Column
+                  dataType="boolean"
+                  dataField={"ERROR"}
+                  caption={"Error"}
+                  hidingPriority={7}
+                  allowEditing={true}
+                  width={100}
+                ></Column>
+                <Column
+                  dataField={"BANKACCOUNTNUMBER"}
+                  caption="Bank Account"
+                  allowEditing={true}
+                  //width={180}
+                >
+                  <Lookup
+                    dataSource={bankAccounts}
+                    valueExpr="BANKACCOUNTNUMBER"
+                    //displayExpr="BANKACCOUNTNUMBER"
+                    displayExpr={(item) =>
+                      item
+                        ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
+                        : ""
+                    }
+                  />
+                </Column>
 
-            <Column
-              dataField={"TRANSACTIONAMOUNT"}
-              caption={"Amount"}
-              hidingPriority={7}
-              allowEditing={true}
-              format="$###,###,###.00"
-              width={100}
-              cellRender={renderFPTransactionCell}
+                <Column
+                  width={70}
+                  dataField={"SEGMENTNUMBER"}
+                  caption={"Seg"}
+                  hidingPriority={7}
+                  allowEditing={true}
+                >
+                  <AsyncRule
+                    message="Segment Does Not Exists"
+                    validationCallback={validateSegment}
+                  />
+                </Column>
+                <Column
+                  dataType="date"
+                  dataField="TRANSACTIONDATE"
+                  caption="Date"
+                  hidingPriority={7}
+                  allowEditing={true}
+                  cellRender={renderFPTransactionCellDate}
+                />
+                <Column
+                  dataType="boolean"
+                  dataField={"DATEERROR"}
+                  caption="Date Issue"
+                  allowEditing={true}
+                />
+
+                {/* <RequiredRule message="A Date is required" /> */}
+
+                <Column
+                  dataField={"DESCRIPTION"}
+                  caption="Bank Description"
+                  allowEditing={true}
+                />
+                <Column
+                  dataField={"SECONDDESCRIPTION"}
+                  caption="Details"
+                  allowEditing={true}
+                />
+                <Column
+                  dataField={"FPTRANSACTIONCODE"}
+                  caption={"Type"}
+                  hidingPriority={7}
+                  allowEditing={true}
+                >
+                  <RequiredRule message="A Transaction Code is required" />
+                  <Lookup
+                    dataSource={transTypes}
+                    valueExpr="FPTRANSACTIONCODE"
+                    displayExpr="LONGDESCRIPTION"
+                  />
+                </Column>
+                <Column
+                  dataField={"INVESTMENTID"}
+                  caption="id"
+                  allowEditing={true}
+
+                  //editCellComponent={PrepareInvestmentID}
+                >
+                  <Lookup
+                    dataSource={investmentlist}
+                    valueExpr="UNIQUEID"
+                    displayExpr="INVESTMENTNAME"
+                    allowClearing={true}
+                  />
+                </Column>
+
+                <Column
+                  dataField={"TRANSACTIONAMOUNT"}
+                  caption={"Amount"}
+                  hidingPriority={7}
+                  allowEditing={true}
+                  format="$###,###,###.00"
+                  width={100}
+                  cellRender={renderFPTransactionCell}
+                />
+                <Column
+                  dataField={"UNIQUEID"}
+                  caption={"ID"}
+                  hidingPriority={7}
+                  allowEditing={true}
+                  visible={false}
+                />
+              </DataGrid>
+            </div>
+          </div>
+        </>
+      )}
+      <div>
+        {ShowMappings && (
+          <div className="overlay">
+            <ClientCodeMapping
+              clientCode={clientCode}
+              onMappingUpdated={handleMappingUpdated}
             />
-            <Column
-              dataField={"UNIQUEID"}
-              caption={"ID"}
-              hidingPriority={7}
-              allowEditing={true}
-              visible={false}
-            />
-          </DataGrid>
-        </div>
+          </div>
+        )}
       </div>
     </>
   );
@@ -445,104 +562,3 @@ export default function ImportTransactions() {
   const { user } = useAuth();
   return <ImportTransactionsx clientCode={user.thisClientcode} />;
 }
-
-// //
-// const PrepareInvestmentID = (props) => {
-//   const [investmentlist, setInvestmentList] = useState(null);
-//   const [selectedRowKeys, setSelectedRowKeys] = useState([props.data.value]);
-//   const [isDropDownOpened, setDropDownOpened] = useState(false);
-//   const [transTypes, setTransTypes] = useState(null);
-//   const [isEditable, setIsEditable] = useState(false);
-//   useEffect(() => {
-//     getInvestmentRecords(props.data.data.CLIENTCODE) // call the function to fetch data
-//       .then((data) => {
-//         setInvestmentList(data.data); // store the data in state
-//       })
-//       .catch((error) => {
-//         console.error(
-//           "There was an error fetching the transaction Types data:",
-//           error
-//         );
-//       });
-//     getTransactionTypes()
-//       .then((data) => {
-//         setTransTypes(data.data);
-
-//         // Find the transaction type for the current row
-//         const currentTransactionType = data.data.find(
-//           (type) => type.FPTRANSACTIONCODE === props.data.data.FPTRANSACTIONCODE
-//         );
-
-//         // Enable or disable editing based on investmenttype
-//         setIsEditable(
-//           currentTransactionType && currentTransactionType.investmenttype === 1
-//         );
-//       })
-//       .catch((error) => {
-//         console.error(
-//           "There was an error fetching the transaction Types data:",
-//           error
-//         );
-//       });
-//   }, [props.data.selectedRowKeys]);
-
-//   const boxOptionChanged = useCallback((e) => {
-//     if (e.name === "opened") {
-//       setDropDownOpened(e.value);
-//     }
-//   }, []);
-//   const contentRender = useCallback(() => {
-//     const onSelectionChanged = (args) => {
-//       setSelectedRowKeys(args.selectedRowKeys);
-//       setDropDownOpened(false);
-//       props.data.setValue(args.selectedRowKeys[0]);
-//     };
-
-//     return (
-//       <DataGrid
-//         keyExpr={"UNIQUEID"}
-//         dataSource={investmentlist}
-//         remoteOperations={true}
-//         height={250}
-//         selectedRowKeys={selectedRowKeys}
-//         hoverStateEnabled={true}
-//         onSelectionChanged={onSelectionChanged}
-//         focusedRowEnabled={true}
-//         defaultFocusedRowKey={selectedRowKeys[0]}
-//       >
-//         <Column dataField="INVESTMENTNAME" />
-//         <Paging enabled={true} defaultPageSize={10} />
-//         <Scrolling mode="virtual" />
-//         <Selection mode="single" />
-//       </DataGrid>
-//     );
-//   }, [props.data, selectedRowKeys]);
-//   return (
-//     <DropDownBox
-//       //disabled={!isEditable}
-//       onOptionChanged={boxOptionChanged}
-//       opened={isDropDownOpened}
-//       dropDownOptions={dropDownOptions}
-//       dataSource={investmentlist}
-//       value={selectedRowKeys[0]}
-//       displayExpr="INVESTMENTNAME"
-//       valueExpr="UNIQUEID"
-//       inputAttr={ownerLabel}
-//       contentRender={contentRender}
-//     ></DropDownBox>
-//   );
-// };
-
-// ////////////////////////////////////////////////
-// //const setFormImport = () => {};
-
-// //const onRowInserted = useCallback();
-// //   (e) => {
-// //     setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
-// //     setLastSegmentNumber(e.data.SEGMENTNUMBER);
-// //   },
-// //   [lastBankAccountNumber]
-
-// // old version const onRowInserted = (e) => {
-// //   setLastBankAccountNumber(e.data.BANKACCOUNTNUMBER);
-// // };

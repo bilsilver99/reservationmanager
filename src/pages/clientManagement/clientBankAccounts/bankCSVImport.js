@@ -29,6 +29,7 @@ class BankCSVImportx extends React.Component {
   state = {
     currentBankAccount: "",
     currentBankAccountName: "", // this is the name of the bank account
+    currentbankaccountdate: "",
     bankAccountList: [],
     dateRow: 0,
     descriptionRow: 0,
@@ -173,6 +174,7 @@ class BankCSVImportx extends React.Component {
       //console.log("bank accounts name ", data);
       this.setState({
         currentBankAccountName: data.data,
+        currentbankaccountdate: data.date,
         dateRow: data.daterow,
         descriptionRow: data.descriptionrow,
         paymentsRow: data.paymentsrow,
@@ -244,17 +246,22 @@ class BankCSVImportx extends React.Component {
               onValueChanged={this.setAccountData}
               //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
             />
-            <p>&nbsp;&nbsp;&nbsp;{this.state.currentBankAccountName}</p>
+            {this.state.currentBankAccount !== "" && (
+              <p style={{ marginTop: "2px" }}>
+                &nbsp;&nbsp;Last Date posted&nbsp;&nbsp;
+                {this.state.currentbankaccountdate}
+              </p>
+            )}
           </div>
-
-          {this.state.dateRow === 0 ? (
-            <DataImporter
-              onCompleteImport={this.handleImportedData}
-              reset={false}
-            />
-          ) : (
-            <PredefinedCSVReader onDataReceived={this.onDataReceived} />
-          )}
+          {this.state.currentBankAccount !== "" &&
+            (this.state.dateRow === 0 ? (
+              <DataImporter
+                onCompleteImport={this.handleImportedData}
+                reset={false}
+              />
+            ) : (
+              <PredefinedCSVReader onDataReceived={this.onDataReceived} />
+            ))}
         </div>
       </>
     );

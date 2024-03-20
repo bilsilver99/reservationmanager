@@ -82,7 +82,19 @@ const ClientManagement = () => {
   useEffect(() => {
     (async () => {
       const resultCustomerdata = await getClients();
+
       setCustomerList(resultCustomerdata.data);
+
+      const resultCustomerData = await getClients();
+      if (resultCustomerData && resultCustomerData.data) {
+        // Assuming resultCustomerData.data is an array of customers
+        // and each customer object has a 'disabled' property
+        const filteredCustomers = resultCustomerData.data.filter(
+          (customer) => !customer.inactive
+        );
+        setCustomerList(filteredCustomers);
+      }
+
       setKey(resultCustomerdata.data.key);
       setThisWidth("70%");
       //setCurrentClientCode(user.lastClientUpdated);
@@ -329,8 +341,8 @@ const ClientManagement = () => {
               {showBanks && (
                 <>
                   <div></div>
-                  <Button text="Import" onClick={setFormImport} />
                   <Button text="Import Excel" onClick={setFormImportExcel} />
+                  <Button text="Import / Process" onClick={setFormImport} />
                   <Button text="Transfers" onClick={setFormTransfers} />
                   <Button text="Interest" onClick={setFormInterest} />
                   <Button text="Transactions" onClick={setFormTransactions} />

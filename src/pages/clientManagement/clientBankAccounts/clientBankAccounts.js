@@ -479,6 +479,13 @@ class ClientBankAccountsx extends React.Component {
               alignment="right"
             />
             <Column
+              dataField={"LASTTRANSACTIONDATE"}
+              width={190}
+              caption={"Last Transaction Date"}
+              hidingPriority={8}
+              visible={true}
+            />
+            <Column
               dataType="boolean"
               dataField={"IMPORTMX"}
               width={200}
@@ -528,14 +535,6 @@ class ClientBankAccountsx extends React.Component {
                 displayExpr="NAME"
               />
             </Column>
-
-            <Column
-              dataField={"LASTTRANSACTIONDATE"}
-              width={190}
-              caption={"Last Transaction Date"}
-              hidingPriority={8}
-              visible={false}
-            />
 
             <MasterDetail
               enabled={true}

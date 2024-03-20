@@ -30,6 +30,7 @@ import {
   StockTransactionTypesPage,
   NotRegisteredPage,
   NewClientsPage,
+  ImportExcelAssetsPage,
 } from "./pages";
 
 import { withNavigationWatcher } from "./contexts/navigation";
@@ -163,6 +164,10 @@ const routes = [
   {
     path: "/newClients",
     element: NewClientsPage,
+  },
+  {
+    path: "/importExcelAssets",
+    element: ImportExcelAssetsPage,
   },
 ];
 

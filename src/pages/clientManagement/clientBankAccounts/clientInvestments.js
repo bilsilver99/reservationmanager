@@ -90,6 +90,7 @@ function ClientInvestments(props) {
     "LIRA",
     "RESP",
     "GROUP",
+    "",
   ]);
   const [currentID, setCurrentID] = useState(0);
   const [currentStock, setCurrentStock] = useState("");
@@ -289,9 +290,10 @@ function ClientInvestments(props) {
         <Column
           dataField={"INVESTMENTNAME"}
           width={150}
-          caption={"Investment"}
+          caption={"Account # "}
           hidingPriority={8}
           visible={true}
+          required={true}
         />
         <Column
           dataField={"CURRENCY"}

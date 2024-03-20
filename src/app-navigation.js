@@ -182,6 +182,12 @@ export const navigation = [
     auth: "Y",
   },
   {
+    text: "Imports",
+    icon: "image",
+    path: "/importExcelAssets",
+    auth: "Y",
+  },
+  {
     text: "Reporting",
     icon: "image",
     auth: "Y",

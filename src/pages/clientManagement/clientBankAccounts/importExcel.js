@@ -1,40 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./import.scss";
 import SelectBox from "devextreme-react/select-box";
-import {
-  getBanks,
-  getBankName,
-  updateImportFile,
-  updateImportFileV2,
-  updateExcelTransactions,
-} from "./clientBanksAccountsData";
+import { getBanks, updateExcelTransactions } from "./clientBanksAccountsData";
 import "./FileUploader.css"; // Importing the CSS file
-import { PropertiesPanel } from "devextreme-react/diagram";
-import { set } from "date-fns";
-//import { set } from "date-fns";
+
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import { useNavigate } from "react-router-dom";
 
 const ExcelJS = require("exceljs");
 
-const toDataURL = (url) => {
-  const promise = new Promise((resolve, reject) => {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-      var reader = new FileReader();
-      reader.readAsDataURL(xhr.response);
-      reader.onloadend = function () {
-        resolve({ base64Url: reader.result });
-      };
-    };
-    xhr.open("GET", url);
-    xhr.responseType = "blob";
-    xhr.send();
-  });
-
-  return promise;
-};
-
 const ImportExcel = (props) => {
-  const [data, setData] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
   const [currentBankAccountName, setCurrentBankAccountName] = useState("");
   const [currentBankAccount, setCurrentBankAccount] = useState("");
@@ -44,10 +20,11 @@ const ImportExcel = (props) => {
   const [showInfo, setShowInfo] = useState(false);
   const [headers, setHeaders] = useState([]); // State for storing headers
   const [rows, setRows] = useState([]); // State for storing row data
-
-  /////////////////////////////
+  const MySwal = withReactContent(Swal);
   const [excelData, setExcelData] = useState([]); // To store Excel rows
   const [editMode, setEditMode] = useState(false); // To toggle edit mode
+  const navigate = useNavigate(); // Inside your component
+  const [ShowPage, setShowPage] = useState(true); // To toggle edit mode
   const [columnMappings, setColumnMappings] = useState({
     date: "",
     description: "",
@@ -55,14 +32,34 @@ const ImportExcel = (props) => {
     credit: "",
   }); // To store user-specified column mappings
 
-  //////////////////////////////////////
-
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
+    if (!file) {
+      // No file was selected
+      return;
+    }
+
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+    if (fileExtension !== "xlsx") {
+      MySwal.fire({
+        icon: "error",
+        title: "Invalid File Format",
+        text: "Please select an Excel file with an .xlsx extension.",
+      });
+      return; // Stop the function if the file is not an Excel file
+    }
+
     setSelectedFile(file);
     readExcelFile(file);
     setShowInfo(true);
   };
+
+  // const handleFileSelect = (event) => {
+  //   const file = event.target.files[0];
+  //   setSelectedFile(file);
+  //   readExcelFile(file);
+  //   setShowInfo(true);
+  // };
 
   const readExcelFile = (file) => {
     const reader = new FileReader();
@@ -80,20 +77,23 @@ const ImportExcel = (props) => {
       worksheet.eachRow({ includeEmpty: true }, function (row, rowNumber) {
         if (rowNumber === 1) {
           // Store header row
-          headersTemp = row.values;
+          headersTemp = row.values.slice(1); // ExcelJS might include a leading empty cell, so slice it off
+          if (!headersTemp.includes("N/A")) {
+            headersTemp.push("N/A");
+          }
+          //console.log("headers temp", headersTemp);
         } else {
           // Store data rows
-          const rowData = row.values.reduce((acc, val, index) => {
-            if (headersTemp[index]) {
-              acc[headersTemp[index]] = val;
+          const rowData = {};
+          row.eachCell({ includeEmpty: true }, function (cell, colNumber) {
+            if (headersTemp[colNumber - 1]) {
+              rowData[headersTemp[colNumber - 1]] = cell.text;
             }
-            return acc;
-          }, {});
+          });
           rowsTemp.push(rowData);
         }
       });
 
-      // Update state with the parsed headers and rows
       setHeaders(headersTemp);
       setRows(rowsTemp);
     };
@@ -104,7 +104,9 @@ const ImportExcel = (props) => {
 
     reader.readAsArrayBuffer(file);
   };
-
+  const handleNavigation = () => {
+    navigate("/clientManagement");
+  };
   const setAccountData = (e) => {
     setCurrentBankAccount(e.value);
   };
@@ -115,14 +117,10 @@ const ImportExcel = (props) => {
   useEffect(() => {
     getBanks(ClientCode) // Directly use clientCode without 'this'
       .then((data) => {
-        //console.log("bank accounts ", data);
         setBankAccounts(data.data); // Correctly updates state in functional component
-        console.log("bank accounts ", data.data);
       })
-      .catch((error) => {
-        //console.log("error", error);
-      });
-  }, []); // Include clientCode in dependency array if its changes should re-trigger this effect
+      .catch((error) => {});
+  }, []);
 
   const handleCellChange = (e, rowIndex, cellIndex) => {
     const updatedRows = [...excelData.rows];
@@ -131,204 +129,210 @@ const ImportExcel = (props) => {
     setExcelData({ ...excelData, rows: updatedRows });
   };
 
-  const exportExcelFile = () => {};
-
   const createJsonFromSelections = () => {
-    const jsonTable = rows.map((row) => {
-      const jsonObject = {
-        date: row[columnMappings.date],
-        description: row[columnMappings.description],
-        debit: row[columnMappings.debit],
-        credit: row[columnMappings.credit],
-      };
-      return jsonObject;
+    console.log(rows);
+    updateExcelTransactions(ClientCode, currentBankAccount, rows);
+    MySwal.fire({
+      icon: "success",
+      title: "Import Complete",
+      text: `Data has been imported successfully - please use the Import button to process the new records.`,
+    }).then(() => {
+      handleNavigation();
+      setShowPage(false);
     });
-    updateExcelTransactions(ClientCode, currentBankAccount, jsonTable);
 
-    console.log(jsonTable); // Or set this to state if you want to render it or do further processing
+    //console.log("json loaded", jsonTable); // Or set this to state if you want to render it or do further processing
   };
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px",
-          justifyContent: "left",
-          alignItems: "center",
-        }}
-      >
-        <div className="file-uploader-container">
-          <label htmlFor="file-upload" className="file-input-label">
-            Choose a file for import
-            <input
-              id="file-upload"
-              type="file"
-              className="file-input"
-              onChange={handleFileSelect}
-            />
-          </label>
-          {selectedFile && (
-            <div className="file-info">
-              <strong>File name:</strong> {selectedFile.name}
+      {ShowPage && (
+        <>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "20px",
+              justifyContent: "left",
+              alignItems: "center",
+            }}
+          >
+            <div className="file-uploader-container">
+              <label htmlFor="file-upload" className="file-input-label">
+                Choose a file for import
+                <input
+                  id="file-upload"
+                  type="file"
+                  className="file-input"
+                  onChange={handleFileSelect}
+                />
+              </label>
+              {selectedFile && (
+                <div className="file-info">
+                  <strong>File name:</strong> {selectedFile.name}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <div className="column-selector">
-          <label htmlFor="date-column">Date Column name:</label>
-          <select
-            id="date-column"
-            value={columnMappings.date}
-            onChange={(e) =>
-              setColumnMappings({ ...columnMappings, date: e.target.value })
-            }
-          >
-            {headers.map((header, index) => (
-              <option key={index} value={header}>
-                {header}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="column-selector">
-          <label htmlFor="description-column">Description Column Name:</label>
-          <select
-            id="description-column"
-            value={columnMappings.description}
-            onChange={(e) =>
-              setColumnMappings({
-                ...columnMappings,
-                description: e.target.value,
-              })
-            }
-          >
-            {headers.map((header, index) => (
-              <option key={index} value={header}>
-                {header}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="column-selector">
-          <label htmlFor="debit-column">Debit Column Name:</label>
-          <select
-            id="debit-column"
-            value={columnMappings.debit}
-            onChange={(e) =>
-              setColumnMappings({ ...columnMappings, debit: e.target.value })
-            }
-          >
-            {headers.map((header, index) => (
-              <option key={index} value={header}>
-                {header}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="column-selector">
-          <label htmlFor="credit-column">Credit Column Name:</label>
-          <select
-            id="credit-column"
-            value={columnMappings.credit}
-            onChange={(e) =>
-              setColumnMappings({ ...columnMappings, credit: e.target.value })
-            }
-          >
-            {headers.map((header, index) => (
-              <option key={index} value={header}>
-                {header}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="content-block2 dx-card">
-        <p> </p>
-        <p>&nbsp;&nbsp;Bank Transactions Import </p>
-        <div style={{ display: "flex", alignItems: "left" }}>
-          {showInfo && (
-            <>
-              <p
-                style={{
-                  marginRight: "10px",
-                  marginLeft: "10px",
-                  marginTop: "6px",
-                }}
-              >
-                Bank Account:
-              </p>
-
-              <SelectBox
-                style={{ width: "250px", height: "30px" }}
-                items={bankAccounts}
-                valueExpr="BANKACCOUNTNUMBER"
-                displayExpr={(item) =>
-                  item
-                    ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
-                    : ""
+            <div className="column-selector">
+              <label htmlFor="date-column">Date Column name:</label>
+              <select
+                id="date-column"
+                value={columnMappings.date}
+                onChange={(e) =>
+                  setColumnMappings({ ...columnMappings, date: e.target.value })
                 }
-                //displayExpr="BANKACCOUNTNUMBER"
-                //displayExpr={(item) =>
-                //  `${item.BANKACCOUNTNUMBER} - ${item.DESCRIPTION}`
-                // }
-                value={currentBankAccount}
-                searchEnabled={true}
-                //value={currentEmployeeName}
-                onValueChanged={setAccountData}
-                //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
-              />
+              >
+                {headers.map((header, index) => (
+                  <option key={index} value={header}>
+                    {header}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="column-selector">
+              <label htmlFor="description-column">
+                Description Column Name:
+              </label>
+              <select
+                id="description-column"
+                value={columnMappings.description}
+                onChange={(e) =>
+                  setColumnMappings({
+                    ...columnMappings,
+                    description: e.target.value,
+                  })
+                }
+              >
+                {headers.map((header, index) => (
+                  <option key={index} value={header}>
+                    {header}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="column-selector">
+              <label htmlFor="debit-column">Deposit Column Name:</label>
+              <select
+                id="debit-column"
+                value={columnMappings.debit}
+                onChange={(e) =>
+                  setColumnMappings({
+                    ...columnMappings,
+                    debit: e.target.value,
+                  })
+                }
+              >
+                {headers.map((header, index) => (
+                  <option key={index} value={header}>
+                    {header}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="column-selector">
+              <label htmlFor="credit-column">Payment Column Name:</label>
+              <select
+                id="credit-column"
+                value={columnMappings.credit}
+                onChange={(e) =>
+                  setColumnMappings({
+                    ...columnMappings,
+                    credit: e.target.value,
+                  })
+                }
+              >
+                {headers.map((header, index) => (
+                  <option key={index} value={header}>
+                    {header}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="content-block2 dx-card">
+            <p> </p>
+            <p>&nbsp;&nbsp;Bank Transactions Import </p>
+            <div style={{ display: "flex", alignItems: "left" }}>
+              {showInfo && (
+                <>
+                  <p
+                    style={{
+                      marginRight: "10px",
+                      marginLeft: "10px",
+                      marginTop: "6px",
+                    }}
+                  >
+                    Bank Account:
+                  </p>
+
+                  <SelectBox
+                    style={{ width: "250px", height: "30px" }}
+                    items={bankAccounts}
+                    valueExpr="BANKACCOUNTNUMBER"
+                    displayExpr={(item) =>
+                      item
+                        ? `${item.BANKNAME} - ${item.BANKACCOUNTNUMBER} - ${item.ACCOUNTDESCRIPTION}`
+                        : ""
+                    }
+                    value={currentBankAccount}
+                    searchEnabled={true}
+                    //value={currentEmployeeName}
+                    onValueChanged={setAccountData}
+                    //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
+                  />
+                </>
+              )}
+
+              {currentBankAccount && (
+                <button
+                  onClick={createJsonFromSelections}
+                  className="pretty-button"
+                >
+                  Import Transactions
+                </button>
+              )}
+              <p>&nbsp;&nbsp;&nbsp;{currentBankAccountName}</p>
+            </div>
+          </div>
+
+          {headers.length > 0 && rows.length > 0 && (
+            <>
+              <table className="table">
+                <thead>
+                  <tr>
+                    {headers.map((header, index) => (
+                      <th key={index}>{header}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {headers.map((header, cellIndex) => (
+                        <td key={cellIndex}>
+                          {editMode ? (
+                            <input
+                              type="text"
+                              value={row[header]}
+                              onChange={(e) =>
+                                handleCellChange(e, rowIndex, header)
+                              }
+                            />
+                          ) : (
+                            row[header] || "" // Using || '' to handle undefined values gracefully
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </>
           )}
-
-          {currentBankAccount && (
-            <button
-              onClick={createJsonFromSelections}
-              className="pretty-button"
-            >
-              Import Transactions
-            </button>
-          )}
-          <p>&nbsp;&nbsp;&nbsp;{currentBankAccountName}</p>
-        </div>
-      </div>
-
-      {headers.length > 0 && rows.length > 0 && (
-        <>
-          <table className="table">
-            <thead>
-              <tr>
-                {headers.map((header, index) => (
-                  <th key={index}>{header}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {headers.map((header, cellIndex) => (
-                    <td key={cellIndex}>
-                      {editMode ? (
-                        <input
-                          type="text"
-                          value={row[header]}
-                          onChange={(e) =>
-                            handleCellChange(e, rowIndex, header)
-                          }
-                        />
-                      ) : (
-                        row[header] || "" // Using || '' to handle undefined values gracefully
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </>
       )}
     </>

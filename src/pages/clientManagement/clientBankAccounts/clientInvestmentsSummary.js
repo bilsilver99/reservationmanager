@@ -68,7 +68,7 @@ function ClientInvestmentsSummary(props) {
         <Column
           dataField={"INVESTMENTNAME"}
           width={150}
-          caption={"Investment"}
+          caption={"Account #"}
           hidingPriority={8}
           allowEditing={false}
           visible={true}

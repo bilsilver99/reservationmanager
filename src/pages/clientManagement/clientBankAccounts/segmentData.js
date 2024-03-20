@@ -706,6 +706,7 @@ export const mystore6 = (bankID, rangeValue) =>
             return response.json();
           })
           .then((json) => {
+            console.log("json.user_response.bankq", json.user_response.bankq);
             resolve(json.user_response.bankq);
           })
           .catch((error) => {
@@ -1721,3 +1722,213 @@ export const mystoreGraph = (ClientCode, rangeValue) =>
       });
     },
   });
+export const remapImportsx = (ClientCode, rangeValue) =>
+  new CustomStore({
+    key: "UNIQUEID",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: ClientCode,
+          Parameters: params,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/processMapping`;
+      return new Promise((resolve, reject) => {
+        fetch(url, requestoptions)
+          .then((response) => {
+            if (!response.ok) {
+              reject(new Error("System did not respond"));
+            }
+            return response.json();
+          })
+          .then((json) => {
+            console.log("LineQ data:", json.user_response.LineQ);
+            resolve(json.user_response.LineQ);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    totalCount: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      return new Promise((resolve, reject) => {
+        fetchData(ClientCode, params, rangeValue)
+          .then((json) => {
+            resolve(json.user_response.LineQ);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+  });
+
+export const updateMapping = (clientcode) => {
+  // console.log(
+  //   "clientcode",
+  //   clientcode,
+  //   "banksaccount",
+  //   bankaccount,
+  //   "array from web page",
+  //   dataArray
+  // );
+  //var myClient = 1;
+
+  //console.log("sent array - this is sent to clarion", sentArray);
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+    }),
+  };
+
+  const url = `${process.env.REACT_APP_BASE_URL}/processMapping`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {
+        count: json.user_response.count,
+        errorcount: json.user_response.errorcount,
+        data: json.user_response.loginq,
+      };
+    });
+};
+
+export const remapImports = (clientcode) => {
+  // console.log(
+  //   "clientcode",
+  //   clientcode,
+  //   "banksaccount",
+  //   bankaccount,
+  //   "array from web page",
+  //   dataArray
+  // );
+  //var myClient = 1;
+
+  console.log("sent array - this is sent to clarion", clientcode);
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+    }),
+  };
+
+  const url = `${process.env.REACT_APP_BASE_URL}/processMapping`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {
+        count: json.user_response.count,
+        errorcount: json.user_response.errorcount,
+        data: json.user_response.loginq,
+      };
+    });
+};
+export const SetClientInterestFlag = (clientcode) => {
+  // console.log(
+  //   "clientcode",
+  //   clientcode,
+  //   "banksaccount",
+  //   bankaccount,
+  //   "array from web page",
+  //   dataArray
+  // );
+  //var myClient = 1;
+
+  console.log("sent array - this is sent to clarion", clientcode);
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      requestedclientcode: clientcode,
+    }),
+  };
+
+  const url = `${process.env.REACT_APP_BASE_URL}/SetClientInterestFlag`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {
+        count: json.user_response.count,
+      };
+    });
+};

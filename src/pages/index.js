@@ -30,3 +30,4 @@ export { default as InvestmentSubGroupsPage } from "./investmentSubGroups/invest
 export { default as StockTransactionTypesPage } from "./stockTransactionTypes/stockTransactionTypes";
 export { default as NotRegisteredPage } from "./notRegistered/notRegistered";
 export { default as NewClientsPage } from "./newClients/newClients";
+export { default as ImportExcelAssetsPage } from "./imports/importExcelAssets";

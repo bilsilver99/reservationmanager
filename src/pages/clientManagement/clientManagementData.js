@@ -28,6 +28,7 @@ export const getClients = async () => {
         data: json.user_response.loginq.map((item) => ({
           label: item.CLIENTCODE,
           value: item.UNIQUEID,
+          inactive: item.INACTIVE,
         })),
         totalCount: json.user_response.totalCount,
         key: json.user_response.keyname,
