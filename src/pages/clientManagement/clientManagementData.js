@@ -156,3 +156,38 @@ export const updateCurrentUser = async (usercode, clientcode) => {
       return {};
     });
 };
+
+export const updateClientx = async (
+  requestedclientcode,
+  startdate,
+  enddate
+) => {
+  console.log("client in:", requestedclientcode);
+  //companyValues.AddressLineThree = "corner light";
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      clientcode: requestedclientcode,
+      startdate: startdate,
+      enddate: enddate,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/updateClientDataAdminDate`;
+  return await fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      return {};
+    });
+};

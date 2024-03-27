@@ -1511,3 +1511,217 @@ export const getStockTypes = () => {
       };
     });
 };
+
+export const returnInvestmentMonthly = (myClient) =>
+  new CustomStore({
+    key: "UNIQUEID",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: myClient,
+          Parameters: params,
+        }),
+      };
+      //console.log("client sent", myClient, "params", params);
+      const url = `${process.env.REACT_APP_BASE_URL}/returnInvestmentMonthly`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          console.log("client " + myClient);
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          //console.log("from client: ", myClient, "assets go bang: ", json);
+          return {
+            data: json.user_response.bankq,
+            totalCount: json.user_response.totalCount,
+            key: json.user_response.keyname,
+          };
+        });
+    },
+    insert: (values) => {
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          ThisFunction: "insert",
+          keyvaluepair: values,
+          sentCompany: myClient,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/UpdateInvestmentMonthly`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+    remove: (key) => {
+      //console.log(key);
+      //////console.log(values);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentCompany: key,
+          ThisFunction: "delete",
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/UpdateInvestmentMonthly`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+    update: (key, values) => {
+      ////console.log("key: ", key);
+      ////console.log("values: ", values);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          ThisFunction: "change",
+          sentCompany: key,
+          keyvaluepair: values,
+        }),
+      };
+      ////console.log("key: ', key", "values", values);
+      const url = `${process.env.REACT_APP_BASE_URL}/UpdateInvestmentMonthly`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+  });
+
+export const CreateMonthlyTransactions = (clientcode, transactiondate) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+      startdate: transactiondate,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/CreateMonthlyTransactions`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      //console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("transaction types", json);
+      return {
+        data: json.user_response.loginq,
+      };
+    });
+};
+
+export const CreateInvestmentsFromMonthlyTransactions = (
+  clientcode,
+  transactiondate
+) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+      startdate: transactiondate,
+    }),
+  };
+  const url = `${process.env.REACT_APP_BASE_URL}/CreateInvestmentsFromMonthlyTransactions`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      //console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("transaction types", json);
+      return {
+        data: json.user_response.loginq,
+      };
+    });
+};
+
+//

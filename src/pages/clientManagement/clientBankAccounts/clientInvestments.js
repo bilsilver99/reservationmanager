@@ -35,6 +35,7 @@ import {
 import ClientInvestmentsTransactions from "./clientInvestmentsTransactions";
 import ClientInvestmentsSummary from "./clientInvestmentsSummary";
 import ClientInvestmentsStocks from "./clientInvestmentsStocks";
+import { ClientInvestmentMonthly } from "./clientInvestmentMonthly";
 //import DebtSummary from "./debtSummary";
 
 import { GetStockQuote } from "./stockQuery";
@@ -96,6 +97,7 @@ function ClientInvestments(props) {
   const [currentStock, setCurrentStock] = useState("");
   const [rowToBeEdited, setRowToBeEdited] = useState(0);
   const [refreshKey, setRefreshKey] = useState(props.sharedValue);
+  const [buildMonthly, setBuildMonthly] = useState(false);
 
   // const [transactionGroupData, setTransactionGroupData] = useState([]);
 
@@ -177,8 +179,21 @@ function ClientInvestments(props) {
     setRefreshKey((oldKey) => oldKey + 1);
   };
 
+  const BuildMonthlyFlag = () => {
+    setBuildMonthly(true);
+  };
+  const handleMappingUpdated = () => {
+    setBuildMonthly(false);
+    // Do something with the value, like updating the state
+  };
   return (
     <div className="content-block2 dx-card ">
+      <p> </p>
+      <Button
+        style={{ marginLeft: "16px" }}
+        text="Build Monthly Data"
+        onClick={BuildMonthlyFlag}
+      />
       <DataGrid
         id="maindatagrid"
         dataSource={InvestmentStore(myClient)}
@@ -378,6 +393,16 @@ function ClientInvestments(props) {
           visible={false}
         />
       </DataGrid>
+      <div>
+        {buildMonthly && (
+          <div className="overlay">
+            <ClientInvestmentMonthly
+              clientCode={myClient}
+              onMappingUpdated={handleMappingUpdated}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1025,6 +1025,7 @@ export const getInvestmentRecords = (myClient) => {
 };
 
 ////////////////////////////////////////////
+
 export const mystore5 = (ClientCode, rangeValue) =>
   new CustomStore({
     key: "UNIQUEID",
@@ -1068,6 +1069,7 @@ export const mystore5 = (ClientCode, rangeValue) =>
           })
           .then((json) => {
             resolve(json.user_response.LineQ);
+            //console.log("json.user_response.LineQ", json.user_response.LineQ);
           })
           .catch((error) => {
             reject(error);
@@ -1181,7 +1183,194 @@ export const mystore7 = (ClientCode, rangeValue) =>
     },
   });
 
-export const relatedData = (ClientCode, UniqueID2) =>
+//////////////////////////////////////////////////////////
+
+export const relatedData = (ClientCode, UniqueID2, rownumber) =>
+  new CustomStore({
+    key: "UNIQUEID2",
+    load: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      params = params.slice(0, -1);
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentclientcode: ClientCode,
+          Parameters: params,
+          UniqueID: UniqueID2,
+          rownumber: rownumber,
+        }),
+      };
+      console.log(
+        "uniqueid is ",
+        UniqueID2,
+        "row number: ",
+        rownumber,
+        "clientcode is ",
+        ClientCode
+      );
+      const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
+      return new Promise((resolve, reject) => {
+        fetch(url, requestoptions)
+          .then((response) => {
+            if (!response.ok) {
+              reject(new Error("System did not respond"));
+            }
+            return response.json();
+          })
+          .then((json) => {
+            resolve(json.user_response.bankq);
+            console.log("json.user_response.bankq", json.user_response.bankq);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+    totalCount: (loadOptions) => {
+      let params = "?";
+      [
+        "skip",
+        "take",
+        "requireTotalCount",
+        "requireGroupCount",
+        "sort",
+        "filter",
+        "totalSummary",
+        "group",
+        "groupSummary",
+      ].forEach((i) => {
+        if (i in loadOptions && isNotEmpty(loadOptions[i])) {
+          params += `${i}=${JSON.stringify(loadOptions[i])}&`;
+        }
+      });
+      return new Promise((resolve, reject) => {
+        fetchData(ClientCode, params, UniqueID2)
+          .then((json) => {
+            resolve(json.user_response.bankq);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+
+    //////////////////////////
+
+    insert: (values) => {
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          ThisFunction: "insert",
+          keyvaluepair: values,
+          sentcompany: ClientCode,
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return json.user_response.keyvaluepair;
+        });
+    },
+    remove: (key) => {
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          sentcompany: key,
+          ThisFunction: "delete",
+        }),
+      };
+      const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+    update: (key, values) => {
+      var requestoptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json;",
+        },
+        body: JSON.stringify({
+          ThisFunction: "change",
+          sentcompany: key,
+          keyvaluepair: values,
+        }),
+      };
+      console.log(
+        "key is ",
+        key,
+        "values are ",
+        values,
+        "option:",
+        requestoptions
+      );
+      const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
+      return fetch(url, requestoptions) // Request fish
+        .then((response) => {
+          if (!response.ok) {
+            return {
+              companyname: "System did not respond",
+              returnaddress: " ",
+            };
+          }
+          return response.json();
+        })
+        .then((json) => {
+          return {};
+        });
+    },
+  });
+
+//////////////////////////////////////////////////////////
+
+export const xrelatedData = (ClientCode, UniqueID2) =>
   new CustomStore({
     key: "UNIQUEID2",
     load: (loadOptions) => {
@@ -1932,3 +2121,4 @@ export const SetClientInterestFlag = (clientcode) => {
       };
     });
 };
+///////////////////////////////////////////

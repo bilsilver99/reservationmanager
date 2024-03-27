@@ -1,0 +1,13 @@
+.date-picker-container {
+  display: flex;
+  justify-content: space-between; /* Adjust space between date pickers */
+  align-items: center; /* Align items vertically */
+  gap: 20px; /* Optional: Adds some space between the date pickers */
+  max-width: 30%;
+}
+
+.date-picker {
+  flex: 1; /* Makes each date picker take up equal space */
+  display: flex;
+  flex-direction: column; /* Aligns the label and DateBox vertically */
+}

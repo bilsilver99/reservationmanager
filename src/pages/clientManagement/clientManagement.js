@@ -8,6 +8,7 @@ import {
   fetchThisClientData,
   getClients,
   updateClient,
+  updateClientx,
   updateCurrentUser,
 } from "./clientManagementData";
 import { Button } from "devextreme-react/button";
@@ -29,6 +30,8 @@ import ClientOwners from "./clientOwners";
 
 import GetStockPrice from "./clientBankAccounts/getStockprice";
 import ImportExcel from "./clientBankAccounts/importExcel";
+import DateBox from "devextreme-react/date-box";
+import "./clientManagement.css";
 
 const clients = ["sam", "lou"];
 
@@ -74,6 +77,57 @@ const ClientManagement = () => {
   const [ShowProcessImport, setShowProcessImport] = React.useState(false);
 
   const [showPrior, setPrior] = React.useState(true);
+
+  const [startdatex, setStartdatex] = React.useState(null);
+  const [enddatex, setEnddatex] = React.useState(null);
+  const [refreshKeyx, setRefreshKey] = React.useState(0); // for dates to refresh grid when date changed
+  const [resetflag, setResetFlag] = React.useState(false);
+  const handleStartDateChangex = (e) => {
+    if (
+      currentClientCode === null ||
+      currentClientCode === undefined ||
+      currentClientCode === ""
+    )
+      return;
+    const newStartDate = e.value; // Capture the new start date value from the event
+    setStartdatex(newStartDate); // Schedule the state update
+    console.log("start date: ", newStartDate);
+
+    updateClientx(currentClientCode, newStartDate, enddatex); // Use newStartDate directly
+    resetflag ? setResetFlag(false) : setResetFlag(true);
+
+    // Directly use newStartDate here as well, since the state update won't be reflected yet
+    setCustomerData({
+      StartDate: newStartDate,
+      EndDate: enddatex,
+    });
+
+    //setRefreshKey((prevKey) => prevKey + 1);
+  };
+
+  const handleEndDateChangex = (e) => {
+    if (
+      currentClientCode === null ||
+      currentClientCode === undefined ||
+      currentClientCode === ""
+    )
+      return;
+    const newEndDate = e.value; // Capture the new start date value from the event
+    setEnddatex(newEndDate); // Schedule the state update
+    console.log("end date: ", newEndDate);
+    //console.log("start date: ", newEndDate);
+
+    updateClientx(currentClientCode, startdatex, newEndDate); // Use newStartDate directly
+    resetflag ? setResetFlag(false) : setResetFlag(true);
+
+    // Directly use newStartDate here as well, since the state update won't be reflected yet
+    setCustomerData({
+      StartDate: startdatex,
+      EndDate: newEndDate,
+    });
+
+    //setRefreshKey((prevKey) => prevKey + 1);
+  };
 
   //////
   // this SHOULD set the current client code to the last client code used by the user
@@ -128,76 +182,61 @@ const ClientManagement = () => {
     // ); //updateUser({ lastClientUpdated: e.value });
   };
 
-  /////
-  // this is trigered when the user changes
-  ////
+  useEffect(
+    () => {
+      // if (
+      //   currentClientCode === null ||
+      //   currentClientCode === undefined ||
+      //   currentClientCode === ""
+      // )
+      //   return;
+      (async () => {
+        //      console.log("current client code: ", currentClientCode);
+        const result = await fetchThisClientData(currentClientCode);
+        //console.log("passsed back", result);
+        setCustomerData({
+          ClientCode: result.CLIENTCODE,
+          Name: result.NAME,
+          AddressLineOne: result.ADDRESSLINEONE,
+          AddressLineTwo: result.ADDRESSLINETWO,
+          AddressLineThree: result.ADDRESSLINETHREE,
+          AddressLineFour: result.ADDRESSLINEFOUR,
+          Country: result.COUNTRY,
+          PostalZip: result.POSTALZIP,
+          UniqueID: result.UNIQUEID,
+          StartDate: result.STARTDATE,
+          EndDate: result.ENDDATE,
+        });
 
-  // useEffect(() => {
-  //   // This code will run when `user.lastClientUpdated` changes
-  //   if (user.lastClientUpdated) {
-  //     setCurrentClientCode(user.lastClientUpdated);
-  //   }
-  // }, [user.lastClientUpdated]);
+        //const resultCustomerdata = await getClients();
+        //setCustomerList(resultCustomerdata.data);
+        //setKey(resultCustomerdata.data.key);
+        //setThisWidth("70%");
 
-  // const buttonOptions = {
-  //   text: "Update",
-  //   type: "success",
-  //   useSubmitBehavior: true,
-  // };
+        updateUser({ thisClientcode: result.CLIENTCODE });
+        updateUser({ lastClientUpdated: result.CLIENTCODE });
+        setCustomerName(result.NAME);
+        setStartDate(result.STARTDATE);
+        setEndDate(result.ENDDATE);
+        setStartdatex(result.STARTDATE);
+        setEnddatex(result.ENDDATE);
+        updateCurrentUser(user.UserCode, currentClientCode);
+        setallflags();
 
-  ///////
-  ///  this is trigerred when the client code changes
-  /////
+        //if (startdate !== null && startdate !== undefined && startdate !== "") {
+        setProcessDates(
+          "Currently Processing from " +
+            result.STARTDATE +
+            " to " +
+            result.ENDDATE
+        );
+      })();
 
-  useEffect(() => {
-    // if (
-    //   currentClientCode === null ||
-    //   currentClientCode === undefined ||
-    //   currentClientCode === ""
-    // )
-    //   return;
-    (async () => {
-      //      console.log("current client code: ", currentClientCode);
-      const result = await fetchThisClientData(currentClientCode);
-      //console.log("passsed back", result);
-      setCustomerData({
-        ClientCode: result.CLIENTCODE,
-        Name: result.NAME,
-        AddressLineOne: result.ADDRESSLINEONE,
-        AddressLineTwo: result.ADDRESSLINETWO,
-        AddressLineThree: result.ADDRESSLINETHREE,
-        AddressLineFour: result.ADDRESSLINEFOUR,
-        Country: result.COUNTRY,
-        PostalZip: result.POSTALZIP,
-        UniqueID: result.UNIQUEID,
-        StartDate: result.STARTDATE,
-        EndDate: result.ENDDATE,
-      });
-
-      //const resultCustomerdata = await getClients();
-      //setCustomerList(resultCustomerdata.data);
-      //setKey(resultCustomerdata.data.key);
-      //setThisWidth("70%");
-
-      updateUser({ thisClientcode: result.CLIENTCODE });
-      updateUser({ lastClientUpdated: result.CLIENTCODE });
-      setCustomerName(result.NAME);
-      setStartDate(result.STARTDATE);
-      setEndDate(result.ENDDATE);
-      updateCurrentUser(user.UserCode, currentClientCode);
-      setallflags();
-
-      //if (startdate !== null && startdate !== undefined && startdate !== "") {
-      setProcessDates(
-        "Currently Processing from " +
-          result.STARTDATE +
-          " to " +
-          result.ENDDATE
-      );
-    })();
-
-    return () => {};
-  }, [currentClientCode]);
+      return () => {};
+    },
+    [currentClientCode],
+    resetflag
+  );
 
   const setallflags = () => {
     setShowInfo(false);
@@ -303,26 +342,48 @@ const ClientManagement = () => {
   return (
     <>
       <div className="responsive-paddingsx my-top-section">
-        <div style={{ display: "flex", alignItems: "left" }}>
-          <p style={{ marginRight: "10px" }}>Client:</p>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <p style={{ marginRight: "10px", marginBottom: "0" }}>Client:</p>
           <SelectBox
             className="white-text-selectbox"
-            style={{ width: "200px", height: "40px", marginTop: "5px" }}
+            style={{ width: "200px", height: "40px", marginRight: "10px" }} // Adjusted to include marginRight
             items={customerList}
             valueExpr="label"
             displayExpr="label"
             value={currentClientCode}
             searchEnabled={true}
-            //value={currentEmployeeName}
             onValueChanged={setClientData}
-            //onValueChanged={(e) => setCurrentEmployeeName(e.value)}
           />
-          <p>
-            &nbsp;&nbsp;&nbsp;{customerName}&nbsp;&nbsp;&nbsp;{processDates}
-          </p>
+          <p style={{ margin: "0 150px 0 0" }}>{customerName}</p>{" "}
+          {/* Adjusted margins for spacing */}
+          <h6 style={{ margin: "0 15px 0 0" }}>Processing Dates</h6>{" "}
+          {/* Adjusted margins for spacing */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div className="date-picker" style={{ marginRight: "10px" }}>
+              {" "}
+              {/* Added marginRight for spacing */}
+              <label>
+                Start Date (MM/DD/YYYY):
+                <DateBox
+                  type="date"
+                  value={startdatex}
+                  onValueChanged={handleStartDateChangex}
+                />
+              </label>
+            </div>
+            <div className="date-picker">
+              <label>
+                End Date (MM/DD/YYYY):
+                <DateBox
+                  type="date"
+                  value={enddatex}
+                  onValueChanged={handleEndDateChangex}
+                />
+              </label>
+            </div>
+          </div>
         </div>
       </div>
-
       <div>
         <div className="app2 " style={{ display: "flex", alignItems: "left" }}>
           <div>
@@ -412,6 +473,7 @@ const ClientManagement = () => {
           />
         </>
       )}
+
       {ShowTransactions && (
         <>
           <p></p>

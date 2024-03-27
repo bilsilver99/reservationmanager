@@ -153,18 +153,20 @@ function ClientBankSegmentTransactions(props) {
                 caption="DESCRIPTION"
                 allowEditing={true}
               />
-              <Column
-                dataField={"FPTRANSACTIONCODE"}
-                caption={"Type"}
-                hidingPriority={7}
-                allowEditing={true}
-              >
+
+              <Column dataField="FPTRANSACTIONCODE" caption=" Type">
                 <Lookup
                   dataSource={transTypes}
                   valueExpr="FPTRANSACTIONCODE"
-                  displayExpr="DESCRIPTIONTWO"
+                  //displayExpr="DESCRIPTION"
+                  displayExpr={(item) =>
+                    item
+                      ? `${item.FPTRANSACTIONCODE} - ${item.TRANSACTIONGROUP} - ${item.DESCRIPTION} `
+                      : ""
+                  }
                 />
               </Column>
+
               <Column
                 dataType="date"
                 dataField={"TRANSACTIONDATE"}

@@ -4,6 +4,7 @@ import DebtSummary from "../clientManagement/clientBankAccounts/debtSummary";
 //import logo from "../images/iron.webp";
 import { useAuth } from "../../contexts/auth";
 import { PropertiesPanel } from "devextreme-react/diagram";
+import DateBox from "devextreme-react/date-box";
 
 function Card() {
   return (
@@ -48,23 +49,56 @@ const Dashboard = () => {
   const [userSent, setUser] = useState(user.thisClientcode);
   const [showPrior, setPrior] = useState(false);
   console.log("userSent", userSent, "thisWidthSent", thisWidthSent);
+  const [startdate, setStartdate] = useState(null);
+  const [enddate, setEnddate] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0); // for dates to refresh grid when date changed
+  const handleStartDateChange = (e) => {
+    setStartdate(e.value);
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
 
+  const handleEndDateChange = (e) => {
+    setEnddate(e.value);
+    setRefreshKey((prevKey) => prevKey + 1);
+  };
   return (
-    <div className="App">
-      <div className="right-container ">
-        <Card />
+    <>
+      <div className="App">
+        <div className="right-container ">
+          <Card />
+        </div>
+        <div className="right-container">
+          <Card2
+            thisUser={userSent}
+            thisWidthOut={thisWidthSent}
+            showPrior={showPrior}
+          />
+        </div>
+        <div className="right-container">
+          <Card3 />
+        </div>
       </div>
-      <div className="right-container">
-        <Card2
-          thisUser={userSent}
-          thisWidthOut={thisWidthSent}
-          showPrior={showPrior}
-        />
+      <div>
+        <label>
+          Start Date (MM/DD/YYYY):
+          <DateBox
+            type="date"
+            value={startdate}
+            onValueChanged={handleStartDateChange}
+          />
+        </label>
       </div>
-      <div className="right-container">
-        <Card3 />
+      <div>
+        <label>
+          End Date (MM/DD/YYYY):
+          <DateBox
+            type="date"
+            value={enddate}
+            onValueChanged={handleEndDateChange}
+          />
+        </label>
       </div>
-    </div>
+    </>
   );
 };
 

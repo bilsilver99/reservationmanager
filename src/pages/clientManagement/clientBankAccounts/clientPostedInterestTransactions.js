@@ -165,8 +165,8 @@ function ClientTransactionsx(props) {
             key={refreshKey} // This key will force a refresh when it changes
             columnAutoWidth={true}
             width={"100%"}
-            // paging={{ pageSize: 10 }}
-            // pagingEnabled={true}
+            paging={{ pageSize: 10 }}
+            pagingEnabled={true}
             remoteOperations={false}
           >
             <SearchPanel visible={false} width={240} placeholder="Search..." />
