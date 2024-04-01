@@ -1,9 +1,6 @@
 import React from "react";
 
-/////////////////////////////////////////
-
 import { Chart, Series } from "devextreme-react/chart";
-//import { areas } from "./progressGraphData.js";
 import ExcelJS from "exceljs";
 
 import withReactContent from "sweetalert2-react-content";
@@ -12,8 +9,6 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Swal from "sweetalert2";
-
-/////////////////////////////
 
 import { useAuth } from "../../../contexts/auth";
 import DataGrid, {
@@ -30,6 +25,7 @@ import {
   relatedData,
   relatedData2,
   relatedData3,
+  getexceldata,
 } from "./segmentData";
 import { Button } from "devextreme-react/button";
 
@@ -38,218 +34,12 @@ import "devextreme/data/data_source";
 import "./debtSummaryStyles.scss";
 import "./debtsummary.css";
 import { EditBatch } from "./editBatch";
+import { GenerateProgressExcel } from "./generateProgressExcel";
+import { GenerateExcelFiles } from "./generateExcelFiles";
 
 //const allowedPageSizes = [8, 12, 20];
 
 //let pageoption = 90;
-
-const renderDescriptionCell = (data) => {
-  const { data: rowData } = data;
-
-  let style = {};
-  if (rowData.LINETYPE === "H") {
-    style = {
-      fontWeight: "bold",
-      color: "white",
-      backgroundColor: "black",
-      borderTop: "1px solid black",
-      borderBottom: "1px solid black",
-      borderLeft: "1px solid black",
-    }; //
-  } else if (rowData.LINETYPE === "X") {
-    style = {
-      fontWeight: "bold",
-      color: "black",
-      backgroundColor: "#D9D9D9",
-      borderTop: "1px solid black",
-      borderBottom: "1px solid black",
-      borderLeft: "1px solid black",
-    }; // Apply blue color
-  } else if (rowData.LINETYPE === "T") {
-    style = {
-      fontWeight: "bold",
-      color: "black",
-      backgroundColor: "#D9D9D9",
-      borderTop: "1px solid black",
-      borderBottom: "1px solid black",
-      borderLeft: "1px solid black",
-    };
-  } else {
-    style = {
-      backgroundColor: "",
-      borderLeft: "1px solid black",
-
-      // borderTop: "1px solid black",
-      // borderBottom: "1px solid black",
-    };
-  }
-
-  return <div style={style}>{rowData.DESCRIPTION}</div>;
-};
-
-const renderValueFieldCell = (data) => {
-  const { data: rowData } = data;
-
-  let style = {};
-  if (rowData.LINETYPE === "T") {
-    style = {
-      fontWeight: "bold",
-      color: "black",
-      backgroundColor: "lightgrey",
-      borderTop: "1px solid black",
-      borderBottom: "1px solid black",
-      borderRight: "1px solid black",
-    };
-  }
-  if (rowData.LINETYPE === "X") {
-    style = {
-      color: "black",
-      backgroundColor: "lightgrey",
-      borderTop: "1px solid black",
-      borderBottom: "1px solid black",
-      borderRight: "1px solid black",
-    };
-  }
-  if (rowData.LINETYPE === "") {
-    style = {
-      color: "black",
-      borderRight: "1px solid black",
-      // borderTop: "1px solid black",
-      // borderBottom: "1px solid black",
-    };
-  }
-
-  if (rowData.LINETYPE === "H") {
-    style = {
-      backgroundColor: "#E6D180",
-      borderRight: "1px solid black",
-      borderTop: "1px solid black",
-      borderBottom: "1px solid black",
-      // borderTop: "1px solid black",
-      // borderBottom: "1px solid black",
-    };
-  }
-
-  // Check if the value is negative
-  const isNegative = rowData.VALUEFIELD < 0;
-  const absoluteValue = Math.abs(rowData.VALUEFIELD);
-
-  // Format the number
-  const formattedValue = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(absoluteValue);
-
-  // If negative, enclose in brackets
-  if (rowData.LINETYPE === "H" || rowData.LINETYPE === "B") {
-    return <div style={style}>&nbsp;</div>;
-  } else {
-    const displayValue = isNegative ? `(${formattedValue})` : formattedValue;
-    return <div style={style}>{displayValue}&nbsp;&nbsp;</div>;
-  }
-};
-
-const renderExcelValueFieldCell = (cell, item) => {
-  // Set font color for all cases
-  cell.font = { color: { argb: "FF000000" } }; // Black color
-
-  // Define common border style for simplicity
-  const commonBorderStyle = { style: "thin", color: { argb: "FF000000" } }; // Black
-
-  // Apply background color and borders based on LINETYPE
-  if (["T", "X"].includes(item.LINETYPE)) {
-    cell.font = { bold: true };
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FFD3D3D3" }, // Light grey background
-    };
-    cell.border = {
-      top: commonBorderStyle,
-      bottom: commonBorderStyle,
-      right: commonBorderStyle,
-    };
-  } else if (item.LINETYPE === "") {
-    // No specific background color, but black font color is already set
-    cell.border = {
-      right: commonBorderStyle,
-    };
-  } else if (item.LINETYPE === "H") {
-    cell.border = {
-      right: commonBorderStyle,
-      top: commonBorderStyle,
-      bottom: commonBorderStyle,
-    };
-    cell.font = { bold: true };
-    cell.fill = {
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FFE6D180" }, // Custom yellow background
-    };
-    cell.value = ""; // This ensures the cell displays no content, including zero
-    return;
-    // Borders are commented out in your example, so not adding them
-  } else if (item.LINETYPE === "B") {
-    cell.value = ""; // This ensures the cell displays no content, including zero
-    return;
-  }
-
-  //const valueCell = rowData.VALUEFIELD;
-  cell.numFmt = "$#,##0.00;($#,##0.00)"; // This is Excel's format for currency
-};
-
-const renderExcelDescriptionFieldCell = (cell, item) => {
-  // Define common border style
-  const commonBorderStyle = { style: "thin", color: { argb: "FF000000" } }; // Black
-
-  // Apply styles based on LINETYPE
-  if (item.LINETYPE === "H") {
-    cell.font = { color: { argb: "FFFFFFFF" } }; // White color
-    cell.fill = {
-      bold: true,
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FF000000" }, // Black background
-    };
-    cell.border = {
-      top: commonBorderStyle,
-      bottom: commonBorderStyle,
-      right: commonBorderStyle,
-      left: commonBorderStyle,
-    };
-  } else if (item.LINETYPE === "X" || item.LINETYPE === "T") {
-    cell.font = {
-      bold: true,
-      color: { argb: item.LINETYPE === "X" ? "FF000000" : "FF000000" },
-    }; // Blue for "X", Black for "T"
-    cell.fill = {
-      bold: true,
-      type: "pattern",
-      pattern: "solid",
-      fgColor: { argb: "FFD9D9D9" }, // Grey background
-    };
-    cell.border = {
-      top: commonBorderStyle,
-      bottom: commonBorderStyle,
-      right: commonBorderStyle,
-      left: commonBorderStyle,
-    };
-  } else if (item.LINETYPE === "") {
-    cell.border = {
-      left: commonBorderStyle,
-    };
-  } else {
-    // For other LINETYPE, no specific style applied here
-    // Assuming default or custom logic might be added
-  }
-
-  // Set the value of the cell to DESCRIPTION
-  cell.value = item.DESCRIPTION;
-};
-
-///////////////////////////////////
 
 class ProgressSummaryx extends React.Component {
   constructor(props) {
@@ -275,7 +65,7 @@ class ProgressSummaryx extends React.Component {
       companyCode: 1,
       assetGroupsCodes: [],
       currentFilter: this.applyFilterTypes[0].key,
-      isLoading: true, // Add a loading state
+      isLoading: false, // Add a loading state
       thisWidth: 580, //this.props.thisWidth,
       showCurrentOnly: this.props.showPrior,
       selectedRowData: null,
@@ -287,13 +77,22 @@ class ProgressSummaryx extends React.Component {
       PieActive: false,
       counterFlash: 0,
       editBatchOn: false,
-      isLoading: false,
+      EditExcelOn: false,
     };
     //console.log("what is props in debtsummary :", { props });
   }
+  CreateExcel = () => {
+    console.log("Edit Batch Clicked");
+    this.setState({ EditExcelOn: true });
+    //this.setState({ CreateExcelOn: true });
+  };
 
   handleMappingUpdated = (value) => {
     this.setState({ editBatchOn: false });
+  };
+
+  handleMappingUpdated2 = (value) => {
+    this.setState({ EditExcelOn: false });
   };
 
   EditBatch = () => {
@@ -339,98 +138,6 @@ class ProgressSummaryx extends React.Component {
       PieActive: !prevState.PieActive, // Toggle the boolean value
       counterFlash: prevState.counterFlash + 1,
     }));
-  };
-
-  CreateExcel = async () => {
-    this.setState({ isLoading: true });
-    const ExcelJS = require("exceljs");
-    const { saveAs } = require("file-saver");
-
-    try {
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Change in Net Worth");
-
-      // Define columns in the worksheet
-      worksheet.columns = [
-        { header: "", key: "UNIQUEID", width: 10 },
-        {
-          header: `Change in Net Worth for ${this.props.clientCode}`,
-          key: "DESCRIPTION",
-          width: 50,
-        },
-        { header: "", key: "VALUEFIELD", width: 15 },
-        // Add more columns as needed
-      ];
-
-      // Instantiate your CustomStore
-      console.log("inside 1");
-      const store = mystore5(this.props.clientCode);
-
-      // Fetch data using the load method of the store
-      //console.log("inside 2");
-      const data = await store.load({});
-      //console.log("inside 3", data);
-
-      if (Array.isArray(data)) {
-        //let previousValue = 0;
-        console.log(data.length);
-        for (let i = 0; i < data.length; i++) {
-          const item = data[i];
-          //console.log(`Adding row for item at index ${i}`, item);
-          const row = worksheet.addRow({
-            DESCRIPTION: item.DESCRIPTION,
-            VALUEFIELD: item.VALUEFIELD,
-            LINETYPE: item.LINETYPE,
-            ROWNUMBER: item.ROWNUMBER,
-          });
-
-          // Apply styles to the cells
-          renderExcelValueFieldCell(row.getCell("VALUEFIELD"), item);
-          renderExcelDescriptionFieldCell(row.getCell("DESCRIPTION"), item);
-        }
-        //console.log("row", worksheet.getRow(1).values);
-        //console.log("row", worksheet.getRow(4).values);
-
-        // Write to a buffer
-        const buf = await workbook.xlsx.writeBuffer();
-        //console.log("buf", buf);
-
-        // Use FileSaver to save the file
-        saveAs(
-          new Blob([buf], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          }),
-          `${this.props.clientCode}.xlsx`
-        );
-
-        // Display success message here
-        this.MySwal.fire({
-          icon: "success",
-          title: "Excel File Created",
-          text: `Your file ${this.props.clientCode}.xlsx has been successfully created.`,
-          customClass: {
-            container: "high-z-index",
-          },
-        });
-      } else {
-        console.error("Expected data to be an array but got:", typeof data);
-      }
-    } catch (error) {
-      console.error(
-        "An error occurred during the Excel file creation process:",
-        error
-      );
-      // You can also show an error message to the user here using MySwal
-      this.MySwal.fire({
-        icon: "error",
-        title: "Error",
-        text: "There was an issue creating the Excel file.",
-        customClass: {
-          container: "high-z-index",
-        },
-      });
-    }
-    this.setState({ isLoading: false });
   };
 
   onRowPrepared(e) {
@@ -582,10 +289,6 @@ class ProgressSummaryx extends React.Component {
       return null;
     }
 
-    // Assuming `getRelatedData` is a function that returns the related data based on the selected row
-    //const relatedData = getRelatedData(selectedRowData);
-    //    <div className="custom-container" style={{ height: "850px" }}>
-
     return (
       <div className="content-block2 dx-card responsive-paddings">
         <Button
@@ -661,10 +364,6 @@ class ProgressSummaryx extends React.Component {
     if (!selectedRowData3) {
       return null;
     }
-
-    // Assuming `getRelatedData` is a function that returns the related data based on the selected row
-    //const relatedData = getRelatedData(selectedRowData);
-    //    <div className="custom-container" style={{ height: "850px" }}>
 
     return (
       <div className="content-block2 dx-card responsive-paddings">
@@ -756,7 +455,7 @@ class ProgressSummaryx extends React.Component {
             )}
           </div>
         )}
-        {this.state.editBatchOn !== true && (
+        {this.state.EditExcelOn !== true && (
           <>
             <Button
               text="Clear Selections"
@@ -780,134 +479,104 @@ class ProgressSummaryx extends React.Component {
                 marginLeft: "15px",
               }}
             ></Button>
-            {!this.state.PieActive ? (
-              <div style={{ display: "flex", flexDirection: "row" }}>
-                <div style={{ flex: 0.75 }}>
-                  <div className="content-block2 dx-card responsive-paddings">
-                    <div
-                      className="custom-container"
-                      style={{ height: "850px" }}
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <div style={{ flex: 0.75 }}>
+                <div className="content-block2 dx-card responsive-paddings">
+                  <div className="custom-container" style={{ height: "850px" }}>
+                    {/* <p>Change in Net Worth (Progress) for {this.props.clientCode}</p> */}
+                    <DataGrid
+                      dataSource={mystore5(this.props.clientCode)}
+                      onRowPrepared={this.onRowPrepared}
+                      onCellPrepared={this.onCellPrepared}
+                      //scrolling={{ mode: "virtual" }} // or 'virtual', based on your preference
+                      //keyExpr="UNIQUEID"
+                      showBorders={true}
+                      remoteOperations={false}
+                      onSelectionChanged={this.handleSelectionChanged.bind(
+                        this
+                      )} // add this line
+                      onEditingStart={this.handleEditingStart}
+                      //onEditorPreparing={this.handleEditorPreparing}
+                      id="yourGridId"
+                      width={this.state.thisWidth}
+                      height={"100%"}
+                      rowHeight={"10px"} // Set the row height to 70px
+                      onRowClick={this.onRowClick}
                     >
-                      {/* <p>Change in Net Worth (Progress) for {this.props.clientCode}</p> */}
-                      <DataGrid
-                        dataSource={mystore5(this.props.clientCode)}
-                        onRowPrepared={this.onRowPrepared}
-                        onCellPrepared={this.onCellPrepared}
-                        //scrolling={{ mode: "virtual" }} // or 'virtual', based on your preference
-                        //keyExpr="UNIQUEID"
-                        showBorders={true}
-                        remoteOperations={false}
-                        onSelectionChanged={this.handleSelectionChanged.bind(
-                          this
-                        )} // add this line
-                        onEditingStart={this.handleEditingStart}
-                        //onEditorPreparing={this.handleEditorPreparing}
-                        id="yourGridId"
-                        width={this.state.thisWidth}
-                        height={"100%"}
-                        rowHeight={"10px"} // Set the row height to 70px
-                        onRowClick={this.onRowClick}
-                      >
-                        <FilterRow
-                          visible={this.state.showFilterRow}
-                          applyFilter={this.state.currentFilter}
-                        />
-                        <HeaderFilter visible={this.state.showHeaderFilter} />
-                        <Paging enabled={false} />
-                        <Column
-                          dataField="UNIQUEID"
-                          caption="Unique ID"
-                          visible={false}
-                        />
-                        <Column
-                          dataField="ROWNUMBER"
-                          caption="Row"
-                          visible={false}
-                        />
+                      <FilterRow
+                        visible={this.state.showFilterRow}
+                        applyFilter={this.state.currentFilter}
+                      />
+                      <HeaderFilter visible={this.state.showHeaderFilter} />
+                      <Paging enabled={false} />
+                      <Column
+                        dataField="UNIQUEID"
+                        caption="Unique ID"
+                        visible={false}
+                      />
+                      <Column
+                        dataField="ROWNUMBER"
+                        caption="Row"
+                        visible={false}
+                      />
 
-                        <Column
-                          dataField="DESCRIPTION"
-                          caption={`Change in Net Worth for ${this.props.clientCode}`}
-                          width={350}
-                          visible={true}
-                          cellRender={renderDescriptionCell}
-                        />
-                        <Column
-                          dataField="VALUEFIELD"
-                          caption=""
-                          format={"$###,###,###"}
-                          alignment="right"
-                          cellRender={renderValueFieldCell}
-                          width={150}
-                        />
-                        <Column
-                          dataField="FORMULAFIELD"
-                          caption="Formula"
-                          visible={false}
-                        />
-                        <Column
-                          dataField="LINETYPE"
-                          caption="Type"
-                          visible={false}
-                        />
-                        <Column
-                          dataField="UNIQUEID"
-                          caption="id"
-                          visible={false}
-                        />
-                      </DataGrid>
-                    </div>
+                      <Column
+                        dataField="DESCRIPTION"
+                        caption={`Change in Net Worth for ${this.props.clientCode}`}
+                        width={350}
+                        visible={true}
+                        cellRender={renderDescriptionCell}
+                      />
+                      <Column
+                        dataField="VALUEFIELD"
+                        caption=""
+                        format={"$###,###,###"}
+                        alignment="right"
+                        cellRender={renderValueFieldCell}
+                        width={150}
+                      />
+                      <Column
+                        dataField="FORMULAFIELD"
+                        caption="Formula"
+                        visible={false}
+                      />
+                      <Column
+                        dataField="LINETYPE"
+                        caption="Type"
+                        visible={false}
+                      />
+                      <Column
+                        dataField="UNIQUEID"
+                        caption="id"
+                        visible={false}
+                      />
+                    </DataGrid>
                   </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  {this.renderRelatedGrid()}
-                  {this.renderRelatedGrid2()}
-                  {this.renderRelatedGrid3()}
-                </div>
               </div>
-            ) : (
-              <Chart
-                id="chart"
-                dataSource={mystoreGraph(this.props.clientCode)}
-              >
-                <Series
-                  valueField="DESCRIPTION"
-                  argumentField="VALUEFIELD"
-                  name="Analysis"
-                  type="bar"
-                  color="#ffaa66"
-                />
-              </Chart>
-
-              // <Chart
-              //   key={this.state.counterFlash}
-              //   id="pie"
-              //   //dataSource={this.state.areas}
-              //   dataSource={mystoreGraph(this.props.clientCode)}
-              //   palette="Bright"
-              //   title="Account Type Analysis"
-              //   onPointClick={pointClickHandler}
-              //   onLegendClick={legendClickHandler}
-              // >
-              //   <Series argumentField="DESCRIPTION" valueField="VALUEFIELD">
-              //     type="bar"
-              //     <Label visible={true}>
-              //       <Connector visible={true} width={1} />
-              //     </Label>
-              //   </Series>
-
-              //   <Size width={800} />
-              //   <Export enabled={true} />
-              // </Chart>
-            )}
+              <div style={{ flex: 1 }}>
+                {this.renderRelatedGrid()}
+                {this.renderRelatedGrid2()}
+                {this.renderRelatedGrid3()}
+              </div>
+            </div>
           </>
         )}
+
         {this.state.editBatchOn === true && (
           <div>
             <EditBatch
               rownumber={this.state.selectedRowNumber}
               clientCode={this.props.clientCode}
               onMappingUpdated={this.handleMappingUpdated}
+            />
+          </div>
+        )}
+        {this.state.EditExcelOn === true && (
+          <div>
+            <GenerateExcelFiles
+              clientCode={this.props.clientCode}
+              onMappingUpdated2={this.handleMappingUpdated2}
             />
           </div>
         )}
@@ -929,19 +598,110 @@ export default function ProgressSummary(props) {
   );
 }
 
-//  <div>
-// {this.clickCount === 1 && (
-//   <EditBatch
-//     rownumber={this.state.selectedRowNumber}
-//     clientCode={this.props.clientCode}
-//     onMappingUpdated={this.handleMappingUpdated}
-//   />
-// )}
-// {this.clickCount === 2 && (
-//   <EditBatch
-//     rownumber={this.state.selectedRowNumber2}
-//     clientCode={this.props.clientCode}
-//     onMappingUpdated={this.handleMappingUpdated}
-//   />
-// )}
-// </div>
+const renderDescriptionCell = (data) => {
+  const { data: rowData } = data;
+
+  let style = {};
+  if (rowData.LINETYPE === "H") {
+    style = {
+      fontWeight: "bold",
+      color: "white",
+      backgroundColor: "black",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+    }; //
+  } else if (rowData.LINETYPE === "X") {
+    style = {
+      fontWeight: "bold",
+      color: "black",
+      backgroundColor: "#D9D9D9",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+    }; // Apply blue color
+  } else if (rowData.LINETYPE === "T") {
+    style = {
+      fontWeight: "bold",
+      color: "black",
+      backgroundColor: "#D9D9D9",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+    };
+  } else {
+    style = {
+      backgroundColor: "",
+      borderLeft: "1px solid black",
+
+      // borderTop: "1px solid black",
+      // borderBottom: "1px solid black",
+    };
+  }
+
+  return <div style={style}>{rowData.DESCRIPTION}</div>;
+};
+
+const renderValueFieldCell = (data) => {
+  const { data: rowData } = data;
+
+  let style = {};
+  if (rowData.LINETYPE === "T") {
+    style = {
+      fontWeight: "bold",
+      color: "black",
+      backgroundColor: "lightgrey",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderRight: "1px solid black",
+    };
+  }
+  if (rowData.LINETYPE === "X") {
+    style = {
+      color: "black",
+      backgroundColor: "lightgrey",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderRight: "1px solid black",
+    };
+  }
+  if (rowData.LINETYPE === "") {
+    style = {
+      color: "black",
+      borderRight: "1px solid black",
+      // borderTop: "1px solid black",
+      // borderBottom: "1px solid black",
+    };
+  }
+
+  if (rowData.LINETYPE === "H") {
+    style = {
+      backgroundColor: "#E6D180",
+      borderRight: "1px solid black",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      // borderTop: "1px solid black",
+      // borderBottom: "1px solid black",
+    };
+  }
+
+  // Check if the value is negative
+  const isNegative = rowData.VALUEFIELD < 0;
+  const absoluteValue = Math.abs(rowData.VALUEFIELD);
+
+  // Format the number
+  const formattedValue = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(absoluteValue);
+
+  // If negative, enclose in brackets
+  if (rowData.LINETYPE === "H" || rowData.LINETYPE === "B") {
+    return <div style={style}>&nbsp;</div>;
+  } else {
+    const displayValue = isNegative ? `(${formattedValue})` : formattedValue;
+    return <div style={style}>{displayValue}&nbsp;&nbsp;</div>;
+  }
+};

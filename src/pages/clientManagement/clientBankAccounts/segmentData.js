@@ -1058,6 +1058,7 @@ export const mystore5 = (ClientCode, rangeValue) =>
           Parameters: params,
         }),
       };
+      //      alert("1. in mystore for some reason ->" + ClientCode);
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgress`;
       return new Promise((resolve, reject) => {
         fetch(url, requestoptions)
@@ -1227,6 +1228,7 @@ export const relatedData = (ClientCode, UniqueID2, rownumber) =>
         "clientcode is ",
         ClientCode
       );
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
       return new Promise((resolve, reject) => {
         fetch(url, requestoptions)
@@ -1288,6 +1290,7 @@ export const relatedData = (ClientCode, UniqueID2, rownumber) =>
           sentcompany: ClientCode,
         }),
       };
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1315,6 +1318,7 @@ export const relatedData = (ClientCode, UniqueID2, rownumber) =>
           ThisFunction: "delete",
         }),
       };
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1351,6 +1355,7 @@ export const relatedData = (ClientCode, UniqueID2, rownumber) =>
         "option:",
         requestoptions
       );
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -1404,6 +1409,7 @@ export const xrelatedData = (ClientCode, UniqueID2) =>
         }),
       };
       console.log("uniqueid is ", UniqueID2);
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
       return new Promise((resolve, reject) => {
         fetch(url, requestoptions)
@@ -1484,6 +1490,7 @@ export const relatedData2 = (ClientCode, UniqueID2) =>
         }),
       };
       console.log("uniqueid is ", UniqueID2);
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
       return new Promise((resolve, reject) => {
         fetch(url, requestoptions)
@@ -1565,6 +1572,7 @@ export const relatedData3 = (ClientCode, UniqueID2) =>
         }),
       };
       console.log("uniqueid is ", UniqueID2);
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressData`;
       return new Promise((resolve, reject) => {
         fetch(url, requestoptions)
@@ -1643,6 +1651,7 @@ export const mystoreGraphs = (ClientCode, rangeValue) =>
           Parameters: params,
         }),
       };
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressGraph`;
       return new Promise((resolve, reject) => {
         fetch(url, requestoptions)
@@ -1726,6 +1735,7 @@ export const mystoreGraphsss = (myClient, rangeValue) =>
         }),
       };
       //lert("in mystore for some reason");
+
       const url = `${process.env.REACT_APP_BASE_URL}/returnProgressGraph`;
       return fetch(url, requestoptions) // Request fish
         .then((response) => {
@@ -2121,4 +2131,96 @@ export const SetClientInterestFlag = (clientcode) => {
       };
     });
 };
-///////////////////////////////////////////
+
+export const getexcelProgressdata = (ClientCode) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: ClientCode,
+    }),
+  };
+  //alert("getexceldata ->" + ClientCode);
+  const url = `${process.env.REACT_APP_BASE_URL}/returnProgressExcel`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("banks list", json.user_response.LineQ);
+      return {
+        data: json.user_response.LineQ,
+      };
+    });
+};
+
+export const getexcelDebtdata = (ClientCode) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: ClientCode,
+    }),
+  };
+  //alert("getexceldata ->" + ClientCode);
+  const url = `${process.env.REACT_APP_BASE_URL}/returnDebtSummary`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("banks list", json.user_response.FPTransq);
+      return {
+        data: json.user_response.FPTransq,
+      };
+    });
+};
+
+export const getexcelNetWorthdata = (ClientCode) => {
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: ClientCode,
+    }),
+  };
+  //alert("getexceldata ->" + ClientCode);
+  const url = `${process.env.REACT_APP_BASE_URL}/returnNetWorth`;
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      console.log("banks list", json.user_response.LineQ);
+      return {
+        data: json.user_response.LineQ,
+      };
+    });
+};

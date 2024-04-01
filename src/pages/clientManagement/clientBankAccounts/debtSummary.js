@@ -7,49 +7,67 @@ import DataGrid, {
   FilterRow,
   HeaderFilter,
 } from "devextreme-react/data-grid";
+import { Button } from "devextreme-react/button";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { mystore4 } from "./segmentData";
 import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import "./debtSummaryStyles.scss";
 import "./debtsummary.css";
+import { GenerateDebtExcel } from "./generateDebtExcel";
 
 //const allowedPageSizes = [8, 12, 20];
 
 //let pageoption = 90;
 
-let lastBankAccountNumber = "xxxxxx";
-
-const renderBankAccountNumber = (data) => {
-  const { data: rowData } = data;
-
-  let style = {};
-  let content = "";
-
-  if (rowData.BANKACCOUNTNUMBER !== lastBankAccountNumber) {
-    content = <div>{rowData.BANKACCOUNTNUMBER}</div>;
-  }
-
-  lastBankAccountNumber = rowData.BANKACCOUNTNUMBER;
-
-  if (rowData.GROUPCODEDESCRIPTION !== "") {
-    if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
-      style = { color: "white" }; // Apply blue color
-    } else if (rowData.ACTUALSEGMENT === 99) {
-      style = { color: "white" }; // Apply yellow color
-    }
-
-    return <div style={style}>{content}</div>;
-  }
-};
 const renderDescriptionCell = (data) => {
   const { data: rowData } = data;
 
   let style = {};
-  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
-    style = { color: "blue" }; // Apply blue color
-  } else if (rowData.ACTUALSEGMENT === 99) {
-    style = { color: "red" }; // Apply yellow color
+  if (
+    rowData.TOTAL === 1 &&
+    rowData.GROUPTYPESEQUENCE !== 99 &&
+    rowData.GROUPTYPESEQUENCE !== 98
+  ) {
+    style = {
+      fontWeight: "bold",
+      backgroundColor: "lightgrey",
+      borderTop: "1px solid black",
+      borderLeft: "1px solid black",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 99) {
+    style = {
+      borderRight: "1px solid black",
+      borderLeft: "1px solid black",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 98) {
+    style = {
+      fontWeight: "bold",
+      color: "white",
+      backgroundColor: "black",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+    }; //
+  } else {
+    if (rowData.DESCRIPTION === "") {
+      style = {
+        borderRight: "1px solid black",
+        borderLeft: "1px solid black",
+      };
+    } else {
+      style = {
+        borderTop: "1px solid black",
+        borderRight: "1px solid black",
+        borderLeft: "1px solid black",
+      };
+    }
+  }
+
+  if (rowData.DESCRIPTION === "") {
+    return <div style={style}>&nbsp;</div>;
   }
 
   return <div style={style}>{rowData.DESCRIPTION}</div>;
@@ -59,26 +77,90 @@ const renderGroupDescriptionCell = (data) => {
   const { data: rowData } = data;
 
   let style = {};
-  if (rowData.GROUPCODEDESCRIPTION !== "") {
-    if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
-      style = { color: "blue" }; // Apply blue color
-    } else if (rowData.ACTUALSEGMENT === 99) {
-      style = { color: "red" }; // Apply yellow color
+  if (
+    rowData.TOTAL === 1 &&
+    rowData.GROUPTYPESEQUENCE !== 99 &&
+    rowData.GROUPTYPESEQUENCE !== 98
+  ) {
+    if (rowData.GROUPCODEDESCRIPTION !== "") {
+      style = {
+        fontWeight: "bold",
+        borderTop: "1px solid black",
+        backgroundColor: "lightgrey",
+        borderRight: "1px solid black",
+      };
+    } else {
+      style = {
+        backgroundColor: "lightgrey",
+        borderTop: "1px solid black",
+        borderRight: "1px solid black",
+      };
+      return <div style={style}>&nbsp;</div>;
     }
-
-    return <div style={style}>{rowData.GROUPCODEDESCRIPTION}</div>;
+  } else if (rowData.GROUPTYPESEQUENCE === 99) {
+    style = {
+      fontWeight: "bold",
+      borderTop: "1px solid black",
+      backgroundColor: "lightgrey",
+      borderRight: "1px solid black",
+      borderBottom: "1px solid black",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 98) {
+    style = {
+      fontWeight: "bold",
+      color: "white",
+      backgroundColor: "black",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+    }; //
+  } else {
+    style = { borderRight: "1px solid black" };
   }
+
+  return <div style={style}>{rowData.GROUPCODEDESCRIPTION}</div>;
 };
 
 const renderCurrentValueCell = (data) => {
   const { data: rowData } = data;
 
   let style = {};
-  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
-    style = { color: "blue", borderTop: "1px solid black" }; // Apply blue color
-  } else if (rowData.ACTUALSEGMENT === 99) {
-    style = { color: "red", borderTop: "1px solid black" }; // Apply yellow color
+  if (
+    rowData.TOTAL === 1 &&
+    rowData.GROUPTYPESEQUENCE !== 99 &&
+    rowData.GROUPTYPESEQUENCE !== 98
+  ) {
+    style = {
+      fontWeight: "bold",
+      borderTop: "1px solid black",
+      backgroundColor: "lightgrey",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 99) {
+    style = {
+      fontWeight: "bold",
+      borderTop: "1px solid black",
+      backgroundColor: "lightgrey",
+      borderRight: "1px solid black",
+      borderBottom: "1px solid black",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 98) {
+    style = {
+      fontWeight: "bold",
+      color: "black",
+      backgroundColor: "#E6D180",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+      borderRight: "1px solid black",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    };
+    return <div style={style}>Current</div>;
+  } else {
+    style = { borderRight: "1px solid black" };
   }
+
   // Check if the value is negative
   const isNegative = rowData.CHANGEVALUE < 0;
   const absoluteValue = Math.abs(rowData.CURRENTVALUE);
@@ -100,11 +182,41 @@ const renderPriorValueCell = (data) => {
   const { data: rowData } = data;
 
   let style = {};
-  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
-    style = { color: "blue", borderTop: "1px solid black" }; // Apply blue color
-  } else if (rowData.ACTUALSEGMENT === 99) {
-    style = { color: "red", borderTop: "1px solid black" }; // Apply yellow color
+  if (
+    rowData.TOTAL === 1 &&
+    rowData.GROUPTYPESEQUENCE !== 99 &&
+    rowData.GROUPTYPESEQUENCE !== 98
+  ) {
+    style = {
+      fontWeight: "bold",
+      borderTop: "1px solid black",
+      backgroundColor: "lightgrey",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 99) {
+    style = {
+      fontWeight: "bold",
+      borderTop: "1px solid black",
+      backgroundColor: "lightgrey",
+      borderRight: "1px solid black",
+      borderBottom: "1px solid black",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 98) {
+    style = {
+      fontWeight: "bold",
+      color: "black",
+      backgroundColor: "#E6D180",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    };
+    return <div style={style}>Prior</div>;
+  } else {
+    style = { borderRight: "1px solid black" };
   }
+
   // Check if the value is negative
   const isNegative = rowData.CHANGEVALUE < 0;
   const absoluteValue = Math.abs(rowData.PRIORVALUE);
@@ -126,10 +238,39 @@ const renderChangeValueCell = (data) => {
   const { data: rowData } = data;
 
   let style = {};
-  if (rowData.TOTAL === 1 && rowData.ACTUALSEGMENT !== 99) {
-    style = { color: "blue", borderTop: "1px solid black" }; // Apply blue color
-  } else if (rowData.ACTUALSEGMENT === 99) {
-    style = { color: "red", borderTop: "1px solid black" }; // Apply yellow color
+  if (
+    rowData.TOTAL === 1 &&
+    rowData.GROUPTYPESEQUENCE !== 99 &&
+    rowData.GROUPTYPESEQUENCE !== 98
+  ) {
+    style = {
+      fontWeight: "bold",
+      borderTop: "1px solid black",
+      backgroundColor: "lightgrey",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 99) {
+    style = {
+      fontWeight: "bold",
+      borderTop: "1px solid black",
+      backgroundColor: "lightgrey",
+      borderRight: "1px solid black",
+      borderBottom: "1px solid black",
+    };
+  } else if (rowData.GROUPTYPESEQUENCE === 98) {
+    style = {
+      fontWeight: "bold",
+      color: "black",
+      backgroundColor: "#E6D180",
+      borderTop: "1px solid black",
+      borderBottom: "1px solid black",
+      borderLeft: "1px solid black",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    };
+    return <div style={style}>+/-</div>;
+  } else {
+    style = { borderRight: "1px solid black" };
   }
 
   // Check if the value is negative
@@ -173,12 +314,22 @@ class DebtSummaryx extends React.Component {
       companyCode: 1,
       assetGroupsCodes: [],
       currentFilter: this.applyFilterTypes[0].key,
-      isLoading: true, // Add a loading state
+      isLoading: false, // Add a loading state
       thisWidth: this.props.thisWidth,
       showCurrentOnly: this.props.showPrior,
     };
     console.log("what is props in debtsummary :", { props });
   }
+
+  handleMappingUpdated2 = (value) => {
+    this.setState({ EditExcelOn: false });
+  };
+
+  CreateExcel = () => {
+    console.log("Edit Batch Clicked");
+    this.setState({ EditExcelOn: true });
+    //this.setState({ CreateExcelOn: true });
+  };
 
   handleSelectionChanged(e) {
     this.setState({ selectedRowKeys: e.selectedRowKeys });
@@ -213,107 +364,139 @@ class DebtSummaryx extends React.Component {
 
   render() {
     return (
-      <div className="content-block2 dx-card responsive-paddings">
-        <div className="custom-container" style={{ height: "800px" }}>
-          <p>Debt Summary for {this.props.clientCode}</p>
-          <DataGrid
-            dataSource={mystore4(this.props.clientCode)}
-            onRowPrepared={this.onRowPrepared}
-            onCellPrepared={this.onCellPrepared}
-            scrolling={{ mode: "virtual" }} // or 'standard', based on your preference
-            //keyExpr="UNIQUEID"
-            showBorders={true}
-            remoteOperations={false}
-            onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
-            onEditingStart={this.handleEditingStart}
-            width={this.state.thisWidth}
-            height={"100%"}
-            rowHeight={"70px"} // Set the row height to 70px
-          >
-            <FilterRow
-              visible={this.state.showFilterRow}
-              applyFilter={this.state.currentFilter}
+      <>
+        {this.state.EditExcelOn !== true && (
+          <>
+            <Button
+              text="Create Excel"
+              onClick={this.CreateExcel}
+              style={{
+                width: "200px",
+                height: "30px",
+                marginTop: "2px",
+                marginBottom: "10px",
+                marginLeft: "15px",
+              }}
+            ></Button>
+            <div className="content-block2 dx-card responsive-paddings">
+              <div className="custom-container" style={{ height: "800px" }}>
+                {/* <p>Debt Summary for {this.props.clientCode}</p> */}
+                <DataGrid
+                  dataSource={mystore4(this.props.clientCode)}
+                  onRowPrepared={this.onRowPrepared}
+                  onCellPrepared={this.onCellPrepared}
+                  scrolling={{ mode: "virtual" }} // or 'standard', based on your preference
+                  //keyExpr="UNIQUEID"
+                  showBorders={true}
+                  remoteOperations={false}
+                  onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
+                  onEditingStart={this.handleEditingStart}
+                  width={this.state.thisWidth}
+                  height={"100%"}
+                  rowHeight={"70px"} // Set the row height to 70px
+                >
+                  <Paging enabled={false} />
+                  <Column
+                    dataField="UNIQUEID"
+                    caption="Unique ID"
+                    visible={false}
+                  />
+                  <Column
+                    dataField="CLIENTCODE"
+                    caption="Client"
+                    visible={false}
+                  />
+                  <Column dataField="TOTALSEQ" caption="Seq" visible={false} />
+                  <Column dataField="BANKCODE" caption="Bank" visible={false} />
+                  <Column
+                    dataField="BANKACCOUNTNUMBER"
+                    caption="Account"
+                    visible={false}
+                  />
+                  <Column
+                    dataField="DESCRIPTION"
+                    width={350}
+                    cellRender={renderDescriptionCell}
+                    caption={`Debt Summary for ${this.props.clientCode}`}
+                    //headerCellRender={renderTitleHeader}
+                  />
+                  <Column
+                    dataField="SEGMENTNUMBER"
+                    caption=""
+                    format={"###"}
+                    alignment="right"
+                    width={120}
+                    visible={false}
+                  />
+                  <Column
+                    dataField="GROUPCODE"
+                    caption="Group"
+                    visible={false}
+                  />
+                  <Column
+                    dataField="GROUPCODEDESCRIPTION"
+                    cellRender={renderGroupDescriptionCell}
+                    caption=""
+                    width={200}
+                  />
+                  <Column
+                    dataField="CURRENTVALUE"
+                    caption=""
+                    format={"$###,###,###"}
+                    alignment="right"
+                    cellRender={renderCurrentValueCell}
+                  />
+                  <Column
+                    dataField="PRIORVALUE"
+                    caption=""
+                    format={"$###,###,###"}
+                    alignment="right"
+                    visible={this.state.showCurrentOnly}
+                    cellRender={renderPriorValueCell}
+                  />
+                  <Column
+                    dataField="CHANGEVALUE"
+                    caption=""
+                    format={"$###,###,###"}
+                    alignment="right"
+                    visible={this.state.showCurrentOnly}
+                    cellRender={renderChangeValueCell}
+                  />
+                  <Column
+                    dataField="GROUPSEQUENCE"
+                    caption=""
+                    visible={false}
+                  />
+                  <Column dataField="TOTAL" caption="Total" visible={false} />
+                  <Column
+                    dataField="BANKSEQUENCE"
+                    caption="Bank Seq"
+                    visible={false}
+                  />
+                  <Column
+                    dataField="GROUPTYPESEQUENCE"
+                    caption="Group Type Seq"
+                    visible={false}
+                  />
+                  <Column
+                    dataField="COMPOUND"
+                    caption="Compound"
+                    visible={false}
+                  />
+                </DataGrid>
+              </div>
+            </div>
+          </>
+        )}
+        {this.state.EditExcelOn === true && (
+          <div>
+            <GenerateDebtExcel
+              clientCode={this.props.clientCode}
+              onMappingUpdated2={this.handleMappingUpdated2}
             />
-            <HeaderFilter visible={this.state.showHeaderFilter} />
-
-            <Paging enabled={false} />
-            <Column dataField="UNIQUEID" caption="Unique ID" visible={false} />
-            <Column dataField="CLIENTCODE" caption="Client" visible={false} />
-            <Column dataField="TOTALSEQ" caption="Seq" visible={false} />
-            <Column dataField="BANKCODE" caption="Bank" visible={false} />
-            <Column
-              dataField="BANKACCOUNTNUMBER"
-              caption="Account"
-              style={{ color: "blue" }}
-              width={150}
-              cellRender={renderBankAccountNumber}
-              visible={false}
-            />
-            <Column
-              dataField="DESCRIPTION"
-              caption="Description"
-              width={350}
-              cellRender={renderDescriptionCell}
-            />
-            <Column
-              dataField="SEGMENTNUMBER"
-              caption="Segment"
-              format={"###"}
-              alignment="right"
-              width={120}
-              visible={false}
-            />
-            <Column dataField="GROUPCODE" caption="Group" visible={false} />
-            <Column
-              dataField="GROUPCODEDESCRIPTION"
-              cellRender={renderGroupDescriptionCell}
-              caption="Description"
-              width={200}
-            />
-            <Column
-              dataField="CURRENTVALUE"
-              caption="Current"
-              format={"$###,###,###"}
-              alignment="right"
-              cellRender={renderCurrentValueCell}
-            />
-            <Column
-              dataField="PRIORVALUE"
-              caption="Prior"
-              format={"$###,###,###"}
-              alignment="right"
-              visible={this.state.showCurrentOnly}
-              cellRender={renderPriorValueCell}
-            />
-            <Column
-              dataField="CHANGEVALUE"
-              caption="Change"
-              format={"$###,###,###"}
-              alignment="right"
-              visible={this.state.showCurrentOnly}
-              cellRender={renderChangeValueCell}
-            />
-            <Column
-              dataField="GROUPSEQUENCE"
-              caption="Sequence"
-              visible={false}
-            />
-            <Column dataField="TOTAL" caption="Total" visible={false} />
-            <Column
-              dataField="BANKSEQUENCE"
-              caption="Bank Seq"
-              visible={false}
-            />
-            <Column
-              dataField="GROUPTYPESEQUENCE"
-              caption="Group Type Seq"
-              visible={false}
-            />
-            <Column dataField="COMPOUND" caption="Compound" visible={false} />
-            <Column dataField="ACTUALSEGMENT" caption="SEQG" visible={false} />
-          </DataGrid>
-        </div>
-      </div>
+          </div>
+        )}
+      </>
     );
   }
 }

@@ -22,6 +22,7 @@ import ClientInvestments from "./clientBankAccounts/clientInvestments";
 import ClientAssets from "./clientBankAccounts/clientAssets";
 import CustomerProfile from "./clientBankAccounts/customerProfile";
 import Transfers from "./clientBankAccounts/transfers";
+import { GenerateExcelFiles } from "./clientBankAccounts/generateExcelFiles";
 
 import ImportTransactions from "./clientBankAccounts/importTransactions";
 import BankCSVImport from "./clientBankAccounts/bankCSVImport";
@@ -32,6 +33,7 @@ import GetStockPrice from "./clientBankAccounts/getStockprice";
 import ImportExcel from "./clientBankAccounts/importExcel";
 import DateBox from "devextreme-react/date-box";
 import "./clientManagement.css";
+import { set } from "date-fns";
 
 const clients = ["sam", "lou"];
 
@@ -75,6 +77,7 @@ const ClientManagement = () => {
   const [ShowImport, setShowImport] = React.useState(false);
   const [ShowImportExcel, setShowImportExcel] = React.useState(false);
   const [ShowProcessImport, setShowProcessImport] = React.useState(false);
+  const [ShowCreateExcel, setShowCreateExcel] = React.useState(false);
 
   const [showPrior, setPrior] = React.useState(true);
 
@@ -82,16 +85,21 @@ const ClientManagement = () => {
   const [enddatex, setEnddatex] = React.useState(null);
   const [refreshKeyx, setRefreshKey] = React.useState(0); // for dates to refresh grid when date changed
   const [resetflag, setResetFlag] = React.useState(false);
+  const [EditExcelOn, setEditExcelOn] = React.useState(false);
   const handleStartDateChangex = (e) => {
     if (
       currentClientCode === null ||
       currentClientCode === undefined ||
-      currentClientCode === ""
+      currentClientCode === "" ||
+      e.value === null ||
+      e.value === undefined ||
+      e.value === "" ||
+      enddatex.value === 0
     )
       return;
     const newStartDate = e.value; // Capture the new start date value from the event
     setStartdatex(newStartDate); // Schedule the state update
-    console.log("start date: ", newStartDate);
+    console.log("start date: ", newStartDate, "end date: ", enddatex);
 
     updateClientx(currentClientCode, newStartDate, enddatex); // Use newStartDate directly
     resetflag ? setResetFlag(false) : setResetFlag(true);
@@ -105,16 +113,26 @@ const ClientManagement = () => {
     //setRefreshKey((prevKey) => prevKey + 1);
   };
 
+  const handleMappingUpdated2 = (value) => {
+    setEditExcelOn(value);
+    setShowCreateExcel(false);
+    //this.setState({ EditExcelOn: false });
+  };
+
   const handleEndDateChangex = (e) => {
     if (
       currentClientCode === null ||
       currentClientCode === undefined ||
-      currentClientCode === ""
+      currentClientCode === "" ||
+      e.value === null ||
+      e.value === undefined ||
+      e.value === "" ||
+      enddatex.value === 0
     )
       return;
     const newEndDate = e.value; // Capture the new start date value from the event
     setEnddatex(newEndDate); // Schedule the state update
-    console.log("end date: ", newEndDate);
+    console.log("end date: ", newEndDate, "start date: ", startdatex);
     //console.log("start date: ", newEndDate);
 
     updateClientx(currentClientCode, startdatex, newEndDate); // Use newStartDate directly
@@ -255,6 +273,7 @@ const ClientManagement = () => {
     setShowTransfers(false);
     setFormProgress(false);
     setFormNetWorth(false);
+    setShowCreateExcel(false);
   };
 
   const setForm1 = () => {
@@ -338,6 +357,11 @@ const ClientManagement = () => {
     setShowBanks(true);
     setShowTransfers(true);
   };
+  const setFormCreateExcel = () => {
+    setallflags();
+    setShowDashboard(true);
+    setShowCreateExcel(true);
+  };
 
   return (
     <>
@@ -420,6 +444,7 @@ const ClientManagement = () => {
                   <Button text="Progress" onClick={setShowProgress} />
                   <Button text="Debt Summary" onClick={setShowDebtSummary} />
                   <Button text="Net Worth" onClick={setShowNetWorth} />
+                  <Button text="Create Excel" onClick={setFormCreateExcel} />
                   {/* Empty divs for alignment */}
                   <div></div>
                   <div></div>
@@ -513,6 +538,14 @@ const ClientManagement = () => {
           clientCode={currentClientCode}
           sharedValue={sharedValue}
         />
+      )}
+      {ShowCreateExcel === true && (
+        <div>
+          <GenerateExcelFiles
+            clientCode={currentClientCode}
+            onMappingUpdated2={handleMappingUpdated2}
+          />
+        </div>
       )}
     </>
   );

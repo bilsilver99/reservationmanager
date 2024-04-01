@@ -187,30 +187,4 @@ export const navigation = [
     path: "/importExcelAssets",
     auth: "Y",
   },
-  {
-    text: "Reporting",
-    icon: "image",
-    auth: "Y",
-    expanded: "N",
-    items: [
-      {
-        text: "Progress",
-        icon: "",
-        path: "/clientProgress",
-        auth: "Y",
-      },
-      {
-        text: "Debt Summary",
-        icon: "folder",
-        path: "/clientDebtSummary",
-        auth: "Y",
-      },
-      {
-        text: "Net Worth",
-        icon: "folder",
-        path: "/clientNetWorth",
-        auth: "Y",
-      },
-    ],
-  },
 ];

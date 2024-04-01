@@ -1,6 +1,7 @@
 import React from "react";
 
 import { useAuth } from "../../../contexts/auth";
+import { Button } from "devextreme-react/button";
 import DataGrid, {
   Column,
   Paging,
@@ -13,6 +14,7 @@ import "devextreme-react/text-area";
 import "devextreme/data/data_source";
 import "./debtSummaryStyles.scss";
 import "./debtsummary.css";
+import { GenerateNetWorthExcel } from "./generateNetWorthExcel";
 
 //const allowedPageSizes = [8, 12, 20];
 
@@ -30,6 +32,8 @@ const renderDescriptionCell = (data) => {
       backgroundColor: "black",
       borderTop: "1px solid black",
       borderBottom: "1px solid black",
+      borderRight: "1px solid black",
+      borderLeft: "1px solid black",
     }; // Apply blue color
   } else if (rowData.LINETYPE === "X") {
     style = {
@@ -37,6 +41,8 @@ const renderDescriptionCell = (data) => {
       backgroundColor: "lightgrey",
       borderTop: "1px solid black",
       borderBottom: "1px solid black",
+      borderRight: "1px solid black",
+      borderLeft: "1px solid black",
     }; // Apply blue color
   } else if (rowData.LINETYPE === "T") {
     style = {
@@ -44,10 +50,14 @@ const renderDescriptionCell = (data) => {
       backgroundColor: "lightgrey",
       borderTop: "1px solid black",
       borderBottom: "1px solid black",
+      borderRight: "1px solid black",
+      borderLeft: "1px solid black",
     };
   } else {
     style = {
       backgroundColor: "",
+      borderRight: "1px solid black",
+      borderLeft: "1px solid black",
       // borderTop: "1px solid black",
       // borderBottom: "1px solid black",
     };
@@ -68,7 +78,7 @@ const renderValueFieldCell3 = (data) => renderValueFieldCellCombined(data, 3);
 const renderValueFieldCellCombined = (data, column) => {
   const { data: rowData } = data;
 
-  let style = {};
+  let style = { borderRight: "1px solid black" };
   let formattedValue = "";
   let displayValue = "";
   let printColumn = "";
@@ -103,10 +113,12 @@ const renderValueFieldCellCombined = (data, column) => {
       backgroundColor: "#D9D9D9",
       borderTop: "1px solid black",
       borderBottom: "1px solid black",
+      borderRight: "1px solid black",
     };
   } else if (rowData.LINETYPE === "H") {
     style = {
       backgroundColor: "#E6D180",
+      borderRight: "1px solid black",
     };
   }
 
@@ -176,9 +188,20 @@ class NetWorthx extends React.Component {
       isLoading: true, // Add a loading state
       thisWidth: 880, //this.props.thisWidth,
       showCurrentOnly: this.props.showPrior,
+      EditExcelOn: false,
     };
     console.log("what is props in debtsummary :", { props });
   }
+
+  handleMappingUpdated2 = (value) => {
+    this.setState({ EditExcelOn: false });
+  };
+
+  CreateExcel = () => {
+    console.log("Edit Batch Clicked");
+    this.setState({ EditExcelOn: true });
+    //this.setState({ CreateExcelOn: true });
+  };
 
   handleSelectionChanged(e) {
     this.setState({ selectedRowKeys: e.selectedRowKeys });
@@ -215,78 +238,107 @@ class NetWorthx extends React.Component {
 
   render() {
     return (
-      <div className="content-block2 dx-card responsive-paddings">
-        <div className="custom-container" style={{ height: "850px" }}>
-          {/* <p>Change in Net Worth (Progress) for {this.props.clientCode}</p> */}
-          <DataGrid
-            dataSource={mystore7(this.props.clientCode)}
-            onRowPrepared={this.onRowPrepared}
-            onCellPrepared={this.onCellPrepared}
-            scrolling={{ mode: "virtual" }} // or 'virtual', based on your preference
-            //keyExpr="UNIQUEID"
-            showBorders={true}
-            remoteOperations={false}
-            onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
-            onEditingStart={this.handleEditingStart}
-            width={this.state.thisWidth}
-            height={"100%"}
-            //rowHeight={"10px"} // Set the row height to 70px
-          >
-            <FilterRow
-              visible={this.state.showFilterRow}
-              applyFilter={this.state.currentFilter}
-            />
-            <HeaderFilter visible={this.state.showHeaderFilter} />
-            <Paging enabled={false} />
-            <Column dataField="UNIQUEID" caption="Unique ID" visible={false} />
-            <Column dataField="ROWNUMBER" caption="Row" visible={false} />
+      <>
+        {this.state.EditExcelOn !== true && (
+          <>
+            <Button
+              text="Create Excel"
+              onClick={this.CreateExcel}
+              style={{
+                width: "200px",
+                height: "30px",
+                marginTop: "2px",
+                marginBottom: "10px",
+                marginLeft: "15px",
+              }}
+            ></Button>
+            <div className="content-block2 dx-card responsive-paddings">
+              <div className="custom-container" style={{ height: "850px" }}>
+                {/* <p>Change in Net Worth (Progress) for {this.props.clientCode}</p> */}
+                <DataGrid
+                  dataSource={mystore7(this.props.clientCode)}
+                  onRowPrepared={this.onRowPrepared}
+                  onCellPrepared={this.onCellPrepared}
+                  scrolling={{ mode: "virtual" }} // or 'virtual', based on your preference
+                  //keyExpr="UNIQUEID"
+                  showBorders={true}
+                  remoteOperations={false}
+                  onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
+                  onEditingStart={this.handleEditingStart}
+                  width={this.state.thisWidth}
+                  height={"100%"}
+                  //rowHeight={"10px"} // Set the row height to 70px
+                >
+                  <FilterRow
+                    visible={this.state.showFilterRow}
+                    applyFilter={this.state.currentFilter}
+                  />
+                  <HeaderFilter visible={this.state.showHeaderFilter} />
+                  <Paging enabled={false} />
+                  <Column
+                    dataField="UNIQUEID"
+                    caption="Unique ID"
+                    visible={false}
+                  />
+                  <Column dataField="ROWNUMBER" caption="Row" visible={false} />
 
-            <Column
-              dataField="DESCRIPTION"
-              caption={`Net Worth for ${this.props.clientCode}`}
-              width={350}
-              visible={true}
-              cellRender={renderDescriptionCell}
-            />
-            {/* <Column
+                  <Column
+                    dataField="DESCRIPTION"
+                    caption={`Net Worth for ${this.props.clientCode}`}
+                    width={350}
+                    visible={true}
+                    cellRender={renderDescriptionCell}
+                  />
+                  {/* <Column
               dataField="COLUMNONE"
               caption=""
               width={100}
               //cellRender={ColumnnOneCell}
             /> */}
-            <Column
-              dataField="VALUEFIELD"
-              caption=""
-              format={"$###,###,###"}
-              alignment="right"
-              cellRender={renderValueFieldCell}
-              width={150}
+                  <Column
+                    dataField="VALUEFIELD"
+                    caption=""
+                    format={"$###,###,###"}
+                    alignment="right"
+                    cellRender={renderValueFieldCell}
+                    width={150}
+                  />
+                  <Column
+                    dataField="VALUEFIELD1"
+                    caption=""
+                    format={"$###,###,###"}
+                    alignment="right"
+                    cellRender={renderValueFieldCell2}
+                    width={150}
+                  />
+                  <Column
+                    dataField="VALUEFIELD2"
+                    caption=""
+                    format={"$###,###,###"}
+                    alignment="right"
+                    cellRender={renderValueFieldCell3}
+                    width={150}
+                  />
+                  <Column
+                    dataField="FORMULAFIELD"
+                    caption="Formula"
+                    visible={false}
+                  />
+                  <Column dataField="LINETYPE" caption="Type" visible={false} />
+                </DataGrid>
+              </div>
+            </div>
+          </>
+        )}
+        {this.state.EditExcelOn === true && (
+          <div>
+            <GenerateNetWorthExcel
+              clientCode={this.props.clientCode}
+              onMappingUpdated2={this.handleMappingUpdated2}
             />
-            <Column
-              dataField="VALUEFIELD1"
-              caption=""
-              format={"$###,###,###"}
-              alignment="right"
-              cellRender={renderValueFieldCell2}
-              width={150}
-            />
-            <Column
-              dataField="VALUEFIELD2"
-              caption=""
-              format={"$###,###,###"}
-              alignment="right"
-              cellRender={renderValueFieldCell3}
-              width={150}
-            />
-            <Column
-              dataField="FORMULAFIELD"
-              caption="Formula"
-              visible={false}
-            />
-            <Column dataField="LINETYPE" caption="Type" visible={false} />
-          </DataGrid>
-        </div>
-      </div>
+          </div>
+        )}
+      </>
     );
   }
 }
