@@ -122,6 +122,7 @@ const renderGroupDescriptionCell = (data) => {
 };
 
 const renderCurrentValueCell = (data) => {
+  console.log("data in renderCurrentValueCell", data);
   const { data: rowData } = data;
 
   let style = {};
@@ -162,7 +163,7 @@ const renderCurrentValueCell = (data) => {
   }
 
   // Check if the value is negative
-  const isNegative = rowData.CHANGEVALUE < 0;
+  const isNegative = rowData.CURRENTVALUE < 0;
   const absoluteValue = Math.abs(rowData.CURRENTVALUE);
 
   // Format the number
@@ -175,7 +176,6 @@ const renderCurrentValueCell = (data) => {
 
   // If negative, enclose in brackets
   const displayValue = isNegative ? `(${formattedValue})` : formattedValue;
-
   return <div style={style}>{displayValue}</div>;
 };
 const renderPriorValueCell = (data) => {
@@ -218,7 +218,7 @@ const renderPriorValueCell = (data) => {
   }
 
   // Check if the value is negative
-  const isNegative = rowData.CHANGEVALUE < 0;
+  const isNegative = rowData.PRIORVALUE < 0;
   const absoluteValue = Math.abs(rowData.PRIORVALUE);
 
   // Format the number

@@ -91,7 +91,7 @@ export const GenerateExcelFiles = (props) => {
     }
 
     //const valueCell = rowData.VALUEFIELD;
-    cell.numFmt = "$#,##0.00;($#,##0.00)"; // This is Excel's format for currency
+    cell.numFmt = "$#,##0;($#,##0)"; // This is Excel's format for currency
   };
 
   const renderExcelDescriptionFieldCell = (cell, item) => {
@@ -328,7 +328,7 @@ const xapplyCurrentValueCellStyle = (cell, rowData) => {
     },
   };
   if (rowData.UNIQUEID !== 0) {
-    style.numFmt = '"$"#,##0.00;"($"#,##0.00)'; // Currency format, red for negative values
+    style.numFmt = '"$"#,##0;"($"#,##0)'; // Currency format, red for negative values
   }
 
   if (rowData.TOTAL === 1 && ![99, 98].includes(rowData.GROUPTYPESEQUENCE)) {
@@ -341,8 +341,8 @@ const xapplyCurrentValueCellStyle = (cell, rowData) => {
     style.font.bold = true;
     style.fill.fgColor.argb =
       rowData.GROUPTYPESEQUENCE === 99 ? "FFD3D3D3" : "FFE6D180"; // Light grey or black
-    style.font.color =
-      rowData.GROUPTYPESEQUENCE === 98 ? { argb: "FFFFFFFF" } : {}; // White for 98
+    //style.font.color =
+    //  rowData.GROUPTYPESEQUENCE === 98 ? { argb: "FFFFFFFF" } : {}; // White for 98
     style.alignment =
       rowData.GROUPTYPESEQUENCE === 98
         ? {
@@ -371,7 +371,7 @@ const xapplyPriorValueCellStyle = (cell, rowData) => {
     },
   };
   if (rowData.UNIQUEID !== 0) {
-    style.numFmt = '"$"#,##0.00;"($"#,##0.00)'; // Currency format, red for negative values
+    style.numFmt = '"$"#,##0;"($"#,##0)'; // Currency format, red for negative values
   }
 
   if (rowData.TOTAL === 1 && ![99, 98].includes(rowData.GROUPTYPESEQUENCE)) {
@@ -384,8 +384,8 @@ const xapplyPriorValueCellStyle = (cell, rowData) => {
     style.font.bold = true;
     style.fill.fgColor.argb =
       rowData.GROUPTYPESEQUENCE === 99 ? "FFD3D3D3" : "FFE6D180"; // Light grey or black
-    style.font.color =
-      rowData.GROUPTYPESEQUENCE === 98 ? { argb: "FFFFFFFF" } : {}; // White for 98
+    //style.font.color =
+    //  rowData.GROUPTYPESEQUENCE === 98 ? { argb: "FFFFFFFF" } : {}; // White for 98
     style.alignment =
       rowData.GROUPTYPESEQUENCE === 98
         ? {
@@ -413,7 +413,7 @@ const xapplyChangeValueCellStyle = (cell, rowData) => {
     },
   };
   if (rowData.UNIQUEID !== 0) {
-    style.numFmt = '"$"#,##0.00;"($"#,##0.00)'; // Currency format, red for negative values
+    style.numFmt = '"$"#,##0;"($"#,##0)'; // Currency format, red for negative values
   }
 
   if (rowData.TOTAL === 1 && ![99, 98].includes(rowData.GROUPTYPESEQUENCE)) {
@@ -426,8 +426,8 @@ const xapplyChangeValueCellStyle = (cell, rowData) => {
     style.font.bold = true;
     style.fill.fgColor.argb =
       rowData.GROUPTYPESEQUENCE === 99 ? "FFD3D3D3" : "FFE6D180"; // Light grey or black
-    style.font.color =
-      rowData.GROUPTYPESEQUENCE === 98 ? { argb: "FFFFFFFF" } : {}; // White for 98
+    //style.font.color =
+    //  rowData.GROUPTYPESEQUENCE === 98 ? { argb: "FFFFFFFF" } : {}; // White for 98
     style.alignment =
       rowData.GROUPTYPESEQUENCE === 98
         ? {
@@ -574,7 +574,7 @@ const yapplyValueFieldCellStyle = (cell, rowData, column) => {
   }
 
   // Apply numeric format if needed
-  let numFmt = printColumn === "H" ? null : '"$"#,##0.00;"($"#,##0.00)';
+  let numFmt = printColumn === "H" ? null : '"$"#,##0;"($"#,##0)';
 
   if (rowData.LINETYPE === "T") {
     cell.style = {

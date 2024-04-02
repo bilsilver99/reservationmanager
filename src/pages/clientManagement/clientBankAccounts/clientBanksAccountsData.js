@@ -106,7 +106,7 @@ export const mystore = (myClient, activeOnly) =>
           params += `${i}=${JSON.stringify(loadOptions[i])}&`;
         }
       });
-
+      //console.log("here");
       params = params.slice(0, -1);
       var requestoptions = {
         method: "POST",
@@ -133,7 +133,12 @@ export const mystore = (myClient, activeOnly) =>
           return response.json();
         })
         .then((json) => {
-          //console.log("from client: ", myClient, "types: ", json);
+          // console.log(
+          //   "from client: ",
+          //   myClient,
+          //   "data: ",
+          //   json.user_response.bankq
+          // );
           return {
             data: json.user_response.bankq,
             totalCount: json.user_response.totalCount,
@@ -546,6 +551,58 @@ export const updateImportFile = (clientcode, bankaccount, dataArray) => {
 };
 
 export const updateExcelTransactions = (clientcode, bankaccount, dataArray) => {
+  const sentArray = dataArray.map((transaction) => ({
+    DATEFIELD: transaction.date,
+    DESCRIPTIONFIELD: transaction.description,
+    PAYMENTSFIELD: transaction.debit, // Assuming 'debit' is equivalent to 'payments'
+    DEPOSITSFIELD: transaction.credit, // Assuming 'credit' is equivalent to 'deposits'
+  }));
+
+  var requestoptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json;",
+    },
+    body: JSON.stringify({
+      sentclientcode: clientcode,
+      sentBankAccount: bankaccount,
+      sentArray: sentArray,
+    }),
+  };
+  console.log(
+    "client sent",
+    clientcode,
+    "bank account sent",
+    bankaccount,
+    "data sent",
+    sentArray
+  );
+  //  const url = `${process.env.REACT_APP_BASE_URL}/SendExcelFileData`;
+  const url = `${process.env.REACT_APP_BASE_URL}/SendImportFileData4`;
+
+  return fetch(url, requestoptions) // Request fish
+    .then((response) => {
+      ////console.log("client " + myClient);
+      if (!response.ok) {
+        return {
+          companyname: "System did not respond",
+          returnaddress: " ",
+        };
+      }
+      return response.json();
+    })
+    .then((json) => {
+      //console.log("banks list", json);
+      return {};
+    });
+};
+
+export const updateExcelTransactionsbyNumber = (
+  clientcode,
+  bankaccount,
+  dataArray
+) => {
   const sentArray = dataArray.map((transaction) => ({
     DATEFIELD: transaction.date,
     DESCRIPTIONFIELD: transaction.description,

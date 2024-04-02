@@ -87,17 +87,24 @@ export class ClientCodeMapping extends React.Component {
   }
 
   handleEditingStart(e) {
+    // alert("now");
+    // console.log("Editing is starting for row", e.data);
+    // // You can access the data of the row that is being edited
+    // const rowToBeEdited = e.data;
+    // if (this.state.showAllClients === false) {
+    //   rowToBeEdited.CLIENTCODE = this.state.clientCode;
+    // }
+  }
+
+  handleInitNewRow = (e) => {
     console.log("Editing is starting for row", e.data);
 
     // You can access the data of the row that is being edited
     const rowToBeEdited = e.data;
-
-    // Perform any checks or logic you want here.
-    // For example, you might want to prevent editing if a certain condition is met:
-    if (rowToBeEdited.someField === "someValue") {
-      e.cancel = true; // Prevents the editing from starting
+    if (this.state.showAllClients === false) {
+      rowToBeEdited.CLIENTCODE = this.state.clientCode;
     }
-  }
+  };
 
   async componentDidMount() {
     //console.log("clientCode: ", this.state.clientCode);
@@ -107,6 +114,7 @@ export class ClientCodeMapping extends React.Component {
           this.fetchCustomers(),
           this.fetchTransactionTypes(),
           this.fetchBankAccounts(),
+          this.fetchClientBankAccounts(),
         ]);
 
       this.setState({
@@ -124,14 +132,14 @@ export class ClientCodeMapping extends React.Component {
   }
 
   fetchClientBankAccounts = async () => {
-    // if (this.state.clientCode) {
-    //   try {
-    //     const bankData = await getBanks(this.state.clientCode);
-    //     this.setState({ clientBankAccounts: bankData.data });
-    //   } catch (error) {
-    //     console.error("Error fetching client bank accounts:", error);
-    //   }
-    // }
+    if (this.state.clientCode) {
+      try {
+        const bankData = await getBanks(this.state.clientCode);
+        this.setState({ clientBankAccounts: bankData.data });
+      } catch (error) {
+        console.error("Error fetching client bank accounts:", error);
+      }
+    }
   };
 
   fetchCustomers = async () => {
@@ -213,7 +221,7 @@ export class ClientCodeMapping extends React.Component {
     return (
       <div className="content-block dx-card responsive-paddings">
         <Button
-          text="Complete"
+          text="Close"
           onClick={this.ProcessComplete}
           style={{ marginRight: "30px" }} // Add right margin to the button
         />
@@ -232,6 +240,7 @@ export class ClientCodeMapping extends React.Component {
           showBorders={true}
           remoteOperations={false}
           onSelectionChanged={this.handleSelectionChanged.bind(this)} // add this line
+          onInitNewRow={this.handleInitNewRow}
           onEditingStart={this.handleEditingStart}
           onRowUpdating={this.onRowUpdating}
           onRowUpdated={this.onRowUpdated}
@@ -250,7 +259,7 @@ export class ClientCodeMapping extends React.Component {
             allowAdding={true}
             allowDeleting={true}
           >
-            <Popup title="Map" showTitle={true} width={900} height={800} />
+            <Popup title="Mapping" showTitle={true} width={900} height={800} />
             <Form>
               <Item itemType="group" colCount={2} colSpan={2}>
                 <Item dataField="CLIENTCODE" />
